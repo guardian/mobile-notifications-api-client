@@ -1,11 +1,14 @@
 package com.gu.notifications_api_client
 
 import com.gu.notifications_api_client.models.{SendNotificationReply, Notification}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import dispatch._
 import play.api.libs.json._
+import models.JsonImplicits._
 
 trait ApiClient {
+  implicit val executionContext: ExecutionContext
+
   /** Host of the Guardian Notifications Service */
   def host: String
 
