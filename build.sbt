@@ -5,6 +5,8 @@ organization := "com.gu"
 
 scalaVersion := "2.10.3"
 
+version := "0.1"
+
 resolvers ++= Seq(
   "Guardian GitHub Releases" at "http://guardian.github.io/maven/repo-releases",
   "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
