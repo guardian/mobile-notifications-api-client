@@ -1,6 +1,6 @@
-package com.gu.notifications_api_client
+package com.gu.mobile.notifications.client
 
-import com.gu.notifications_api_client.models.{SendNotificationReply, Notification}
+import com.gu.mobile.notifications.client.models.{SendNotificationReply, Notification}
 import scala.concurrent.{ExecutionContext, Future}
 import dispatch._
 import play.api.libs.json._

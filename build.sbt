@@ -1,5 +1,5 @@
 
-name := "notifications-api-client"
+name := "mobile-notifications-client"
 
 organization := "com.gu"
 

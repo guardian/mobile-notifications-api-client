@@ -1,4 +1,4 @@
-package com.gu.notifications_api_client.lib
+package com.gu.mobile.notifications.client.lib
 
 import play.api.libs.json._
 import play.api.libs.json.JsObject

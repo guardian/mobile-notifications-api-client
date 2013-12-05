@@ -1,4 +1,4 @@
-package com.gu.notifications_api_client.models
+package com.gu.mobile.notifications.client.models
 
 /** Models for interfacing with the services API's JSON endpoint */
 sealed trait MessagePayload

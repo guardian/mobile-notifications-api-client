@@ -1,6 +1,6 @@
-package com.gu.notifications_api_client.models
+package com.gu.mobile.notifications.client.models
 
-import com.gu.notifications_api_client.lib.JsonFormatsHelper._
+import com.gu.mobile.notifications.client.lib.JsonFormatsHelper._
 import play.api.libs.json.{Writes, JsValue, JsString, Json}
 
 object JsonImplicits {
