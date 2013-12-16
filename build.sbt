@@ -14,7 +14,7 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(
   "org.scalaz" %% "scalaz-core" % "7.0.5",
-  "net.databinder.dispatch" %% "dispatch-core" % "0.11.0",
+  "net.databinder.dispatch" %% "dispatch-core" % "0.10.0",
   "com.typesafe.play" %% "play-json" % "2.2.0",
   "org.specs2" %% "specs2" % "2.3.4" % "test"
 )
