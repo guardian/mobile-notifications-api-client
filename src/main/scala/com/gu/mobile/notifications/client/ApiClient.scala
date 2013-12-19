@@ -1,13 +1,17 @@
 package com.gu.mobile.notifications.client
 
-import com.gu.mobile.notifications.client.models.{SendNotificationReply, Notification}
 import scala.concurrent.{ExecutionContext, Future}
-import dispatch._
-import play.api.libs.json._
-import models.JsonImplicits._
 
-trait ApiClient {
+import com.gu.mobile.notifications.client.models.{Notification, SendNotificationReply}
+
+import dispatch._
+import grizzled.slf4j.Logging
+import net.liftweb.json.{NoTypeHints, Serialization}
+import net.liftweb.json.Serialization.{read, write}
+
+trait ApiClient extends Logging {
   implicit val executionContext: ExecutionContext
+  implicit val formats = Serialization.formats(NoTypeHints)
 
   /** Host of the Guardian Notifications Service */
   def host: String
@@ -15,9 +19,13 @@ trait ApiClient {
   /** Http client */
   def httpClient: Http
 
-  def send(notification: Notification): Future[SendNotificationReply] = {
-    httpClient((url(host) / "notifications") << Json.toJson(notification.toString).toString() OK as.String) map { body =>
-      Json.fromJson[SendNotificationReply](Json.parse(body)).get
+  def send(notification: Notification): Future[SendNotificationReply] = 
+    send(write(notification))
+  
+  private def send(json: String): Future[SendNotificationReply] = {
+    debug(s"request body: $json")
+    httpClient((url(host) / "notifications") << json OK as.String) map { body =>
+      read[SendNotificationReply](body)
     }
   }
 }
