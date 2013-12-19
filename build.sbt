@@ -15,8 +15,11 @@ resolvers ++= Seq(
 libraryDependencies ++= Seq(
   "org.scalaz" %% "scalaz-core" % "7.0.5",
   "net.databinder.dispatch" %% "dispatch-core" % "0.10.0",
-  "com.typesafe.play" %% "play-json" % "2.2.0",
-  "org.specs2" %% "specs2" % "2.3.4" % "test"
+  "net.liftweb" %% "lift-json" % "2.5.1",
+  "org.clapper" %% "grizzled-slf4j" % "1.0.1",
+  "org.specs2" %% "specs2" % "2.3.4" % "test",
+  "com.github.tomakehurst" % "wiremock" % "1.39" % "test",
+  "ch.qos.logback"      %   "logback-classic"  % "1.0.13" % "test"
 )
 
 publishTo <<= (version) { version: String =>
