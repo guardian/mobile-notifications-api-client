@@ -48,7 +48,7 @@ class ApiClientSpec extends Specification {
       stubFor(post(urlEqualTo(path)).withRequestBody(
         equalToJson("""
               {"type":"news","sender":"sender","target":{"regions":[],"topics":[]},"timeToLiveInSeconds":20,"payloads":{},"metadata":{}}
-              """))
+              """)).withHeader("Content-Type", wireMockEqualTo("application/json"))
         .willReturn(
           aResponse()
             .withStatus(200)

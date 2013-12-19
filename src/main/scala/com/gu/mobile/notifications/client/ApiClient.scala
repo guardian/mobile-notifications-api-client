@@ -24,7 +24,7 @@ trait ApiClient extends Logging {
   
   private def send(json: String): Future[SendNotificationReply] = {
     debug(s"request body: $json")
-    httpClient((url(host) / "notifications") << json OK as.String) map { body =>
+    httpClient((url(host) / "notifications") << json <:< Map("Content-Type" -> "application/json") OK as.String) map { body =>
       read[SendNotificationReply](body)
     }
   }
