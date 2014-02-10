@@ -59,6 +59,8 @@ case class Notification(
     * which it can query the API ('news'). No other clients should use this.
     */
   `type`: String,
+  /** Used for de-duplication */
+  uniqueIdentifier: String,
   sender: String,
   target: Target,
   timeToLiveInSeconds: Int,
