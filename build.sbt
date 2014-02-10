@@ -5,7 +5,7 @@ organization := "com.gu"
 
 scalaVersion := "2.10.3"
 
-version := "0.3-SNAPSHOT"
+version := "0.4-SNAPSHOT"
 
 resolvers ++= Seq(
   "Guardian GitHub Releases" at "http://guardian.github.io/maven/repo-releases",
