@@ -21,9 +21,9 @@ trait ApiClient {
   } map const(Ok)
 
   def send(notification: Notification): Future[SendNotificationReply] = {
-    val json = Json.toJson(notification).toString()
-    val request = (url(host) / "notifications") << json
-    request.setHeader("Content-Type", "application/json")
+    val json = Json.stringify(Json.toJson(notification))
+    val request = (url(host) / "notifications").setMethod("POST").setBody(json.getBytes("UTF-8"))
+    request.setHeader("Content-Type", "application/json; charset=utf-8")
     httpClient(request OK as.String) map { body =>
       Json.fromJson[SendNotificationReply](Json.parse(body)).get
     }
