@@ -1,11 +1,11 @@
+import sbtrelease._
+import ReleaseStateTransformations._
 
 name := "mobile-notifications-client"
 
 organization := "com.gu"
 
-scalaVersion := "2.10.3"
-
-version := "0.3-SNAPSHOT"
+scalaVersion := "2.10.4"
 
 resolvers ++= Seq(
   "Guardian GitHub Releases" at "http://guardian.github.io/maven/repo-releases",
@@ -19,12 +19,39 @@ libraryDependencies ++= Seq(
   "com.github.tomakehurst" % "wiremock" % "1.33" % "test"
 )
 
-publishTo <<= (version) { version: String =>
-  val publishType = if (version.endsWith("SNAPSHOT")) "snapshots" else "releases"
-  Some(
-    Resolver.file(
-      "guardian github " + publishType,
-      file(System.getProperty("user.home") + "/guardian.github.com/maven/repo-" + publishType)
-    )
-  )
-}
+releaseSettings
+
+sonatypeSettings
+
+description := "Scala client for the Guardian Push Notifications API"
+
+pomExtra := (
+  <url>https://github.com/guardian/mobile-notifications-api-client</url>
+  <developers>
+    <developer>
+      <id>robertberry</id>
+      <name>Robert Berry</name>
+      <url>https://github.com/robertberry</url>
+    </developer>
+  </developers>
+)
+
+licenses := Seq("Apache V2" -> url("http://www.apache.org/licenses/LICENSE-2.0.html"))
+
+ReleaseKeys.releaseProcess := Seq[ReleaseStep](
+  checkSnapshotDependencies,
+  inquireVersions,
+  runClean,
+  runTest,
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+  ReleaseStep(
+    action = state => Project.extract(state).runTask(PgpKeys.publishSigned, state)._1,
+    enableCrossBuild = true
+  ),
+  setNextVersion,
+  commitNextVersion,
+  ReleaseStep(state => Project.extract(state).runTask(SonatypeKeys.sonatypeReleaseAll, state)._1),
+  pushChanges
+)
