@@ -25,6 +25,11 @@ sonatypeSettings
 
 description := "Scala client for the Guardian Push Notifications API"
 
+scmInfo := Some(ScmInfo(
+  url("https://github.com/guardian/mobile-notifications-api-client"),
+  "scm:git:git@github.com:guardian/mobile-notifications-api-client.git"
+))
+
 pomExtra := (
   <url>https://github.com/guardian/mobile-notifications-api-client</url>
   <developers>
