@@ -48,7 +48,7 @@ class ApiClientSpec extends Specification with WireMockHelper {
         ))
 
         verify(postRequestedFor(urlMatching("/notifications"))
-          .withRequestBody(WireMock.matching(".*Masters 2014: round one – live!.*"))
+          .withRequestBody(WireMock.containing("Masters 2014: round one – live!"))
         )
 
         1 mustEqual 1
