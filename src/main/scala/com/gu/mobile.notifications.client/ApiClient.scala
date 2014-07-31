@@ -22,9 +22,11 @@ trait ApiClient {
 
   def send(notification: Notification): Future[SendNotificationReply] = {
     val json = Json.stringify(Json.toJson(notification))
-    val request = (url(host) / "notifications").setMethod("POST").setBody(json.getBytes("UTF-8"))
-    request.setHeader("Content-Type", "application/json; charset=utf-8")
-    httpClient(request OK as.String) map { body =>
+    val request = (url(host) / "notifications")
+      .setMethod("POST")
+      .setContentType("application/json", "UTF-8")
+      .setBody(json.getBytes("UTF-8"))
+    httpClient(request OK as.Bytes) map { body =>
       Json.fromJson[SendNotificationReply](Json.parse(body)).get
     }
   }

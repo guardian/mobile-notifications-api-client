@@ -5,7 +5,9 @@ name := "mobile-notifications-client"
 
 organization := "com.gu"
 
-scalaVersion := "2.10.4"
+scalaVersion := "2.11.2"
+
+crossScalaVersions := Seq("2.10.4")
 
 resolvers ++= Seq(
   "Guardian GitHub Releases" at "http://guardian.github.io/maven/repo-releases",
@@ -13,9 +15,9 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play-json" % "2.2.0",
-  "net.databinder.dispatch" %% "dispatch-core" % "0.10.0",
-  "org.specs2" %% "specs2" % "2.3.4" % "test",
+  "com.typesafe.play" %% "play-json" % "2.3.2",
+  "net.databinder.dispatch" %% "dispatch-core" % "0.11.1",
+  "org.specs2" %% "specs2" % "2.3.13" % "test",
   "com.github.tomakehurst" % "wiremock" % "1.33" % "test"
 )
 
