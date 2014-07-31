@@ -59,6 +59,9 @@ ReleaseKeys.releaseProcess := Seq[ReleaseStep](
   ),
   setNextVersion,
   commitNextVersion,
-  ReleaseStep(state => Project.extract(state).runTask(SonatypeKeys.sonatypeReleaseAll, state)._1),
+  ReleaseStep(
+    state => Project.extract(state).runTask(SonatypeKeys.sonatypeReleaseAll, state)._1,
+    enableCrossBuild = true
+  ),
   pushChanges
 )
