@@ -11,7 +11,8 @@ case class AndroidMessagePayload(
 /** IOS message payload is a String body and a map of custom properties that the app can use */
 case class IOSMessagePayload(
   body: String,
-  customProperties: Map[String, String]
+  customProperties: Map[String, String],
+  category: Option[String] = None
 ) extends MessagePayload
 
 case class MessagePayloads(
