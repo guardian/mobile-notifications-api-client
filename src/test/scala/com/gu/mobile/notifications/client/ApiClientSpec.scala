@@ -1,15 +1,18 @@
 package com.gu.mobile.notifications.client
 
 import org.specs2.mutable.Specification
-import scala.concurrent.ExecutionContext.Implicits.global
-import dispatch.Http
+import org.specs2.time.NoDurationConversions
+import dispatch._
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.libs.json.Json
 import com.gu.mobile.notifications.client.models._
 import com.github.tomakehurst.wiremock.client.WireMock
 import JsonImplicits._
 
-class ApiClientSpec extends Specification with WireMockHelper {
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
+
+class ApiClientSpec extends Specification with WireMockHelper with NoDurationConversions {
   val wireMockHost: String = "localhost"
   val wireMockPort: Int = 9595
 
@@ -17,13 +20,27 @@ class ApiClientSpec extends Specification with WireMockHelper {
     "not mangle unicode" in {
 
       val fixture = new ApiClient {
-        /** Http client */
-        override def httpClient: Http = Http
+        override def http(
+          method: String,
+          urlString: String,
+          contentType: Option[ContentType] = None,
+          body: Option[Array[Byte]] = None
+        ): Future[HttpResponse] = {
+          var request = url(urlString).setMethod(method)
+          request = contentType.map { case ContentType(mediaType, charset) => request.setContentType(mediaType, charset) }.getOrElse(request)
+          request = body.map(request.setBody).getOrElse(request)
+
+          Http(request).map { response =>
+            if (response.getStatusCode / 100 == 2) {
+              HttpOk(response.getStatusCode, response.getResponseBody)
+            } else {
+              HttpError(response.getStatusCode, response.getResponseBody)
+            }
+          }
+        }
 
         /** Host of the Guardian Notifications Service */
         override def host: String = s"http://$wireMockHost:$wireMockPort"
-
-        override implicit val executionContext = global
       }
 
       StubServer {
@@ -34,7 +51,7 @@ class ApiClientSpec extends Specification with WireMockHelper {
             .withHeader("Content-Type", "text/html")
             .withBody(Json.stringify(Json.toJson(SendNotificationReply("messageId"))))))
 
-        fixture.send(Notification(
+        val future = fixture.send(Notification(
           "",
           "",
           "",
@@ -46,6 +63,8 @@ class ApiClientSpec extends Specification with WireMockHelper {
           )), None),
           Map.empty
         ))
+
+        Await.ready(future, Duration(5, "s"))
 
         verify(postRequestedFor(urlMatching("/notifications"))
           .withRequestBody(WireMock.containing("Masters 2014: round one – live!"))

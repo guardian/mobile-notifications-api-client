@@ -7,7 +7,7 @@ organization := "com.gu"
 
 scalaVersion := "2.11.2"
 
-crossScalaVersions := Seq("2.10.4", "2.11.2")
+crossScalaVersions := Seq("2.10.3", "2.10.4", "2.11.2")
 
 resolvers ++= Seq(
   "Guardian GitHub Releases" at "http://guardian.github.io/maven/repo-releases",
@@ -16,7 +16,7 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.3.2",
-  "net.databinder.dispatch" %% "dispatch-core" % "0.11.1",
+  "net.databinder.dispatch" %% "dispatch-core" % "0.11.1" % Test,
   "org.specs2" %% "specs2" % "2.3.13" % "test",
   "com.github.tomakehurst" % "wiremock" % "1.33" % "test"
 )
