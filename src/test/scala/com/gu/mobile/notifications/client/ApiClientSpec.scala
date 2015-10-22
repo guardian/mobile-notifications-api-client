@@ -1,5 +1,7 @@
 package com.gu.mobile.notifications.client
 
+import com.gu.mobile.notifications.client.models.NotificationTypes.BreakingNews
+import com.gu.mobile.notifications.client.models.legacy.{IOSMessagePayload, MessagePayloads, Target, Notification}
 import org.specs2.mutable.Specification
 import org.specs2.time.NoDurationConversions
 import dispatch._
@@ -7,7 +9,6 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.libs.json.Json
 import com.gu.mobile.notifications.client.models._
 import com.github.tomakehurst.wiremock.client.WireMock
-import JsonImplicits._
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -52,7 +53,7 @@ class ApiClientSpec extends Specification with WireMockHelper with NoDurationCon
             .withBody(Json.stringify(Json.toJson(SendNotificationReply("messageId"))))))
 
         val future = fixture.send(Notification(
-          "",
+          BreakingNews,
           "",
           "",
           Target(Set.empty, Set.empty),

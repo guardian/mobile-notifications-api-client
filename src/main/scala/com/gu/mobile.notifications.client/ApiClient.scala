@@ -1,8 +1,9 @@
 package com.gu.mobile.notifications.client
 
+import com.gu.mobile.notifications.client.models.legacy.Notification
+
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.libs.json._
-import models.JsonImplicits._
 import models._
 
 trait HttpProvider {
