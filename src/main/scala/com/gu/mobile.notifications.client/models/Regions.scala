@@ -3,6 +3,13 @@ package com.gu.mobile.notifications.client.models
 import play.api.libs.json._
 
 object Regions {
+
+  val regions: Map[String, Region] = Map(
+    "uk" -> UK,
+    "us" -> US,
+    "au" -> AU
+  )
+
   sealed trait Region
 
   case object UK extends Region {
