@@ -13,7 +13,7 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-class ApiClientSpec extends Specification with WireMockHelper with NoDurationConversions {
+class ApiClientSpec extends Specification with NoDurationConversions with WireMockHelper {
   val wireMockHost: String = "localhost"
   val wireMockPort: Int = 9595
 
@@ -21,22 +21,19 @@ class ApiClientSpec extends Specification with WireMockHelper with NoDurationCon
     "not mangle unicode" in {
 
       val fixture = new ApiClient {
-        override def http(
-          method: String,
-          urlString: String,
-          contentType: Option[ContentType] = None,
-          body: Option[Array[Byte]] = None
-        ): Future[HttpResponse] = {
-          var request = url(urlString).setMethod(method)
-          request = contentType.map { case ContentType(mediaType, charset) => request.setContentType(mediaType, charset) }.getOrElse(request)
-          request = body.map(request.setBody).getOrElse(request)
+        override def get(url: String): Future[HttpResponse] = Future.successful(HttpError(418, "I'm a teapot"))
+        override def post(urlString: String, contentType: ContentType, body: Array[Byte]): Future[HttpResponse] =
+          execute(url(urlString)
+            .setMethod("POST")
+            .setContentType(contentType.mediaType, contentType.charset)
+            .setBody(body)
+          )
 
-          Http(request).map { response =>
-            if (response.getStatusCode / 100 == 2) {
-              HttpOk(response.getStatusCode, response.getResponseBody)
-            } else {
-              HttpError(response.getStatusCode, response.getResponseBody)
-            }
+        private def execute(request: Req) = Http(request).map { response =>
+          if (response.getStatusCode / 100 == 2) {
+            HttpOk(response.getStatusCode, response.getResponseBody)
+          } else {
+            HttpError(response.getStatusCode, response.getResponseBody)
           }
         }
 

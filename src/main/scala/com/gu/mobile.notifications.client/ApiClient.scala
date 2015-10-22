@@ -14,14 +14,10 @@ trait HttpProvider {
   /** For every other status */
   case class HttpError(status: Int, body: String) extends Throwable with HttpResponse
   
-  case class ContentType(contentType: String, charset: String)
+  case class ContentType(mediaType: String, charset: String)
 
-  def http(
-    method: String,
-    url: String,
-    contentType: Option[ContentType] = None,
-    body: Option[Array[Byte]] = None
-  ): Future[HttpResponse]
+  def post(url: String, contentType: ContentType, body: Array[Byte]): Future[HttpResponse]
+  def get(url: String): Future[HttpResponse]
 }
 
 trait ApiClient extends HttpProvider {
@@ -29,7 +25,7 @@ trait ApiClient extends HttpProvider {
   def host: String
 
   def healthcheck(implicit ec: ExecutionContext): Future[Healthcheck] = {
-    http(url = s"$host/healthcheck", method = "GET").map {
+    get(s"$host/healthcheck").map {
       case HttpOk(200, body) => Ok
       case HttpOk(code, _) => Unhealthy(Some(code))
       case httpError => Unhealthy()
@@ -38,11 +34,10 @@ trait ApiClient extends HttpProvider {
 
   def send(notification: Notification)(implicit ec: ExecutionContext): Future[SendNotificationReply] = {
     val json = Json.stringify(Json.toJson(notification))
-    http(
+    post(
       url = s"$host/notifications",
-      method = "POST",
-      contentType = Some(ContentType("application/json", "UTF-8")),
-      body = Some(json.getBytes("UTF-8"))
+      contentType = ContentType("application/json", "UTF-8"),
+      body = json.getBytes("UTF-8")
     ) map {
       case HttpOk(code, body) => Json.fromJson[SendNotificationReply](Json.parse(body)).get
       case error: HttpError => throw error
