@@ -1,5 +1,6 @@
 package com.gu.mobile.notifications.client.models.legacy
 
+import com.gu.mobile.notifications.client.lib.JsonFormatsHelper._
 import play.api.libs.json.Json
 
 sealed trait MessagePayload
@@ -9,7 +10,7 @@ case class AndroidMessagePayload(
 ) extends MessagePayload
 
 object AndroidMessagePayload{
-  implicit val jf = Json.format[AndroidMessagePayload]
+  implicit val jf = Json.format[AndroidMessagePayload].withTypeString("android")
 }
 
 case class IOSMessagePayload(
@@ -19,7 +20,7 @@ case class IOSMessagePayload(
 ) extends MessagePayload
 
 object IOSMessagePayload {
-  implicit val jf = Json.format[IOSMessagePayload]
+  implicit val jf = Json.format[IOSMessagePayload].withTypeString("ios")
 }
 
 case class MessagePayloads(
