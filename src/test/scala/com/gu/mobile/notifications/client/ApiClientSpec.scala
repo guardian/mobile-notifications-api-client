@@ -30,7 +30,7 @@ class ApiClientSpec extends Specification with NoDurationConversions with WireMo
           )
 
         private def execute(request: Req) = Http(request).map { response =>
-          if (response.getStatusCode / 100 == 2) {
+          if (response.getStatusCode >= 200 && response.getStatusCode < 300) {
             HttpOk(response.getStatusCode, response.getResponseBody)
           } else {
             HttpError(response.getStatusCode, response.getResponseBody)

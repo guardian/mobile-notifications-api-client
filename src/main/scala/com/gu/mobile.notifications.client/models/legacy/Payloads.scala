@@ -28,8 +28,6 @@ case class MessagePayloads(
   android: Option[AndroidMessagePayload]
 ) {
   def isEmpty = ios.isEmpty && android.isEmpty
-
-  /** Platforms available */
   def platforms = Set(ios.map(_ => "ios"), android.map(_ => "android")).flatten
 }
 
