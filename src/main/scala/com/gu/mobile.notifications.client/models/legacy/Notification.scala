@@ -14,12 +14,6 @@ object Topic {
   implicit val jf = Json.format[Topic]
 }
 
-/** Generic topic for a push notification:
-  *
-  * Examples:
-  *   - Topic("football-match", "1234")
-  *   - Topic("content", "/environment/2013/oct/21/britain-nuclear-power-station-hinkley-edf")
-  */
 case class Topic(
   `type`: String,
   name: String
