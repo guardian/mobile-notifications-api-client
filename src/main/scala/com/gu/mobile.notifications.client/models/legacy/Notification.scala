@@ -1,57 +1,46 @@
-package com.gu.mobile.notifications.client.models
+package com.gu.mobile.notifications.client.models.legacy
 
-/** Models for interfacing with the services API's JSON endpoint */
-sealed trait MessagePayload
+import com.gu.mobile.notifications.client.models.NotificationTypes.NotificationType
+import play.api.libs.json._
+import com.gu.mobile.notifications.client.models.Regions._
 
-/** Android's message payload is just a map of properties - the client determines how to display that */
-case class AndroidMessagePayload(
-  body: Map[String, String]
-) extends MessagePayload
+object Topic {
+  val FootballTeamType = "football-team"
+  val FootballMatchType = "football-match"
+  val UserType = "user-type"
 
-/** IOS message payload is a String body and a map of custom properties that the app can use */
-case class IOSMessagePayload(
-  body: String,
-  customProperties: Map[String, String],
-  category: Option[String] = None
-) extends MessagePayload
+  val NewsstandIos = Topic(`type` = "newsstand", `name` = "newsstandIos")
 
-case class MessagePayloads(
-  ios: Option[IOSMessagePayload],
-  android: Option[AndroidMessagePayload]
-) {
-  def isEmpty = ios.isEmpty && android.isEmpty
-
-  /** Platforms available */
-  def platforms = Set(ios.map(_ => "ios"), android.map(_ => "android")).flatten
+  implicit val jf = Json.format[Topic]
 }
 
+/** Generic topic for a push notification:
+  *
+  * Examples:
+  *   - Topic("football-match", "1234")
+  *   - Topic("content", "/environment/2013/oct/21/britain-nuclear-power-station-hinkley-edf")
+  */
 case class Topic(
   `type`: String,
   name: String
-)
-
-sealed trait Region
-
-case object UK extends Region {
-  override def toString = "uk"
-}
-
-case object US extends Region {
-  override def toString = "us"
-}
-
-case object AU extends Region {
-  override def toString = "au"
+) {
+  def toTopicString = `type` + "//" + name
 }
 
 case class Target(
   regions: Set[Region],
-  topics: Set[Topic],
-  recipients: Option[Map[String, Seq[Recipient]]] = None
+  topics: Set[Topic]
 )
+
+object Target {
+  implicit val jf = Json.format[Target]
+}
 
 case class Recipient(userId: String)
 
+object Recipient {
+  implicit val jf = Json.format[Recipient]
+}
 case class Notification(
   /** Type has no meaning in Guardian Notifications API - it is for ease of querying and must be established by
     * convention between clients.
@@ -59,7 +48,7 @@ case class Notification(
     * e.g., if Breaking News wants to be able to keep track of what notifications it's sent, it should use a type by
     * which it can query the API ('news'). No other clients should use this.
     */
-  `type`: String,
+  `type`: NotificationType,
   /** Used for de-duplication */
   uniqueIdentifier: String,
   sender: String,
@@ -77,3 +66,7 @@ case class Notification(
     */
   metadata: Map[String, String]
 )
+
+object Notification {
+  implicit val jf = Json.format[Notification]
+}

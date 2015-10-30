@@ -1,15 +1,19 @@
 package com.gu.mobile.notifications.client
 
+import com.gu.mobile.notifications.client.models.NotificationTypes.BreakingNews
+import com.gu.mobile.notifications.client.models.legacy.{IOSMessagePayload, MessagePayloads, Target, Notification}
 import org.specs2.mutable.Specification
-import scala.concurrent.ExecutionContext.Implicits.global
-import dispatch.Http
+import org.specs2.time.NoDurationConversions
+import dispatch._
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.libs.json.Json
 import com.gu.mobile.notifications.client.models._
 import com.github.tomakehurst.wiremock.client.WireMock
-import JsonImplicits._
 
-class ApiClientSpec extends Specification with WireMockHelper {
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
+
+class ApiClientSpec extends Specification with NoDurationConversions with WireMockHelper {
   val wireMockHost: String = "localhost"
   val wireMockPort: Int = 9595
 
@@ -17,13 +21,24 @@ class ApiClientSpec extends Specification with WireMockHelper {
     "not mangle unicode" in {
 
       val fixture = new ApiClient {
-        /** Http client */
-        override def httpClient: Http = Http
+        override def get(url: String): Future[HttpResponse] = Future.successful(HttpError(418, "I'm a teapot"))
+        override def post(urlString: String, contentType: ContentType, body: Array[Byte]): Future[HttpResponse] =
+          execute(url(urlString)
+            .setMethod("POST")
+            .setContentType(contentType.mediaType, contentType.charset)
+            .setBody(body)
+          )
+
+        private def execute(request: Req) = Http(request).map { response =>
+          if (response.getStatusCode >= 200 && response.getStatusCode < 300) {
+            HttpOk(response.getStatusCode, response.getResponseBody)
+          } else {
+            HttpError(response.getStatusCode, response.getResponseBody)
+          }
+        }
 
         /** Host of the Guardian Notifications Service */
         override def host: String = s"http://$wireMockHost:$wireMockPort"
-
-        override implicit val executionContext = global
       }
 
       StubServer {
@@ -34,8 +49,8 @@ class ApiClientSpec extends Specification with WireMockHelper {
             .withHeader("Content-Type", "text/html")
             .withBody(Json.stringify(Json.toJson(SendNotificationReply("messageId"))))))
 
-        fixture.send(Notification(
-          "",
+        val future = fixture.send(Notification(
+          BreakingNews,
           "",
           "",
           Target(Set.empty, Set.empty),
@@ -46,6 +61,8 @@ class ApiClientSpec extends Specification with WireMockHelper {
           )), None),
           Map.empty
         ))
+
+        Await.ready(future, Duration(5, "s"))
 
         verify(postRequestedFor(urlMatching("/notifications"))
           .withRequestBody(WireMock.containing("Masters 2014: round one – live!"))

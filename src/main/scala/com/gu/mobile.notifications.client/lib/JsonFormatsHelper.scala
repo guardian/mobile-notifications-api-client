@@ -29,6 +29,15 @@ object JsonFormatsHelper {
     }
   }
 
+  implicit class RichFormat[A](format: Format[A]) {
+    def withTypeString(typ: String): Format[A] = new Format[A] {
+      private val richWrites = new RichWrites[A](format).withTypeString(typ)
+      private val richReads = new RichReads[A](format).withTypeString(typ)
+      override def writes(o: A): JsValue = richWrites.writes(o)
+      override def reads(json: JsValue): JsResult[A] = richReads.reads(json)
+    }
+  }
+
   class TypedSubclassReads[A](val subClassReads: List[Reads[_ <: A]]) extends Reads[A] {
     def reads(json: JsValue): JsResult[A] = {
       def iter(reads: List[Reads[_ <: A]]): JsResult[A] = reads match {

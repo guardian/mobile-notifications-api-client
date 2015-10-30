@@ -1,8 +1,8 @@
-package com.gu.mobile.notifications.client.models
+package com.gu.mobile.notifications.client.legacy
 
+import com.gu.mobile.notifications.client.models.legacy.IOSMessagePayload
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
-import JsonImplicits._
 
 class ModelSpec extends Specification  {
   "IOSMessagePayload" should {
