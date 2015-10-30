@@ -8,7 +8,7 @@ object Regions {
     "uk" -> UK,
     "us" -> US,
     "au" -> AU,
-    "international" -> INTERNATIONAL
+    "international" -> International
   )
 
   sealed trait Region
@@ -25,7 +25,7 @@ object Regions {
     override def toString = "au"
   }
 
-  case object INTERNATIONAL extends Region {
+  case object International extends Region {
     override def toString = "international"
   }
 
@@ -35,7 +35,7 @@ object Regions {
         case JsString("uk") => JsSuccess(UK)
         case JsString("us") => JsSuccess(US)
         case JsString("au") => JsSuccess(AU)
-        case JsString("international") => JsSuccess(INTERNATIONAL)
+        case JsString("international") => JsSuccess(International)
         case JsString(unknown) => JsError(s"Unkown region [$unknown]")
         case _ => JsError(s"Unknown type $json")
       }
