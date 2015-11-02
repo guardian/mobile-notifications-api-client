@@ -7,7 +7,8 @@ object Regions {
   val regions: Map[String, Region] = Map(
     "uk" -> UK,
     "us" -> US,
-    "au" -> AU
+    "au" -> AU,
+    "international" -> International
   )
 
   sealed trait Region
@@ -24,12 +25,17 @@ object Regions {
     override def toString = "au"
   }
 
+  case object International extends Region {
+    override def toString = "international"
+  }
+
   object Region {
     implicit val jf = new Format[Region] {
       override def reads(json: JsValue): JsResult[Region] = json match {
         case JsString("uk") => JsSuccess(UK)
         case JsString("us") => JsSuccess(US)
         case JsString("au") => JsSuccess(AU)
+        case JsString("international") => JsSuccess(International)
         case JsString(unknown) => JsError(s"Unkown region [$unknown]")
         case _ => JsError(s"Unknown type $json")
       }
