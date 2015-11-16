@@ -26,7 +26,7 @@ object BreakingNewsPayloadType extends PayloadType
 object ContentAlertPayloadType extends PayloadType
 object GoalAlertPayloadType extends PayloadType
 
-trait NotificationPayload {
+sealed trait NotificationPayload {
   def title: String
   def notificationType: String
   def message: String
@@ -34,7 +34,7 @@ trait NotificationPayload {
   def debug: Boolean
 }
 
-trait NotificationWithLink extends NotificationPayload {
+sealed trait NotificationWithLink extends NotificationPayload {
   def link: Link
 }
 

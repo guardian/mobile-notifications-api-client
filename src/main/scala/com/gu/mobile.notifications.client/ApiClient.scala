@@ -1,10 +1,12 @@
 package com.gu.mobile.notifications.client
 
+import com.gu.mobile.notifications.client.constants.Platforms
+import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy.Notification
+import com.gu.mobile.notifications.client.PayloadBuilder._
 
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.libs.json._
-import models._
 
 trait HttpProvider {
 
@@ -29,6 +31,13 @@ trait ApiClient extends HttpProvider {
       case HttpOk(code, _) => Unhealthy(Some(code))
       case HttpError(code, _) => Unhealthy(Some(code))
     }
+  }
+
+  //Priority MEDIUM/HIGH ask Fabio
+  //Support Topics - For Sport Alerts
+
+  def send(notification: NotificationPayload, sender: String, platforms: Set[Platforms])(implicit ec: ExecutionContext): Future[String] = {
+    this.send(buildNotification(notification, sender, platforms)) map(_.messageId)
   }
 
   def send(notification: Notification)(implicit ec: ExecutionContext): Future[SendNotificationReply] = {
