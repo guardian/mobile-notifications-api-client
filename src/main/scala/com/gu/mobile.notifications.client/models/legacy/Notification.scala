@@ -1,7 +1,6 @@
 package com.gu.mobile.notifications.client.models.legacy
 
-import com.gu.mobile.notifications.client.constants.TTL
-import com.gu.mobile.notifications.client.lib.UUID
+import java.util.{UUID => JUUID}
 import com.gu.mobile.notifications.client.models.NotificationTypes.NotificationType
 import play.api.libs.json._
 import com.gu.mobile.notifications.client.models.Regions._
@@ -46,10 +45,10 @@ case class Notification(
     */
   `type`: NotificationType,
   /** Used for de-duplication */
-  uniqueIdentifier: String,
+  uniqueIdentifier: String = JUUID.randomUUID.toString,
   sender: String,
   target: Target,
-  timeToLiveInSeconds: Int = TTL.defaultTTL,
+  timeToLiveInSeconds: Int =  60 * 60 * 2,
   payloads: MessagePayloads,
   /** Guardian Notifications API is agnostic as to what sort of notifications are sent (the idea being we can use this
     * service to send both news alerts and push notifications to wake up an iPad app in the morning to download today's

@@ -1,6 +1,6 @@
-package com.gu.mobile.notifications.client.constants
+package com.gu.mobile.notifications.client.models.legacy
 
-object Keys {
+object AndroidKeys {
   final val Type: String = "type"
   final val NotificationType = "notificationType"
   final val Debug: String = "debug"

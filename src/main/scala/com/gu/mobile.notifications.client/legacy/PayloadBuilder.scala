@@ -1,16 +1,16 @@
-package com.gu.mobile.notifications.client
+package com.gu.mobile.notifications.client.legacy
 
 import java.net.URI
-import com.gu.mobile.notifications.client.constants.Keys._
-import com.gu.mobile.notifications.client.lib.UUID
-import constants.Keys._
-import constants.MessageTypes._
-import constants.{Android, Ios, TTL, Platforms}
-import com.gu.mobile.notifications.client.models.Regions._
-import com.gu.mobile.notifications.client.messagebuilder.InternationalEditionSupport
-import com.gu.mobile.notifications.client.models.NotificationTypes.{Content => ContentNotification, BreakingNews}
-import com.gu.mobile.notifications.client.models._
+
 import com.gu.mobile.notifications.client.models.legacy._
+import AndroidMessageTypes._
+import AndroidKeys._
+import com.gu.mobile.notifications.client.constants.{Android, Ios, Platforms}
+import com.gu.mobile.notifications.client.messagebuilder.InternationalEditionSupport
+import com.gu.mobile.notifications.client.models.NotificationTypes.{BreakingNews, Content => ContentNotification}
+import com.gu.mobile.notifications.client.models.Regions._
+import com.gu.mobile.notifications.client.models._
+
 import scala.PartialFunction._
 
 object PayloadBuilder extends InternationalEditionSupport {
@@ -23,10 +23,8 @@ object PayloadBuilder extends InternationalEditionSupport {
 
   private def buildBreakingNewsAlert(bnp: BreakingNewsPayload, sender: String, platforms: Set[Platforms]) = Notification(
     `type` = BreakingNews,
-    uniqueIdentifier = UUID.next,
     sender = sender,
     target = Target(editionsFrom(bnp) flatMap regions.get, Set.empty),
-    timeToLiveInSeconds = TTL.defaultTTL,
     payloads = breakingNewsAlertPayloads(bnp, platforms),
     metadata = Map(
       "title" -> bnp.title,
@@ -37,10 +35,8 @@ object PayloadBuilder extends InternationalEditionSupport {
 
   private def buildContentAlert(cap: ContentAlertPayload, sender: String, platforms: Set[Platforms]) = Notification(
     `type` = ContentNotification,
-    uniqueIdentifier = UUID.next,
     sender = sender,
     target = Target(Set.empty, Set.empty),
-    timeToLiveInSeconds = TTL.defaultTTL,
     payloads = contentAlertPayloads(cap, platforms),
     metadata = Map(
       "title" -> cap.title,
@@ -51,10 +47,8 @@ object PayloadBuilder extends InternationalEditionSupport {
 
   private def buildGoalAlert(gap: GoalAlertPayload, sender: String, platforms: Set[Platforms]) = Notification(
     `type` = ContentNotification,
-    uniqueIdentifier = UUID.next,
     sender = sender,
     target = Target(Set.empty, Set.empty),
-    timeToLiveInSeconds = TTL.defaultTTL,
     payloads = goalAlertPayload(gap, platforms),
     metadata = Map(
       "title" -> gap.title,

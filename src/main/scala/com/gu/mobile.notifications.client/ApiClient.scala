@@ -1,9 +1,10 @@
 package com.gu.mobile.notifications.client
 
 import com.gu.mobile.notifications.client.constants.Platforms
+import com.gu.mobile.notifications.client.legacy.PayloadBuilder
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy.Notification
-import com.gu.mobile.notifications.client.PayloadBuilder._
+import PayloadBuilder._
 
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.libs.json._
