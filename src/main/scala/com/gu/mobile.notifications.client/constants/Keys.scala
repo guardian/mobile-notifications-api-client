@@ -2,7 +2,7 @@ package com.gu.mobile.notifications.client.constants
 
 object Keys {
   final val Type: String = "type"
-  val NotificationType = "notificationType"
+  final val NotificationType = "notificationType"
   final val Debug: String = "debug"
   final val Title: String = "title"
   final val Message: String = "message"

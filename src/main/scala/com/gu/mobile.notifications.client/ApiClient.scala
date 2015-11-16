@@ -33,9 +33,6 @@ trait ApiClient extends HttpProvider {
     }
   }
 
-  //Priority MEDIUM/HIGH ask Fabio
-  //Support Topics - For Sport Alerts
-
   def send(notification: NotificationPayload, sender: String, platforms: Set[Platforms])(implicit ec: ExecutionContext): Future[String] = {
     this.send(buildNotification(notification, sender, platforms)) map(_.messageId)
   }

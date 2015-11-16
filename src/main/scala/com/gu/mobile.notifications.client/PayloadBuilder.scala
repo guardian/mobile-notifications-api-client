@@ -1,14 +1,14 @@
 package com.gu.mobile.notifications.client
 
 import java.net.URI
-import com.gu.mobile.notifications.client.constants.Keys.NotificationType
+import com.gu.mobile.notifications.client.constants.Keys._
 import com.gu.mobile.notifications.client.lib.UUID
 import constants.Keys._
 import constants.MessageTypes._
 import constants.{Android, Ios, TTL, Platforms}
 import com.gu.mobile.notifications.client.models.Regions._
 import com.gu.mobile.notifications.client.messagebuilder.InternationalEditionSupport
-import com.gu.mobile.notifications.client.models.NotificationTypes.{Content => ContentNotifi, BreakingNews}
+import com.gu.mobile.notifications.client.models.NotificationTypes.{Content => ContentNotification, BreakingNews}
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy._
 import scala.PartialFunction._
@@ -36,7 +36,7 @@ object PayloadBuilder extends InternationalEditionSupport {
   )
 
   private def buildContentAlert(cap: ContentAlertPayload, sender: String, platforms: Set[Platforms]) = Notification(
-    `type` = ContentNotifi,
+    `type` = ContentNotification,
     uniqueIdentifier = UUID.next,
     sender = sender,
     target = Target(Set.empty, Set.empty),
@@ -50,7 +50,7 @@ object PayloadBuilder extends InternationalEditionSupport {
   )
 
   private def buildGoalAlert(gap: GoalAlertPayload, sender: String, platforms: Set[Platforms]) = Notification(
-    `type` = ContentNotifi,
+    `type` = ContentNotification,
     uniqueIdentifier = UUID.next,
     sender = sender,
     target = Target(Set.empty, Set.empty),
