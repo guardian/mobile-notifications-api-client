@@ -5,7 +5,8 @@ import java.net.URI
 import com.gu.mobile.notifications.client.models.legacy._
 import AndroidMessageTypes._
 import AndroidKeys._
-import com.gu.mobile.notifications.client.constants.{Android, Ios, Platforms}
+import IosMessageTypes._
+import IosKeys._
 import com.gu.mobile.notifications.client.messagebuilder.InternationalEditionSupport
 import com.gu.mobile.notifications.client.models.NotificationTypes.{BreakingNews, Content => ContentNotification}
 import com.gu.mobile.notifications.client.models.Regions._
@@ -15,17 +16,17 @@ import scala.PartialFunction._
 
 object PayloadBuilder extends InternationalEditionSupport {
 
-  def buildNotification(notif: NotificationPayload, sender: String, platforms: Set[Platforms]) = notif match {
-    case bnp: BreakingNewsPayload => buildBreakingNewsAlert(bnp, sender, platforms)
-    case cap: ContentAlertPayload => buildContentAlert(cap, sender, platforms)
-    case gap: GoalAlertPayload => buildGoalAlert(gap, sender, platforms)
+  def buildNotification(notification: NotificationPayload) = notification match {
+    case bnp: BreakingNewsPayload => buildBreakingNewsAlert(bnp)
+    case cap: ContentAlertPayload => throw new UnsupportedOperationException("Method not implemented")
+    case gap: GoalAlertPayload => throw new UnsupportedOperationException("Method not implemented")
   }
 
-  private def buildBreakingNewsAlert(bnp: BreakingNewsPayload, sender: String, platforms: Set[Platforms]) = Notification(
+  private def buildBreakingNewsAlert(bnp: BreakingNewsPayload) = Notification(
     `type` = BreakingNews,
-    sender = sender,
+    sender = bnp.sender,
     target = Target(editionsFrom(bnp) flatMap regions.get, Set.empty),
-    payloads = breakingNewsAlertPayloads(bnp, platforms),
+    payloads = breakingNewsAlertPayloads(bnp),
     metadata = Map(
       "title" -> bnp.title,
       "message" -> bnp.message,
@@ -33,11 +34,11 @@ object PayloadBuilder extends InternationalEditionSupport {
     )
   )
 
-  private def buildContentAlert(cap: ContentAlertPayload, sender: String, platforms: Set[Platforms]) = Notification(
+  private def buildContentAlert(cap: ContentAlertPayload) = Notification(
     `type` = ContentNotification,
-    sender = sender,
+    sender = cap.sender,
     target = Target(Set.empty, Set.empty),
-    payloads = contentAlertPayloads(cap, platforms),
+    payloads = contentAlertPayloads(cap),
     metadata = Map(
       "title" -> cap.title,
       "message" -> cap.message,
@@ -45,11 +46,11 @@ object PayloadBuilder extends InternationalEditionSupport {
     )
   )
 
-  private def buildGoalAlert(gap: GoalAlertPayload, sender: String, platforms: Set[Platforms]) = Notification(
+  private def buildGoalAlert(gap: GoalAlertPayload) = Notification(
     `type` = ContentNotification,
-    sender = sender,
+    sender = gap.sender,
     target = Target(Set.empty, Set.empty),
-    payloads = goalAlertPayload(gap, platforms),
+    payloads = goalAlertPayload(gap),
     metadata = Map(
       "title" -> gap.title,
       "message" -> gap.message,
@@ -57,24 +58,26 @@ object PayloadBuilder extends InternationalEditionSupport {
     )
   )
 
-  private def breakingNewsAlertPayloads(message: BreakingNewsPayload, platforms: Set[Platforms]) = MessagePayloads(
-    ios = if (platforms(Ios)) Some(buildIosPayload(message)) else None,
-    android = if (platforms(Android)) Some(buildAndroidBreakingNewsPayloads(message)) else None
+  private def breakingNewsAlertPayloads(message: BreakingNewsPayload) = MessagePayloads(
+    ios = Some(buildIosPayload(message)),
+    android = Some(buildAndroidBreakingNewsPayloads(message))
   )
 
-  private def contentAlertPayloads(message: ContentAlertPayload, platforms: Set[Platforms]) = MessagePayloads(
-    ios = if (platforms(Ios)) Some(buildIosPayload(message)) else None,
-    //android = if (platforms(Android)) Some(buildAndroidContentAlertPayloads(message)) else None
-    android = None
+  private def contentAlertPayloads(message: ContentAlertPayload) = MessagePayloads(
+    ios = Some(buildIosPayload(message)),
+    android = Some(buildAndroidContentAlertPayloads(message))
   )
 
-  private def goalAlertPayload(message: GoalAlertPayload, platforms: Set[Platforms]) = MessagePayloads(
-    //ios = if (platforms(Ios)) Some(buildIosGoalAlertPayload(message)) else None,
-    //android = if (platforms(Android)) Some(buildAndroidGoalAlertPayload(message)) else None
-    ios = None,
-    android = None
+  private def goalAlertPayload(message: GoalAlertPayload) = MessagePayloads(
+    ios = Some(buildIosGoalAlertPayload(message)),
+    android = Some(buildAndroidGoalAlertPayload(message))
   )
 
+  private def buildAndroidContentAlertPayloads(payload: ContentAlertPayload) = ???
+
+  private def buildAndroidGoalAlertPayload(payload: GoalAlertPayload) = ???
+
+  private def buildIosGoalAlertPayload(payload: GoalAlertPayload) = ???
 
   private def buildAndroidBreakingNewsPayloads(payload: BreakingNewsPayload) = {
     val androidLink = payload.link match {
@@ -116,8 +119,6 @@ object PayloadBuilder extends InternationalEditionSupport {
 
   private def buildIosPayload(payload: NotificationWithLink) = {
 
-    val IOSMessageType = "t"
-
     val iosLink = payload.link match {
       case GuardianLinkDetails(_, Some(url), _, _, _) => s"x-gu://" + new URI(url).getPath
       case details: GuardianLinkDetails => details.webUrl
@@ -130,7 +131,7 @@ object PayloadBuilder extends InternationalEditionSupport {
     }
 
     val properties = Map(
-      IOSMessageType -> "m",
+      IOSMessageType -> M,
       NotificationType -> BreakingNews.toString(),
       Link -> iosLink
     )

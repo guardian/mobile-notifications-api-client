@@ -1,6 +1,7 @@
 package com.gu.mobile.notifications.client.models
 
 import java.net.URL
+import play.api.libs.json._
 
 sealed case class GuardianItemType(mobileAggregatorPrefix: String)
 
@@ -31,6 +32,9 @@ sealed trait NotificationPayload {
   def notificationType: String
   def message: String
   def thumbnailUrl: Option[URL]
+  def sender: String
+  def priority: Priority
+  def topic: Set[Topic]
   def debug: Boolean
 }
 
@@ -43,9 +47,12 @@ case class BreakingNewsPayload(
   notificationType: String = "news",
   message: String,
   thumbnailUrl: Option[URL],
+  sender: String,
   editions: Set[String],
   link: Link,
   imageUrl: Option[String],
+  priority: Priority,
+  topic: Set[Topic],
   debug: Boolean
 ) extends NotificationWithLink
 
@@ -54,7 +61,10 @@ case class ContentAlertPayload(
   notificationType: String = "content",
   message: String,
   thumbnailUrl: Option[URL],
+  sender: String,
   link: Link,
+  priority: Priority,
+  topic: Set[Topic],
   debug: Boolean,
   shortUrl: String
 ) extends NotificationWithLink
@@ -64,6 +74,7 @@ case class GoalAlertPayload(
   notificationType: String = "goal",
   message: String,
   thumbnailUrl: Option[URL] = None,
+  sender: String,
   goalType: GoalType,
   awayTeamName: String,
   awayTeamScore: Int,
@@ -75,6 +86,8 @@ case class GoalAlertPayload(
   otherTeamName: String,
   matchId: String,
   mapiUrl: String,
+  priority: Priority,
+  topic: Set[Topic],
   debug: Boolean,
   addedTime: Option[String]
 ) extends NotificationPayload

@@ -26,3 +26,6 @@ object AndroidKeys {
   final val AwayTeamScore: String = "AWAY_TEAM_SCORE"
 }
 
+object IosKeys {
+  final val IOSMessageType: String = "t"
+}

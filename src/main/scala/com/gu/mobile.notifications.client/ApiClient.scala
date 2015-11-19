@@ -1,11 +1,9 @@
 package com.gu.mobile.notifications.client
 
-import com.gu.mobile.notifications.client.constants.Platforms
 import com.gu.mobile.notifications.client.legacy.PayloadBuilder
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy.Notification
 import PayloadBuilder._
-
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.libs.json._
 
@@ -26,6 +24,8 @@ trait HttpProvider {
 trait ApiClient extends HttpProvider {
   def host: String
 
+  def apiKey: String
+
   def healthcheck(implicit ec: ExecutionContext): Future[Healthcheck] = {
     get(s"$host/healthcheck").map {
       case HttpOk(200, body) => Ok
@@ -34,8 +34,8 @@ trait ApiClient extends HttpProvider {
     }
   }
 
-  def send(notification: NotificationPayload, sender: String, platforms: Set[Platforms])(implicit ec: ExecutionContext): Future[String] = {
-    this.send(buildNotification(notification, sender, platforms)) map(_.messageId)
+  def send(notification: NotificationPayload)(implicit ec: ExecutionContext): Future[String] = {
+    this.send(buildNotification(notification)) map (_.messageId)
   }
 
   def send(notification: Notification)(implicit ec: ExecutionContext): Future[SendNotificationReply] = {

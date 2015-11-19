@@ -5,3 +5,6 @@ object AndroidMessageTypes {
   final val GoalAlert: String = "goalAlert"
 }
 
+object IosMessageTypes {
+  final val M: String = "m"
+}
