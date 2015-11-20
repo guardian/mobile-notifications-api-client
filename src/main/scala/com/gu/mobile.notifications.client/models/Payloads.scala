@@ -1,6 +1,7 @@
 package com.gu.mobile.notifications.client.models
 
 import java.net.URL
+import com.gu.mobile.notifications.client.models.legacy.Topic
 import play.api.libs.json._
 
 sealed case class GuardianItemType(mobileAggregatorPrefix: String)

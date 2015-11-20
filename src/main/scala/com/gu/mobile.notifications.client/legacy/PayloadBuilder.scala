@@ -25,7 +25,7 @@ object PayloadBuilder extends InternationalEditionSupport {
   private def buildBreakingNewsAlert(bnp: BreakingNewsPayload) = Notification(
     `type` = BreakingNews,
     sender = bnp.sender,
-    target = Target(editionsFrom(bnp) flatMap regions.get, Set.empty),
+    target = Target(editionsFrom(bnp) flatMap regions.get, bnp.topic),
     payloads = breakingNewsAlertPayloads(bnp),
     metadata = Map(
       "title" -> bnp.title,
@@ -37,7 +37,7 @@ object PayloadBuilder extends InternationalEditionSupport {
   private def buildContentAlert(cap: ContentAlertPayload) = Notification(
     `type` = ContentNotification,
     sender = cap.sender,
-    target = Target(Set.empty, Set.empty),
+    target = Target(Set.empty, cap.topic),
     payloads = contentAlertPayloads(cap),
     metadata = Map(
       "title" -> cap.title,
@@ -49,7 +49,7 @@ object PayloadBuilder extends InternationalEditionSupport {
   private def buildGoalAlert(gap: GoalAlertPayload) = Notification(
     `type` = ContentNotification,
     sender = gap.sender,
-    target = Target(Set.empty, Set.empty),
+    target = Target(Set.empty, gap.topic),
     payloads = goalAlertPayload(gap),
     metadata = Map(
       "title" -> gap.title,
