@@ -1,6 +1,7 @@
 package com.gu.mobile.notifications.client
 
 import com.gu.mobile.notifications.client.models.NotificationTypes.BreakingNews
+import com.gu.mobile.notifications.client.models.Priority.Major
 import com.gu.mobile.notifications.client.models.Regions.UK
 import com.gu.mobile.notifications.client.models.legacy.{MessagePayloads, Target, Notification}
 import com.gu.mobile.notifications.client.models._
@@ -10,21 +11,21 @@ import org.specs2.time.NoTimeConversions
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class ApiClientSpec extends Specification with ApiClient with Mockito with NoTimeConversions {
+class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
 
   var postedBody = "{}"
 
-  def apiKey = "myKey"
-  def host = "myHost"
-  def get(url: String): Future[HttpResponse] = Future.successful(HttpError(500, "Not implemented"))
-  def post(url: String, contentType: ContentType, body: Array[Byte]): Future[HttpResponse] = {
-    postedBody = new String(body)
-    Future.successful(HttpOk(200, "{\"messageId\":\"123\"}"))
-  }
-
   "ApiClient" should {
 
-    val serviceApi = new ApiClientSpec
+    val serviceApi = new ApiClient {
+      def apiKey = "myKey"
+      def host = "myHost"
+      def get(url: String): Future[HttpResponse] = Future.successful(HttpError(500, "Not implemented"))
+      def post(url: String, contentType: ContentType, body: Array[Byte]): Future[HttpResponse] = {
+        postedBody = new String(body)
+        Future.successful(HttpOk(200, "{\"messageId\":\"123\"}"))
+      }
+    }
 
     "successfully send Notification" in {
       val notification = Notification(
