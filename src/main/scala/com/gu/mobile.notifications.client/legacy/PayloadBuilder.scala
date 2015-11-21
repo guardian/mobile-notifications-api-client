@@ -14,7 +14,11 @@ import com.gu.mobile.notifications.client.models._
 
 import scala.PartialFunction._
 
-object PayloadBuilder extends InternationalEditionSupport {
+trait PayloadBuilder {
+  def buildNotification(notification: NotificationPayload): Notification
+}
+
+object PayloadBuilderImpl extends PayloadBuilder with InternationalEditionSupport {
 
   def buildNotification(notification: NotificationPayload) = notification match {
     case bnp: BreakingNewsPayload => buildBreakingNewsAlert(bnp)

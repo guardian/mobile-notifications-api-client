@@ -7,7 +7,7 @@ import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy.Notification
 import org.specs2.mutable.Specification
 import org.specs2.mock.Mockito
-import com.gu.mobile.notifications.client.legacy.PayloadBuilder._
+import com.gu.mobile.notifications.client.legacy.PayloadBuilderImpl._
 
 class PayloadBuilderSpec extends Specification with Mockito {
 
