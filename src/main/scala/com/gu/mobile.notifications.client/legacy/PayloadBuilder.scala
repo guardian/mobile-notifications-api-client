@@ -13,7 +13,7 @@ import com.gu.mobile.notifications.client.models.Regions._
 import com.gu.mobile.notifications.client.models._
 
 import scala.PartialFunction._
-
+//TODO MAYBE IT SHOULD BE CALLED SOMETHING LIKE NotificationBuilder or PayloadConverter or something like that because it builds notifications from payloads not the other way around
 trait PayloadBuilder {
   def buildNotification(notification: NotificationPayload): Notification
 }
