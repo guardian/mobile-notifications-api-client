@@ -35,7 +35,7 @@ trait ApiClient extends HttpProvider {
   }
 
   def send(notification: NotificationPayload)(implicit ec: ExecutionContext): Future[String] = {
-    this.send(buildNotification(notification)) map (_.messageId)
+    send(buildNotification(notification)) map (_.messageId)
   }
 
   def send(notification: Notification)(implicit ec: ExecutionContext): Future[SendNotificationReply] = {
