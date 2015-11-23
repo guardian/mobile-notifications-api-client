@@ -131,7 +131,7 @@ object PayloadBuilder extends InternationalEditionSupport {
     }
 
     val properties = Map(
-      IOSMessageType -> M,
+      IOSMessageType -> NewsAlert,
       NotificationType -> BreakingNews.toString(),
       Link -> iosLink
     )

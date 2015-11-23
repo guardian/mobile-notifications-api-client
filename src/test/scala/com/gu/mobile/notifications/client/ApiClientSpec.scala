@@ -13,8 +13,6 @@ import scala.concurrent.duration._
 
 class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
 
-  var postedBody = "{}"
-
   "ApiClient" should {
 
     val serviceApi = new ApiClient {
@@ -22,7 +20,6 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
       def host = "myHost"
       def get(url: String): Future[HttpResponse] = Future.successful(HttpError(500, "Not implemented"))
       def post(url: String, contentType: ContentType, body: Array[Byte]): Future[HttpResponse] = {
-        postedBody = new String(body)
         Future.successful(HttpOk(200, "{\"messageId\":\"123\"}"))
       }
     }
