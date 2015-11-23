@@ -11,7 +11,7 @@ import org.specs2.mock.mockito.ArgumentCapture
 import org.specs2.mutable.Specification
 import org.specs2.time.NoTimeConversions
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 
 class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
@@ -122,7 +122,7 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
       )
 
       val reply = serviceApi.send(payload)
-      reply must beEqualTo(Left(TotalError("Server error status 500"))).await
+      reply must beEqualTo(Left(HttpApiError(status = 500))).await
       val bodyCapture = new ArgumentCapture[Array[Byte]]
       val urlCapture = new ArgumentCapture[String]
       val contentTypeCapture = new ArgumentCapture[ContentType]
@@ -134,6 +134,21 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
 
     }
 
+  }
+  "CompositeApiClient" should {
+    "Collect errors" in {
+      val error1 = HttpApiError(500)
+      val error2 = HttpApiError(400)
+      val api1 = mock[ApiClient]
+      api1.send(any[NotificationPayload])(any[ExecutionContext])returns Future(Left(error1))
+      val api2 = mock[ApiClient]
+      api2.send(any[NotificationPayload])(any[ExecutionContext])returns Future(Left(error2))
+
+      val client = new CompositeApiClient(List(api1, api2))
+
+      client.send(payload) must beEqualTo(Left(TotalApiError(List(error1, error2)))).await
+
+    }
   }
 
 

@@ -8,15 +8,21 @@ import play.api.libs.json._
 import scala.concurrent.{ExecutionContext, Future}
 
 
-//TODO ARE THERE ERROR CASES BESIDES HTTP ERRORS?. LIKE THE API RETURNING AN ERROR BECAUSE THERE IS SOMETHING MISSING IN THE JSON IMPUT OR SOMETHING IS WRONG?
 sealed trait ApiClientError {
-  //todo probably some more details here
   def message: String
 }
 
-//TODO how much information we need here? just to know if it was full or partial error and a human readable description is enough?
-case class TotalError(message: String) extends ApiClientError
-case class PartialError(message: String) extends ApiClientError
+trait CompositeApiError extends ApiClientError{
+  def errors : List[ApiClientError]
+  override def message: String = errors.map(_.message).mkString("\n")
+}
+case class PartialApiError(errors: List[ApiClientError]) extends CompositeApiError
+case class TotalApiError(errors: List[ApiClientError]) extends CompositeApiError
+case class HttpApiError(status:Int) extends ApiClientError {
+  val message = s"Http error status $status"
+}
+
+
 
 trait ApiClient {
   def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, String]]
@@ -45,10 +51,7 @@ class LegacyApiClient(val host: String,
   override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, String]] = {
 
       val notification = payloadBuilder.buildNotification(notificationPayload)
-      this.send(notification) map (x => Right(x.messageId)) recover {case error: HttpError => Left(TotalError(error.getMessage))}
-
-    //  case error: HttpError => Future(Left(TotalError(error.getMessage)))
-
+      this.send(notification) map (x => Right(x.messageId)) recover {case error: HttpError => Left(HttpApiError(error.status))}
   }
 
   def send(notification: Notification)(implicit ec: ExecutionContext): Future[SendNotificationReply] = {
@@ -74,28 +77,21 @@ class N10nApiClient(val host: String,
 
 //TODO tag the api clients so that we can return a meaningful error code that can be displayed to the user
 class CompositeApiClient(apiClients: List[ApiClient]) extends ApiClient {
-  require(apiClients.size>0)
+  require(apiClients.size > 0)
 
   override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, String]] = {
     def sendWithRetry(apiClient: ApiClient) = apiClient.send(notificationPayload)
 
-    val responses = Future.sequence(apiClients.map(sendWithRetry))
+    val responses = Future.sequence(apiClients.map(sendWithRetry))//TODO make sure there are no future failures here
     responses.map(aggregateResponses)
   }
 
   //from the responses to the individual call figure out what response to give to the composite api user
   private def aggregateResponses(responses: List[Either[ApiClientError, String]]): Either[ApiClientError, String] = {
-    val (failures, success) = responses.partition(_.isLeft)
-    //TODO ugly code here, refactor later
-    if (failures.isEmpty)
-      success(0) //according to diego all responses from all apis should be the same so I just grab the first one
-    else {
-      val errorMessage = failures.map(_.left.get.message).mkString("\n")
-      if (success.isEmpty)
-        Left(TotalError(errorMessage))
-      else
-        Left(PartialError(errorMessage))
+    responses.partition(_.isLeft) match {
+      case (Nil, rights) => rights(0)
+      case (lefts, _) => Left(TotalApiError(lefts.map(_.left.get)))
+
     }
   }
-
 }
