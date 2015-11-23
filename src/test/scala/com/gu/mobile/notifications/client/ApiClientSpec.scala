@@ -16,7 +16,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
   val legacyHost = "http://legacyHost.co.uk"
-
+  val apiKey="apiKey"
   val iosPayload = IOSMessagePayload(
     body = "ios_body",
     customProperties = Map("p1" -> "v1"),
@@ -66,7 +66,7 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
       fakeHttpProvider.post(anyString, any[ContentType], any[Array[Byte]]) returns Future.successful(HttpOk(200, "{\"messageId\":\"123\"}"))
 
       val serviceApi = new LegacyApiClient (
-        apiKey = "IS THIS USED FOR ANYTHING?",
+        apiKey = apiKey,
         httpProvider = fakeHttpProvider,
         host = legacyHost
       )
@@ -78,7 +78,7 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
       val contentTypeCapture = new ArgumentCapture[ContentType]
 
       there was one(fakeHttpProvider).post(urlCapture, contentTypeCapture, bodyCapture)
-      urlCapture.value mustEqual (s"$legacyHost/notifications")
+      urlCapture.value mustEqual (s"$legacyHost/notifications?api-key=$apiKey")
       contentTypeCapture.value mustEqual (ContentType("application/json", "UTF-8"))
       new String(bodyCapture.value) mustEqual (notificationAsJson)
     }
@@ -89,7 +89,7 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
       fakeHttpProvider.post(anyString, any[ContentType], any[Array[Byte]]) returns Future.successful(HttpOk(200, "{\"messageId\":\"123\"}"))
 
       val serviceApi = new LegacyApiClient (
-        apiKey = "IS THIS USED FOR ANYTHING?",
+        apiKey = apiKey,
         httpProvider = fakeHttpProvider,
         host = legacyHost,
         payloadBuilder = fakePayloadBuilder
@@ -102,7 +102,7 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
       val contentTypeCapture = new ArgumentCapture[ContentType]
 
       there was one(fakeHttpProvider).post(urlCapture, contentTypeCapture, bodyCapture)
-      urlCapture.value mustEqual (s"$legacyHost/notifications")
+      urlCapture.value mustEqual (s"$legacyHost/notifications?api-key=$apiKey")
       contentTypeCapture.value mustEqual (ContentType("application/json", "UTF-8"))
       new String(bodyCapture.value) mustEqual (notificationAsJson)
     }
@@ -115,7 +115,7 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
       fakeHttpProvider.post(anyString, any[ContentType], any[Array[Byte]]) returns Future.successful(httpError)
 
       val serviceApi = new LegacyApiClient (
-        apiKey = "IS THIS USED FOR ANYTHING?",
+        apiKey = apiKey,
         httpProvider = fakeHttpProvider,
         host = legacyHost,
         payloadBuilder = fakePayloadBuilder
@@ -128,7 +128,7 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
       val contentTypeCapture = new ArgumentCapture[ContentType]
 
       there was one(fakeHttpProvider).post(urlCapture, contentTypeCapture, bodyCapture)
-      urlCapture.value mustEqual (s"$legacyHost/notifications")
+      urlCapture.value mustEqual (s"$legacyHost/notifications?api-key=$apiKey")
       contentTypeCapture.value mustEqual (ContentType("application/json", "UTF-8"))
       new String(bodyCapture.value) mustEqual (notificationAsJson)
 

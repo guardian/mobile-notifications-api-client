@@ -1,6 +1,6 @@
 package com.gu.mobile.notifications.client.models.legacy
 
-import java.util.{UUID => JUUID}
+import java.util.UUID
 import com.gu.mobile.notifications.client.models.NotificationTypes.NotificationType
 import play.api.libs.json._
 import com.gu.mobile.notifications.client.models.Regions._
@@ -45,7 +45,7 @@ case class Notification(
     */
   `type`: NotificationType,
   /** Used for de-duplication */
-  uniqueIdentifier: String = JUUID.randomUUID.toString,
+  uniqueIdentifier: String = UUID.randomUUID.toString,
   sender: String,
   target: Target,
   timeToLiveInSeconds: Int =  60 * 60 * 2,

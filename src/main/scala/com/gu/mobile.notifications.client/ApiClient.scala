@@ -31,7 +31,6 @@ trait ApiClient {
 trait SimpleHttpApiClient extends ApiClient {
   def host: String
   def httpProvider: HttpProvider
-  //TODO IS THIS USED FOR ANYTHING ??
   def apiKey: String
 
   def healthcheck(implicit ec: ExecutionContext): Future[Healthcheck] = {
@@ -48,6 +47,7 @@ class LegacyApiClient(val host: String,
                       val apiKey: String,
                       payloadBuilder: PayloadBuilder = PayloadBuilderImpl) extends SimpleHttpApiClient {
 
+
   override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, String]] = {
 
       val notification = payloadBuilder.buildNotification(notificationPayload)
@@ -57,7 +57,7 @@ class LegacyApiClient(val host: String,
   def send(notification: Notification)(implicit ec: ExecutionContext): Future[SendNotificationReply] = {
     val json = Json.stringify(Json.toJson(notification))
     httpProvider.post(
-      url = s"$host/notifications",
+      url = if (apiKey.isEmpty) s"$host/notifications" else s"$host/notifications?api-key=$apiKey",
       contentType = ContentType("application/json", "UTF-8"),
       body = json.getBytes("UTF-8")
     ) map {
