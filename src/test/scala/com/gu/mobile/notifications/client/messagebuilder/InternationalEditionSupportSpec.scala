@@ -53,7 +53,7 @@ class InternationalEditionSupportSpec extends Specification {
       imageUrl = None,
       editions = Set.empty,
       sender = "sender",
-      priority = Importance.Major,
+      importance = Importance.Major,
       topic = Set.empty,
       debug = true
     )
