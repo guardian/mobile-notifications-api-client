@@ -1,7 +1,7 @@
 package com.gu.mobile.notifications.client.models
 
 import java.net.URL
-import com.gu.mobile.notifications.client.models.Priority.Priority
+import com.gu.mobile.notifications.client.models.Importance.Importance
 import com.gu.mobile.notifications.client.models.legacy.Topic
 
 sealed case class GuardianItemType(mobileAggregatorPrefix: String)
@@ -34,7 +34,7 @@ sealed trait NotificationPayload {
   def message: String
   def thumbnailUrl: Option[URL]
   def sender: String
-  def priority: Priority
+  def priority: Importance
   def topic: Set[Topic]
   def debug: Boolean
 }
@@ -52,7 +52,7 @@ case class BreakingNewsPayload(
   editions: Set[String],
   link: Link,
   imageUrl: Option[String],
-  priority: Priority,
+  priority: Importance,
   topic: Set[Topic],
   debug: Boolean
 ) extends NotificationWithLink
@@ -64,7 +64,7 @@ case class ContentAlertPayload(
   thumbnailUrl: Option[URL],
   sender: String,
   link: Link,
-  priority: Priority,
+  priority: Importance,
   topic: Set[Topic],
   debug: Boolean,
   shortUrl: String
@@ -87,7 +87,7 @@ case class GoalAlertPayload(
   otherTeamName: String,
   matchId: String,
   mapiUrl: String,
-  priority: Priority,
+  priority: Importance,
   topic: Set[Topic],
   debug: Boolean,
   addedTime: Option[String]

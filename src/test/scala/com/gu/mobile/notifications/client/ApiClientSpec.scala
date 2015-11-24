@@ -1,7 +1,7 @@
 package com.gu.mobile.notifications.client
 
 import com.gu.mobile.notifications.client.models.NotificationTypes.BreakingNews
-import com.gu.mobile.notifications.client.models.Priority.Major
+import com.gu.mobile.notifications.client.models.Importance.Major
 import com.gu.mobile.notifications.client.models.Regions.UK
 import com.gu.mobile.notifications.client.models.legacy.{MessagePayloads, Target, Notification}
 import com.gu.mobile.notifications.client.models._
@@ -24,7 +24,7 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
       }
     }
 
-    "successfully send Notification" in {
+    "successfully send if provided with a Notification" in {
       val notification = Notification(
         `type` = BreakingNews,
         sender = "mySender",
@@ -36,7 +36,7 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
       reply must beEqualTo(SendNotificationReply("123")).await(timeout = 5 seconds)
     }
 
-    "successfully send BreakingNewsPayload" in {
+    "successfully send if provided with a BreakingNewsPayload" in {
       val notif = mock[BreakingNewsPayload]
       notif.title returns "myTitle"
       notif.notificationType returns "news"

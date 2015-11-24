@@ -1,7 +1,7 @@
 package com.gu.mobile.notifications.client.legacy
 
 import com.gu.mobile.notifications.client.models.NotificationTypes.BreakingNews
-import com.gu.mobile.notifications.client.models.Priority.Major
+import com.gu.mobile.notifications.client.models.Importance.Major
 import com.gu.mobile.notifications.client.models.Regions._
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy.Notification

@@ -1,6 +1,6 @@
 package com.gu.mobile.notifications.client.messagebuilder
 
-import com.gu.mobile.notifications.client.models.{ExternalLink, Priority, BreakingNewsPayload}
+import com.gu.mobile.notifications.client.models.{ExternalLink, Importance, BreakingNewsPayload}
 import com.gu.mobile.notifications.client.models.NotificationTypes.BreakingNews
 import com.gu.mobile.notifications.client.models.Regions.{Region, UK, US, AU, International}
 import org.specs2.mutable.Specification
@@ -53,7 +53,7 @@ class InternationalEditionSupportSpec extends Specification {
       imageUrl = None,
       editions = Set.empty,
       sender = "sender",
-      priority = Priority.Major,
+      priority = Importance.Major,
       topic = Set.empty,
       debug = true
     )
