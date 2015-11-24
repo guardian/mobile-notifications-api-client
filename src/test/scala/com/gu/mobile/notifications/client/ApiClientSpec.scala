@@ -37,7 +37,20 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
     metadata = Map("m1" -> "v1")
   )
 
-  val payload = mock[BreakingNewsPayload]
+  val payload = BreakingNewsPayload(
+    title = "myTitle",
+    notificationType = BreakingNews.toString,
+    message = "myMessage",
+    sender = "test sender",
+    editions = Set.empty,
+    imageUrl = None,
+    thumbnailUrl = None,
+    link = ExternalLink("http://mylink"),
+    importance = Importance.Major,
+    topic = Set.empty,
+    debug = true
+  )
+
   val fakePayloadBuilder = mock[PayloadBuilder]
   fakePayloadBuilder.buildNotification(payload) returns notification
 
@@ -68,10 +81,36 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
     new String(bodyCapture.value) mustEqual (notificationAsJson)
   }
 
+//TODO remove duplication between legacy and n10n tests
+def n10nTest(test: N10nApiClient => Unit):Result = {
+  val successServerResponse = HttpOk(200, "{\"messageId\":\"123\"}")
+  n10nTest(successServerResponse)(test)
+}
+  def n10nTest(serverResponse:HttpResponse)(test: N10nApiClient => Unit):Result = {
+    val fakeHttpProvider = mock[HttpProvider]
+    fakeHttpProvider.post(anyString, any[ContentType], any[Array[Byte]]) returns Future.successful(serverResponse)
+
+    val serviceApi = new N10nApiClient(
+      apiKey = apiKey,
+      httpProvider = fakeHttpProvider,
+      host = legacyHost
+    )
+    test(serviceApi)
+
+    val bodyCapture = new ArgumentCapture[Array[Byte]]
+    val urlCapture = new ArgumentCapture[String]
+    val contentTypeCapture = new ArgumentCapture[ContentType]
+
+    there was one(fakeHttpProvider).post(urlCapture, contentTypeCapture, bodyCapture)
+    urlCapture.value mustEqual (s"$legacyHost/push?api-key=$apiKey")
+    contentTypeCapture.value mustEqual (ContentType("application/json", "UTF-8"))
+    new String(bodyCapture.value) mustEqual (payloadAsJson)
+  }
+
 
 
   val notificationAsJson = """{"type":"news","uniqueIdentifier":"UNIQUE_ID","sender":"sender","target":{"regions":["uk"],"topics":[{"type":"newsstand","name":"newsstandIos"}]},"timeToLiveInSeconds":10,"payloads":{"ios":{"type":"ios","body":"ios_body","customProperties":{"p1":"v1"},"category":"category"},"android":{"type":"android","body":{"k1":"v1"}}},"metadata":{"m1":"v1"}}"""
-
+  val payloadAsJson= """{"title":"myTitle","notificationType":"news","message":"myMessage","sender":"test sender","editions":[],"link":{"url":"http://mylink"},"importance":"Major","topic":[],"debug":true}"""
 //TODO WE NEED TO COVER OTHER API ERRORS
   "LegacyApiClient" should {
 
@@ -88,7 +127,16 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
       legacyApiClient => legacyApiClient.send(notification) must throwA[HttpError].await
     }
   }
+  
+"n10nApiClient" should {
+  "successfully send BreakingNewsPayload" in n10nTest {
+    n10nClient => n10nClient.send(payload) must beEqualTo(Right(SendNotificationReply("123"))).await
+  }
+  "return error if cannot send BreakingNewsPayload" in legacyApiTest(serverResponse = HttpError(500, "")) {
+    n10nClient => n10nClient.send(payload) must beEqualTo(Left(HttpApiError(status = 500))).await
+  }
 
+}
   "CompositeApiClient" should {
     "Report total error if all api calls fail" in {
       val api1 = mock[ApiClient]

@@ -1,8 +1,12 @@
 package com.gu.mobile.notifications.client.lib
 
+import java.net.URL
+
 import play.api.libs.json._
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsString
+
+import scala.util.Try
 
 object JsonFormatsHelper {
   implicit class RichJsObject(obj: JsObject) {
@@ -46,6 +50,23 @@ object JsonFormatsHelper {
       }
 
       iter(subClassReads)
+    }
+  }
+
+  implicit def optionFormat[T](implicit format: Format[T]): Format[Option[T]] = new Format[Option[T]] {
+    override def reads(json: JsValue): JsResult[Option[T]] = json match {
+      case JsNull => JsSuccess(None)
+      case _ => format.reads(json) map Some.apply
+    }
+
+    override def writes(o: Option[T]): JsValue =
+      o map format.writes getOrElse JsNull
+  }
+  implicit val urlFormat = new Format[URL] {
+    override def writes(o: URL): JsValue = JsString(o.toExternalForm)
+    override def reads(json: JsValue): JsResult[URL] = json match {
+      case JsString(url) => Try(JsSuccess(new URL(url))).getOrElse(JsError(s"Invalid url: $url"))
+      case _ => JsError("Invalid url type")
     }
   }
 }

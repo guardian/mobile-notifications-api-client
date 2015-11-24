@@ -39,11 +39,11 @@ trait ApiClient {
 
 trait SimpleHttpApiClient extends ApiClient {
   def host: String
-
+  def endPoint:String
   def httpProvider: HttpProvider
 
   def apiKey: String
-  protected val url = s"$host/notifications?api-key=$apiKey"
+  protected val url = s"$host/$endPoint?api-key=$apiKey"
 
   def healthcheck(implicit ec: ExecutionContext): Future[Healthcheck] = {
     httpProvider.get(s"$host/healthcheck").map {
@@ -67,6 +67,7 @@ trait SimpleHttpApiClient extends ApiClient {
 class LegacyApiClient(val host: String,
                       val httpProvider: HttpProvider,
                       val apiKey: String,
+                      val endPoint:String = "notifications",
                       val clientId: String = "Legacy",
                       payloadBuilder: PayloadBuilder = PayloadBuilderImpl) extends SimpleHttpApiClient {
 
@@ -97,11 +98,10 @@ class LegacyApiClient(val host: String,
 class N10nApiClient(val host: String,
                     val httpProvider: HttpProvider,
                     val clientId: String = "n10n",
+                    val endPoint:String = "push",
                     val apiKey: String) extends SimpleHttpApiClient {
   override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, SendNotificationReply]] = {
-    //TODO
-    // val json = Json.stringify(Json.toJson(notificationPayload))
-    val json = "{some json}"
+    val json = Json.stringify(Json.toJson(notificationPayload))
     postJson(json) map {
       case error: HttpError => Left(HttpApiError(error.status))
       case HttpOk(code, body) => Right(parseResponse(body))
