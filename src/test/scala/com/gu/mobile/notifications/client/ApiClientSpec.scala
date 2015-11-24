@@ -51,7 +51,7 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
     fakeHttpProvider.post(anyString, any[ContentType], any[Array[Byte]]) returns Future.successful(serverResponse)
 
     val serviceApi = new LegacyApiClient(
-      apiKey = Some(apiKey),
+      apiKey = apiKey,
       httpProvider = fakeHttpProvider,
       host = legacyHost,
       payloadBuilder = fakePayloadBuilder
@@ -68,6 +68,8 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
     new String(bodyCapture.value) mustEqual (notificationAsJson)
   }
 
+
+
   val notificationAsJson = """{"type":"news","uniqueIdentifier":"UNIQUE_ID","sender":"sender","target":{"regions":["uk"],"topics":[{"type":"newsstand","name":"newsstandIos"}]},"timeToLiveInSeconds":10,"payloads":{"ios":{"type":"ios","body":"ios_body","customProperties":{"p1":"v1"},"category":"category"},"android":{"type":"android","body":{"k1":"v1"}}},"metadata":{"m1":"v1"}}"""
 
 //TODO WE NEED TO COVER OTHER API ERRORS
@@ -77,7 +79,7 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
       legacyApiClient => legacyApiClient.send(notification) must beEqualTo(SendNotificationReply("123")).await
     }
     "successfully send BreakingNewsPayload" in legacyApiTest {
-      legacyApiClient => legacyApiClient.send(payload) must beEqualTo(Right("123")).await
+      legacyApiClient => legacyApiClient.send(payload) must beEqualTo(Right(SendNotificationReply("123"))).await
     }
     "return error if cannot send BreakingNewsPayload" in legacyApiTest(serverResponse = HttpError(500, "")) {
       legacyApiClient => legacyApiClient.send(payload) must beEqualTo(Left(HttpApiError(status = 500))).await
@@ -119,10 +121,11 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
 
       val error1 = HttpApiError(500)
       val error3 = HttpApiError(403)
+      val success = SendNotificationReply("123")
 
       api1.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(Left(error1))
       api1.clientId returns "api1"
-      api2.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(Right("{successful json response would go here}"))
+      api2.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(Right(success))
       api2.clientId returns "api2"
       api3.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(Left(error3))
       api3.clientId returns "api3"
@@ -139,16 +142,17 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
       val api1 = mock[ApiClient]
       val api2 = mock[ApiClient]
       val api3 = mock[ApiClient]
-
-      api1.send(any[NotificationPayload])(any[ExecutionContext]) returns  Future(Right("Api_1_response"))
-      api2.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(Right("Api_2_response"))
-      api3.send(any[NotificationPayload])(any[ExecutionContext]) returns  Future(Right("Api_3_response"))
+      val success = Right(SendNotificationReply("1234"))
+      api1.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(success)
+      api2.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(success)
+      api3.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(success)
 
       val client = new CompositeApiClient(List(api1, api2, api3))
-
-      client.send(payload) must beEqualTo(Right("Api_1_response")).await
+      client.send(payload) must beEqualTo(success).await
     }
 
   }
+
+
 
 }

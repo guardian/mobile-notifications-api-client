@@ -33,20 +33,17 @@ case class HttpApiError(status: Int) extends ApiClientError {
 trait ApiClient {
   //used to identify the client on error reports
   def clientId: String
-  def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, String]]
+
+  def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, SendNotificationReply]]
 }
 
 trait SimpleHttpApiClient extends ApiClient {
   def host: String
+
   def httpProvider: HttpProvider
-  def apiKey: Option[String]
 
-  protected val url = s"$host/notifications" + apiKeyPathPart
-
-  private def apiKeyPathPart = apiKey match {
-    case None => ""
-    case Some(key) => s"?api-key=$key"
-  }
+  def apiKey: String
+  protected val url = s"$host/notifications?api-key=$apiKey"
 
   def healthcheck(implicit ec: ExecutionContext): Future[Healthcheck] = {
     httpProvider.get(s"$host/healthcheck").map {
@@ -64,20 +61,20 @@ trait SimpleHttpApiClient extends ApiClient {
     )
   }
 
-  protected def parseResponse(jsonBody:String) = Json.fromJson[SendNotificationReply](Json.parse(jsonBody)).get
+  protected def parseResponse(jsonBody: String) = Json.fromJson[SendNotificationReply](Json.parse(jsonBody)).get
 }
 
 class LegacyApiClient(val host: String,
                       val httpProvider: HttpProvider,
-                      val apiKey: Option[String] = None,
+                      val apiKey: String,
                       val clientId: String = "Legacy",
                       payloadBuilder: PayloadBuilder = PayloadBuilderImpl) extends SimpleHttpApiClient {
 
-  override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, String]] = {
+  override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, SendNotificationReply]] = {
     val legacyNotification = payloadBuilder.buildNotification(notificationPayload)
     sendToServer(legacyNotification) map {
       case Left(httpError) => Left(HttpApiError(httpError.status))
-      case Right(sendNotificationReply) => Right(sendNotificationReply.messageId)
+      case Right(sendNotificationReply) => Right(sendNotificationReply)
     }
   }
 
@@ -100,15 +97,14 @@ class LegacyApiClient(val host: String,
 class N10nApiClient(val host: String,
                     val httpProvider: HttpProvider,
                     val clientId: String = "n10n",
-                    val apiKey: Option[String]) extends SimpleHttpApiClient {
-  override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, String]] = {
+                    val apiKey: String) extends SimpleHttpApiClient {
+  override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, SendNotificationReply]] = {
     //TODO
     // val json = Json.stringify(Json.toJson(notificationPayload))
     val json = "{some json}"
     postJson(json) map {
       case error: HttpError => Left(HttpApiError(error.status))
-      case HttpOk(code, body) => Right(parseResponse(body).messageId)
-
+      case HttpOk(code, body) => Right(parseResponse(body))
     }
 
   }
@@ -117,9 +113,9 @@ class N10nApiClient(val host: String,
 class CompositeApiClient(apiClients: List[ApiClient], val clientId: String = "composite") extends ApiClient {
   require(apiClients.size > 0)
 
-  override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, String]] = {
+  override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, SendNotificationReply]] = {
 
-    def sendAndSource(apiClient: ApiClient): Future[Either[ErrorWithSource, String]] = {
+    def sendAndSource(apiClient: ApiClient): Future[Either[ErrorWithSource, SendNotificationReply]] = {
       apiClient.send(notificationPayload) map {
         case Left(error) => Left(ErrorWithSource(apiClient.clientId, error))
         case Right(x) => Right(x)
@@ -131,12 +127,20 @@ class CompositeApiClient(apiClients: List[ApiClient], val clientId: String = "co
   }
 
   //from the responses to the individual calls figure out what response to give to the composite api user
-  private def aggregateResponses(responses: List[Either[ErrorWithSource, String]]): Either[ApiClientError, String] = {
+  private def aggregateResponses(responses: List[Either[ErrorWithSource, SendNotificationReply]]): Either[ApiClientError, SendNotificationReply] = {
     responses.partition(_.isLeft) match {
       case (Nil, Right(res) :: _) => Right(res)
       case (lefts, Nil) => Left(TotalApiError(lefts.map(_.left.get)))
       case (lefts, _) => Left(PartialApiError(lefts.map(_.left.get)))
 
     }
+  }
+}
+
+object ApiClient {
+  def apply(legacyHost: String, legacyApiKey: String, n10nHost: String, n10nApikey: String, httpProvider: HttpProvider): ApiClient = {
+    val legacyClient = new LegacyApiClient(host = legacyHost, apiKey = legacyApiKey, httpProvider = httpProvider)
+    val n10nClient = new N10nApiClient(host = n10nHost, apiKey = n10nApikey, httpProvider = httpProvider)
+    new CompositeApiClient(List(n10nClient, legacyClient))
   }
 }
