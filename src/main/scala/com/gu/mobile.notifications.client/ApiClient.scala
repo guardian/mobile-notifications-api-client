@@ -41,7 +41,7 @@ trait ApiClient extends HttpProvider {
   def send(notification: Notification)(implicit ec: ExecutionContext): Future[SendNotificationReply] = {
     val json = Json.stringify(Json.toJson(notification))
     post(
-      url = if (apiKey.isEmpty) s"$host/notifications" else s"$host/notifications?api-key=$apiKey",
+      url = s"$host/notifications?api-key=$apiKey",
       contentType = ContentType("application/json", "UTF-8"),
       body = json.getBytes("UTF-8")
     ) map {
