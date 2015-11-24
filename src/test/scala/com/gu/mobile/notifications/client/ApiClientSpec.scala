@@ -50,7 +50,7 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
       notif.topic returns Set.empty
       notif.debug returns true
       val reply = serviceApi.send(notif)
-      reply must beEqualTo("123").await(timeout = 5 seconds)
+      reply must beEqualTo(SendNotificationReply("123")).await(timeout = 5 seconds)
     }
 
   }
