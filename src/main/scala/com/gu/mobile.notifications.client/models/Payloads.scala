@@ -1,6 +1,8 @@
 package com.gu.mobile.notifications.client.models
 
 import java.net.URL
+import com.gu.mobile.notifications.client.models.Importance.Importance
+import com.gu.mobile.notifications.client.models.legacy.Topic
 
 sealed case class GuardianItemType(mobileAggregatorPrefix: String)
 
@@ -26,15 +28,18 @@ object BreakingNewsPayloadType extends PayloadType
 object ContentAlertPayloadType extends PayloadType
 object GoalAlertPayloadType extends PayloadType
 
-trait NotificationPayload {
+sealed trait NotificationPayload {
   def title: String
   def notificationType: String
   def message: String
   def thumbnailUrl: Option[URL]
+  def sender: String
+  def importance: Importance
+  def topic: Set[Topic]
   def debug: Boolean
 }
 
-trait NotificationWithLink extends NotificationPayload {
+sealed trait NotificationWithLink extends NotificationPayload {
   def link: Link
 }
 
@@ -43,9 +48,12 @@ case class BreakingNewsPayload(
   notificationType: String = "news",
   message: String,
   thumbnailUrl: Option[URL],
+  sender: String,
   editions: Set[String],
   link: Link,
   imageUrl: Option[String],
+  importance: Importance,
+  topic: Set[Topic],
   debug: Boolean
 ) extends NotificationWithLink
 
@@ -54,7 +62,10 @@ case class ContentAlertPayload(
   notificationType: String = "content",
   message: String,
   thumbnailUrl: Option[URL],
+  sender: String,
   link: Link,
+  importance: Importance,
+  topic: Set[Topic],
   debug: Boolean,
   shortUrl: String
 ) extends NotificationWithLink
@@ -64,6 +75,7 @@ case class GoalAlertPayload(
   notificationType: String = "goal",
   message: String,
   thumbnailUrl: Option[URL] = None,
+  sender: String,
   goalType: GoalType,
   awayTeamName: String,
   awayTeamScore: Int,
@@ -75,6 +87,8 @@ case class GoalAlertPayload(
   otherTeamName: String,
   matchId: String,
   mapiUrl: String,
+  importance: Importance,
+  topic: Set[Topic],
   debug: Boolean,
   addedTime: Option[String]
 ) extends NotificationPayload
