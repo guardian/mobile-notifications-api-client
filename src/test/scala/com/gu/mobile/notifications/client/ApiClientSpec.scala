@@ -73,7 +73,7 @@ class ApiClientSpec extends Specification with Mockito with NoTimeConversions {
 //TODO WE NEED TO COVER OTHER API ERRORS
   "LegacyApiClient" should {
 
-    "successfully send legacacy notification object" in legacyApiTest {
+    "successfully send legacy notification object" in legacyApiTest {
       legacyApiClient => legacyApiClient.send(notification) must beEqualTo(SendNotificationReply("123")).await
     }
     "successfully send BreakingNewsPayload" in legacyApiTest {

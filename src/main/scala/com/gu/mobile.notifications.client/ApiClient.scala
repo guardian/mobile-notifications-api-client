@@ -12,34 +12,33 @@ sealed trait ApiClientError {
   def description: String
 }
 
-case class ErrorWithSource(clientId:String, error:ApiClientError){
+case class ErrorWithSource(clientId: String, error: ApiClientError) {
   def description = clientId + ": " + error.description
 }
 
 trait CompositeApiError extends ApiClientError {
   def errors: List[ErrorWithSource]
-  override def description: String = errors.map(e=>e.description).mkString(", ")
+
+  override def description: String = errors.map(e => e.description).mkString(", ")
 }
 
 case class PartialApiError(errors: List[ErrorWithSource]) extends CompositeApiError
 
 case class TotalApiError(errors: List[ErrorWithSource]) extends CompositeApiError
 
-case class HttpApiError( status: Int) extends ApiClientError {
+case class HttpApiError(status: Int) extends ApiClientError {
   val description = s"Http error status $status"
 }
 
 trait ApiClient {
   //used to identify the client on error reports
-  def clientId:String
+  def clientId: String
   def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, String]]
 }
 
 trait SimpleHttpApiClient extends ApiClient {
   def host: String
-
   def httpProvider: HttpProvider
-
   def apiKey: Option[String]
 
   protected val url = s"$host/notifications" + apiKeyPathPart
@@ -64,12 +63,14 @@ trait SimpleHttpApiClient extends ApiClient {
       body = json.getBytes("UTF-8")
     )
   }
+
+  protected def parseResponse(jsonBody:String) = Json.fromJson[SendNotificationReply](Json.parse(jsonBody)).get
 }
 
 class LegacyApiClient(val host: String,
                       val httpProvider: HttpProvider,
                       val apiKey: Option[String] = None,
-                      val clientId:String = "Legacy",
+                      val clientId: String = "Legacy",
                       payloadBuilder: PayloadBuilder = PayloadBuilderImpl) extends SimpleHttpApiClient {
 
   override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, String]] = {
@@ -90,7 +91,7 @@ class LegacyApiClient(val host: String,
   private def sendToServer(notification: Notification)(implicit ec: ExecutionContext): Future[Either[HttpError, SendNotificationReply]] = {
     val json = Json.stringify(Json.toJson(notification))
     postJson(json) map {
-      case HttpOk(code, body) => Right(Json.fromJson[SendNotificationReply](Json.parse(body)).get)
+      case HttpOk(code, body) => Right(parseResponse(body))
       case error: HttpError => Left(error)
     }
   }
@@ -98,22 +99,27 @@ class LegacyApiClient(val host: String,
 
 class N10nApiClient(val host: String,
                     val httpProvider: HttpProvider,
-                    val clientId:String = "n10n",
+                    val clientId: String = "n10n",
                     val apiKey: Option[String]) extends SimpleHttpApiClient {
   override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, String]] = {
     //TODO
-   // val json = Json.stringify(Json.toJson(notificationPayload))
-    Future(Left(HttpApiError(500)))
+    // val json = Json.stringify(Json.toJson(notificationPayload))
+    val json = "{some json}"
+    postJson(json) map {
+      case error: HttpError => Left(HttpApiError(error.status))
+      case HttpOk(code, body) => Right(parseResponse(body).messageId)
+
+    }
+
   }
 }
 
-//TODO tag the api clients so that we can return a meaningful error code that can be displayed to the user
-class CompositeApiClient(apiClients: List[ApiClient], val clientId:String = "composite") extends ApiClient {
+class CompositeApiClient(apiClients: List[ApiClient], val clientId: String = "composite") extends ApiClient {
   require(apiClients.size > 0)
 
   override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, String]] = {
 
-    def sendAndSource(apiClient: ApiClient) : Future[Either[ErrorWithSource, String]] = {
+    def sendAndSource(apiClient: ApiClient): Future[Either[ErrorWithSource, String]] = {
       apiClient.send(notificationPayload) map {
         case Left(error) => Left(ErrorWithSource(apiClient.clientId, error))
         case Right(x) => Right(x)
