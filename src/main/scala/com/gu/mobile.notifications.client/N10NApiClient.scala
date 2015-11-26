@@ -20,7 +20,7 @@ protected class N10nApiClient(val host: String,
     //TODO for now at least we push the notification to the first topic in the payload.. this should be changed after we do MAPI-1123
     val topicName = notificationPayload.topic.head.name
 
-    val url = s"$host/$endPoint/$topicName?api-key=$apiKey"
+    val url = s"$host/$endPoint/topic/$topicName?api-key=$apiKey"
     val json = Json.stringify(Json.toJson(notificationPayload))
     postJson(url, json) map {
       case error: HttpError => Left(HttpApiError(error.status))
