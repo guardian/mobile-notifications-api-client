@@ -16,7 +16,7 @@ class CompositeApiClient(apiClients: List[ApiClient], val clientId: String = "co
       }
     }
 
-    val responses = Future.sequence(apiClients.map(sendAndSource)) //TODO make sure there are no future failures here (but how?)
+    val responses = Future.sequence(apiClients.map(sendAndSource))
     responses.map(aggregateResponses)
   }
 
