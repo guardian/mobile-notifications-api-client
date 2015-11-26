@@ -104,7 +104,8 @@ object PayloadBuilder extends InternationalEditionSupport {
         Message -> payload.message,
         Debug -> payload.debug.toString,
         Editions -> payload.editions.mkString(","),
-        Link -> androidLink
+        Link -> androidLink,
+        Topics -> payload.topic.map(_.toTopicString).mkString(", ")
       ) ++ Seq(
         Section -> sectionLink,
         Edition -> edition,
@@ -133,7 +134,8 @@ object PayloadBuilder extends InternationalEditionSupport {
     val properties = Map(
       IOSMessageType -> NewsAlert,
       NotificationType -> BreakingNews.toString(),
-      Link -> iosLink
+      Link -> iosLink,
+      Topics -> payload.topic.map(_.toTopicString).mkString(", ")
     )
 
     IOSMessagePayload(
