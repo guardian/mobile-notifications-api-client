@@ -1,6 +1,6 @@
-package com.gu.mobile.notifications.client.legacy
+package com.gu.mobile.notifications.client
 
-import com.gu.mobile.notifications.client._
+import com.gu.mobile.notifications.client.legacy.PayloadBuilder
 import com.gu.mobile.notifications.client.models.NotificationTypes.BreakingNews
 import com.gu.mobile.notifications.client.models.Regions.UK
 import com.gu.mobile.notifications.client.models._

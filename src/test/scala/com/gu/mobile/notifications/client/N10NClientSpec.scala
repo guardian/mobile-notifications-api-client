@@ -23,11 +23,11 @@ class N10NClientSpec extends ApiClientSpec[N10nApiClient] {
     thumbnailUrl = None,
     link = ExternalLink("http://mylink"),
     importance = Importance.Major,
-    topic = Set.empty,
+    topic = Set(Topic("t1", "n1"), Topic("t2", "n2")),
     debug = true
   )
 
-  val expectedPostUrl = s"$host/push?api-key=$apiKey"
+  val expectedPostUrl = s"$host/push/n1?api-key=$apiKey"
   val expectedPostBody = Json.stringify(Json.toJson(payload))
 
   override def getTestApiClient(httpProvider: HttpProvider) = new N10nApiClient(
@@ -44,11 +44,30 @@ class N10NClientSpec extends ApiClientSpec[N10nApiClient] {
     "successfully send BreakingNewsPayload" in apiTest {
       n10nClient => n10nClient.send(payload) must beEqualTo(Right(SendNotificationReply(""))).await
     }
-    "return error if BreakingNewsPayload cannot be sent" in apiTest(serverResponse = HttpError(500, "")) {
+    "return HttpApiError error if http provider returns httpError" in apiTest(serverResponse = HttpError(500, "")) {
       n10nClient => n10nClient.send(payload) must beEqualTo(Left(HttpApiError(status = 500))).await
     }
 
-    "Return HttpProviderError if http provider throws exception" in {
+    "return missing parameter error if payload has no topic" in {
+      val payloadWithNoTopics = BreakingNewsPayload(
+        title = "myTitle",
+        notificationType = BreakingNews.toString,
+        message = "myMessage",
+        sender = "test sender",
+        editions = Set.empty,
+        imageUrl = None,
+        thumbnailUrl = None,
+        link = ExternalLink("http://mylink"),
+        importance = Importance.Major,
+        topic = Set.empty,
+        debug = true
+      )
+
+      val n10nClient = getTestApiClient(mock[HttpProvider])
+      n10nClient.send(payloadWithNoTopics) must beEqualTo(Left(MissingParameterError("topic"))).await
+    }
+
+    "return HttpProviderError if http provider throws exception" in {
       val throwable = new RuntimeException("something went wrong!!")
       val fakeHttpProvider = mock[HttpProvider]
       fakeHttpProvider.post(anyString, any[ContentType], any[Array[Byte]]) returns Future.failed(throwable)

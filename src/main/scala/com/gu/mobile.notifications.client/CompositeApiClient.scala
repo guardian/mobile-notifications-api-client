@@ -22,11 +22,13 @@ class CompositeApiClient(apiClients: List[ApiClient], val clientId: String = "co
 
   //from the responses to the individual calls figure out what response to give to the composite api user
   private def aggregateResponses(responses: List[Either[ErrorWithSource, SendNotificationReply]]): Either[ApiClientError, SendNotificationReply] = {
-    responses.partition(_.isLeft) match {
-      case (Nil, Right(res) :: _) => Right(res)
-      case (lefts, Nil) => Left(TotalApiError(lefts.map(_.left.get)))
-      case (lefts, _) => Left(PartialApiError(lefts.map(_.left.get)))
+    val errorResponses = responses.collect {case Left(v) => v}
+    val successfulResponses = responses.collect {case Right(v) => v}
 
+    (errorResponses,successfulResponses) match {
+      case (Nil,firstSuccess :: _) => Right(firstSuccess)
+      case (failures, Nil) => Left(TotalApiError(failures))
+      case (failures, _) => Left(PartialApiError(failures))
     }
   }
 }
