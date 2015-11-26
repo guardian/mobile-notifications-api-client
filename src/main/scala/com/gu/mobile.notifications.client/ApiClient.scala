@@ -14,10 +14,8 @@ case class ErrorWithSource(clientId: String, error: ApiClientError) {
 
 trait CompositeApiError extends ApiClientError {
   def errors: List[ErrorWithSource]
-
-  override def description: String = errors.map(e => e.description).mkString(", ")
+  def description: String = errors.map(e => e.description).mkString(", ")
 }
-
 case class PartialApiError(errors: List[ErrorWithSource]) extends CompositeApiError
 
 case class TotalApiError(errors: List[ErrorWithSource]) extends CompositeApiError
@@ -30,7 +28,6 @@ case class HttpProviderError(throwable: Throwable) extends ApiClientError {
   def description = throwable.getMessage
 }
 
-
 case class UnexpectedApiResponseError(serverResponse: String) extends ApiClientError {
   val description = s"Unexpected response from server: $serverResponse"
 }
@@ -42,17 +39,13 @@ case class MissingParameterError(parameterName: String) extends ApiClientError {
 trait ApiClient {
   //used to identify the client on error reports
   def clientId: String
-
-  def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, SendNotificationReply]]
+  def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, Unit]]
 }
 
 protected trait SimpleHttpApiClient extends ApiClient {
   def host: String
-
   def endPoint: String
-
   def httpProvider: HttpProvider
-
   def apiKey: String
 
   def healthcheck(implicit ec: ExecutionContext): Future[Healthcheck] = {
@@ -70,23 +63,14 @@ protected trait SimpleHttpApiClient extends ApiClient {
       body = json.getBytes("UTF-8")
     )
   }
-
 }
 
 object ApiClient {
-  def apply(legacyHost: Option[String] = None, legacyApiKey: Option[String] = None, n10nHost: String, n10nApikey: String, httpProvider: HttpProvider): ApiClient = {
-    val n10nClient = new N10nApiClient(host = n10nHost, apiKey = n10nApikey, httpProvider = httpProvider)
-
-    (legacyHost, legacyApiKey) match {
-      case (Some(legacyHostVal), Some(legacyKeyVal)) => {
-        val legacyClient = new LegacyApiClient(host = legacyHostVal, apiKey = legacyKeyVal, httpProvider = httpProvider)
-        new CompositeApiClient(List(n10nClient, legacyClient))
-      }
-      case (_, _) => n10nClient
-    }
-
+  def apply(host: String, apiKey: String, httpProvider: HttpProvider, legacyHost: String, legacyApiKey: String): ApiClient = {
+    val client = new N10nApiClient(host = host, apiKey = apiKey, httpProvider = httpProvider)
+    val legacy = new LegacyApiClient(host = legacyHost, apiKey = legacyApiKey, httpProvider = httpProvider)
+    new CompositeApiClient(List(legacy, client))
   }
-
 
 }
 

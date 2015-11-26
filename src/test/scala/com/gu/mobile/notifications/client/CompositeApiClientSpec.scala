@@ -1,11 +1,11 @@
 package com.gu.mobile.notifications.client
 
-import com.gu.mobile.notifications.client.models.{BreakingNewsPayload, SendNotificationReply, NotificationPayload}
+import com.gu.mobile.notifications.client.models.{BreakingNewsPayload, NotificationPayload}
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.time.NoTimeConversions
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 
 class CompositeApiClientSpec  extends Specification with Mockito with NoTimeConversions{
   "CompositeApiClient" should {
@@ -40,11 +40,11 @@ class CompositeApiClientSpec  extends Specification with Mockito with NoTimeConv
 
       val error1 = HttpApiError(500)
       val error3 = HttpApiError(403)
-      val success = SendNotificationReply("123")
+
 
       api1.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(Left(error1))
       api1.clientId returns "api1"
-      api2.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(Right(success))
+      api2.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(Right())
       api2.clientId returns "api2"
       api3.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(Left(error3))
       api3.clientId returns "api3"
@@ -60,13 +60,13 @@ class CompositeApiClientSpec  extends Specification with Mockito with NoTimeConv
       val api1 = mock[ApiClient]
       val api2 = mock[ApiClient]
       val api3 = mock[ApiClient]
-      val success = Right(SendNotificationReply("1234"))
-      api1.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(success)
-      api2.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(success)
-      api3.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(success)
+
+      api1.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(Right())
+      api2.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(Right())
+      api3.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(Right())
 
       val client = new CompositeApiClient(List(api1, api2, api3))
-      client.send(payload) must beEqualTo(success).await
+      client.send(payload) must beEqualTo(Right()).await
     }
 
   }

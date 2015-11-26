@@ -1,6 +1,6 @@
 package com.gu.mobile.notifications.client
 
-import com.gu.mobile.notifications.client.models.{NotificationPayload, SendNotificationReply}
+import com.gu.mobile.notifications.client.models.NotificationPayload
 import play.api.libs.json.Json
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -13,7 +13,7 @@ protected class N10nApiClient(val host: String,
 
   val endPoint = "push"
 
-  override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, SendNotificationReply]] = {
+  override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, Unit]] = {
 
     if (notificationPayload.topic.isEmpty) return Future(Left(MissingParameterError("topic")))
 
@@ -24,7 +24,7 @@ protected class N10nApiClient(val host: String,
     val json = Json.stringify(Json.toJson(notificationPayload))
     postJson(url, json) map {
       case error: HttpError => Left(HttpApiError(error.status))
-      case HttpOk(code, body) => Right(SendNotificationReply("")) //TODO SEE WHAT TO RETURN HERE, WE PROBABLY NEED TO CHANGE THE MAIN INTERFACE SO THAT IT DOESN'T RETURN AN ID
+      case HttpOk(code, body) => Right()
     } recover {
       case t: Throwable => Left(HttpProviderError(t))
     }

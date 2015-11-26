@@ -6,7 +6,6 @@ import com.gu.mobile.notifications.client.models.Regions.UK
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy._
 import org.specs2.execute.Result
-import play.api.libs.json.Json
 
 import scala.concurrent.Future
 
@@ -46,7 +45,7 @@ class LegacyApiClientSpec extends ApiClientSpec[LegacyApiClient] {
     metadata = Map("m1" -> "v1")
   )
 
-  val expectedPostBody = Json.stringify(Json.toJson(notification))
+  val expectedPostBody = """{"type":"news","uniqueIdentifier":"UNIQUE_ID","sender":"sender","target":{"regions":["uk"],"topics":[{"type":"newsstand","name":"newsstandIos"}]},"timeToLiveInSeconds":10,"payloads":{"ios":{"type":"ios","body":"ios_body","customProperties":{"p1":"v1"},"category":"category"},"android":{"type":"android","body":{"k1":"v1"}}},"metadata":{"m1":"v1"}}"""
   val expectedPostUrl = s"$host/notifications?api-key=$apiKey"
 
   val fakePayloadBuilder = mock[PayloadBuilder]
@@ -65,27 +64,21 @@ class LegacyApiClientSpec extends ApiClientSpec[LegacyApiClient] {
 
   "LegacyApiClient" should {
 
-    "successfully send legacy notification object" in apiTest {
-      legacyApiClient => legacyApiClient.send(notification) must beEqualTo(SendNotificationReply("123")).await
-    }
     "successfully send BreakingNewsPayload" in apiTest {
-      legacyApiClient => legacyApiClient.send(payload) must beEqualTo(Right(SendNotificationReply("123"))).await
+      legacyApiClient => legacyApiClient.send(payload) must beEqualTo(Right()).await
     }
     "return HttpApiError if http error while sending BreakingNewsPayload" in apiTest(serverResponse = HttpError(500, "")) {
       legacyApiClient => legacyApiClient.send(payload) must beEqualTo(Left(HttpApiError(status = 500))).await
     }
 
-    "return UnexpectedApiResponseError if legacy returns unexpected json" in apiTest(serverResponse = HttpOk(200, """ {"unexpected" : "yes"} """")) {
-      legacyApiClient => legacyApiClient.send(payload) must beEqualTo(Left(UnexpectedApiResponseError( """ {"unexpected" : "yes"} """"))).await
+    "return UnexpectedApiResponseError if legacy returns unexpected json" in apiTest(serverResponse = HttpOk(200, "{\"something\":\"else\"}")) {
+      legacyApiClient => legacyApiClient.send(payload) must beEqualTo(Left(UnexpectedApiResponseError("{\"something\":\"else\"}"))).await
     }
     "return UnexpectedApiResponseError if legacy returns invalid json" in apiTest(serverResponse = HttpOk(200, "I'm not valid json at all")) {
       legacyApiClient => legacyApiClient.send(payload) must beEqualTo(Left(UnexpectedApiResponseError("I'm not valid json at all"))).await
     }
 
-    "throw error if error returned while sending legacy notification" in apiTest(serverResponse = HttpError(500, "")) {
-      legacyApiClient => legacyApiClient.send(notification) must throwA[HttpError].await
-    }
-    "Return HttpProviderError if http provider throws exception" in {
+    "return HttpProviderError if http provider throws exception" in {
       val throwable = new RuntimeException("something went wrong!!")
       val fakeHttpProvider = mock[HttpProvider]
       fakeHttpProvider.post(anyString, any[ContentType], any[Array[Byte]]) returns Future.failed(throwable)

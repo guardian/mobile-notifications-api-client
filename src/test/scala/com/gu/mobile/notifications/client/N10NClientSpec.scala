@@ -1,8 +1,6 @@
 package com.gu.mobile.notifications.client
 
-import com.gu.mobile.notifications.client.legacy.PayloadBuilder
 import com.gu.mobile.notifications.client.models.NotificationTypes.BreakingNews
-import com.gu.mobile.notifications.client.models.Regions.UK
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy._
 import org.specs2.execute.Result
@@ -42,7 +40,7 @@ class N10NClientSpec extends ApiClientSpec[N10nApiClient] {
 
   "n10nApiClient" should {
     "successfully send BreakingNewsPayload" in apiTest {
-      n10nClient => n10nClient.send(payload) must beEqualTo(Right(SendNotificationReply(""))).await
+      n10nClient => n10nClient.send(payload) must beEqualTo(Right()).await
     }
     "return HttpApiError error if http provider returns httpError" in apiTest(serverResponse = HttpError(500, "")) {
       n10nClient => n10nClient.send(payload) must beEqualTo(Left(HttpApiError(status = 500))).await
