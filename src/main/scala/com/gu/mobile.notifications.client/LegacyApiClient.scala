@@ -2,7 +2,7 @@ package com.gu.mobile.notifications.client
 
 import com.gu.mobile.notifications.client.legacy.{PayloadBuilder, PayloadBuilderImpl}
 import com.gu.mobile.notifications.client.models.{NotificationPayload, SendNotificationReply}
-import play.api.libs.json.{Reads, JsError, JsSuccess, Json}
+import play.api.libs.json.Json
 
 import scala.concurrent.{ExecutionContext, Future}
 

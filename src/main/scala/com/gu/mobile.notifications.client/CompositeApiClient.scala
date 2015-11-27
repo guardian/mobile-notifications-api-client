@@ -26,7 +26,7 @@ class CompositeApiClient(apiClients: List[ApiClient], val clientId: String = "co
     val successfulResponses = responses.collect {case Right(v) => v}
 
     (errorResponses,successfulResponses) match {
-      case (Nil,firstSuccess :: _) => Right()
+      case (Nil, _) => Right()
       case (failures, Nil) => Left(TotalApiError(failures))
       case (failures, _) => Left(PartialApiError(failures))
     }
