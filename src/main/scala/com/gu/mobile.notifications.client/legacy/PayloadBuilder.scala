@@ -105,7 +105,7 @@ object PayloadBuilder extends InternationalEditionSupport {
         Debug -> payload.debug.toString,
         Editions -> payload.editions.mkString(","),
         Link -> androidLink,
-        Topics -> payload.topic.map(_.toTopicString).mkString(", ")
+        Topics -> payload.topic.map(_.toTopicString).mkString(",")
       ) ++ Seq(
         Section -> sectionLink,
         Edition -> edition,
