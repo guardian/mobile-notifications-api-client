@@ -34,7 +34,7 @@ protected class N10nApiClient(val host: String,
           case HttpOk(201, body) => validateFormat[N10NResponse](body)
           case HttpOk(code, body) => Left(UnexpectedApiResponseError(s"Server returned status code $code and body:$body"))
         } recover {
-          case t: Throwable => Left(HttpProviderError(t))
+          case e: Exception => Left(HttpProviderError(e))
         }
       }
     }

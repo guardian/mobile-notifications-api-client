@@ -22,7 +22,7 @@ protected class LegacyApiClient(val host: String,
       case HttpOk(code, body) => validateFormat[SendNotificationReply](body)
       case error: HttpError => Left(HttpApiError(error.status))
     } recover {
-      case t: Throwable => Left(HttpProviderError(t))
+      case e: Exception => Left(HttpProviderError(e))
     }
 
   }

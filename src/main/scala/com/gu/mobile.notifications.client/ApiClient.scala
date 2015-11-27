@@ -15,7 +15,7 @@ case class ErrorWithSource(clientId: String, error: ApiClientError) {
 
 trait CompositeApiError extends ApiClientError {
   def errors: List[ErrorWithSource]
-  def description: String = errors.map(e => e.description).mkString(", ")
+  def description = errors.map(_.description).mkString(", ")
 }
 case class PartialApiError(errors: List[ErrorWithSource]) extends CompositeApiError
 
@@ -38,7 +38,6 @@ case class MissingParameterError(parameterName: String) extends ApiClientError {
 }
 
 trait ApiClient {
-  //used to identify the client on error reports
   def clientId: String
   def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, Unit]]
 }
@@ -71,7 +70,7 @@ protected trait SimpleHttpApiClient extends ApiClient {
       }
     }
     catch {
-      case _:Throwable => Left(UnexpectedApiResponseError(jsonBody))
+      case _: Exception => Left(UnexpectedApiResponseError(jsonBody))
     }
   }
 }

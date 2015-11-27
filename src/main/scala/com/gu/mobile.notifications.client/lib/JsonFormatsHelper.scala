@@ -53,15 +53,6 @@ object JsonFormatsHelper {
     }
   }
 
-  implicit def optionFormat[T](implicit format: Format[T]): Format[Option[T]] = new Format[Option[T]] {
-    override def reads(json: JsValue): JsResult[Option[T]] = json match {
-      case JsNull => JsSuccess(None)
-      case _ => format.reads(json) map Some.apply
-    }
-
-    override def writes(o: Option[T]): JsValue =
-      o map format.writes getOrElse JsNull
-  }
   implicit val urlFormat = new Format[URL] {
     override def writes(o: URL): JsValue = JsString(o.toExternalForm)
     override def reads(json: JsValue): JsResult[URL] = json match {
