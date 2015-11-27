@@ -13,7 +13,7 @@ class N10NClientSpec extends ApiClientSpec[N10nApiClient] {
 
   val payload = BreakingNewsPayload(
     title = "myTitle",
-    notificationType = BreakingNews.toString,
+    `type` = BreakingNews.toString,
     message = "myMessage",
     sender = "test sender",
     editions = Set.empty,
@@ -25,7 +25,7 @@ class N10NClientSpec extends ApiClientSpec[N10nApiClient] {
     debug = true
   )
 
-  val expectedPostUrl = s"$host/push/n1?api-key=$apiKey"
+  val expectedPostUrl = s"$host/push/topic/t1/n1?api-key=$apiKey"
   val expectedPostBody = Json.stringify(Json.toJson(payload))
 
   override def getTestApiClient(httpProvider: HttpProvider) = new N10nApiClient(
@@ -49,7 +49,7 @@ class N10NClientSpec extends ApiClientSpec[N10nApiClient] {
     "return missing parameter error if payload has no topic" in {
       val payloadWithNoTopics = BreakingNewsPayload(
         title = "myTitle",
-        notificationType = BreakingNews.toString,
+        `type` = BreakingNews.toString,
         message = "myMessage",
         sender = "test sender",
         editions = Set.empty,

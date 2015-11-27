@@ -23,7 +23,7 @@ class LegacyApiClientSpec extends ApiClientSpec[LegacyApiClient] {
 
   val payload = BreakingNewsPayload(
     title = "myTitle",
-    notificationType = BreakingNews.toString,
+    `type` = BreakingNews.toString,
     message = "myMessage",
     sender = "test sender",
     editions = Set.empty,

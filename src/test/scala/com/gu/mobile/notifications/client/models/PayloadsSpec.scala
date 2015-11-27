@@ -18,8 +18,8 @@ class PayloadsSpec extends Specification {
     "define serializable Breaking News payload" in {
 
       val payload = BreakingNewsPayload(
+        id = "notification_id",
         title = "myTitle",
-        notificationType = BreakingNews.toString,
         message = "myMessage",
         sender = "test sender",
         editions = Set("ed1", "ed2"),
@@ -29,7 +29,7 @@ class PayloadsSpec extends Specification {
         importance = Importance.Major,
         topic = Set(Topic("t1", "n1"), Topic("t2", "n2")),
         debug = true)
-      val expectedJson = """{"title":"myTitle","notificationType":"news","message":"myMessage","thumbnailUrl":"http://something.com/thumb.jpg","sender":"test sender","editions":["ed1","ed2"],"link":{"url":"http://mylink"},"imageUrl":"http://something.com/img.jpg","importance":"Major","topic":[{"type":"t1","name":"n1"},{"type":"t2","name":"n2"}],"debug":true}"""
+      val expectedJson = """{"id":"notification_id","title":"myTitle","type":"news","message":"myMessage","thumbnailUrl":"http://something.com/thumb.jpg","sender":"test sender","editions":["ed1","ed2"],"link":{"url":"http://mylink"},"imageUrl":"http://something.com/img.jpg","importance":"Major","topic":[{"type":"t1","name":"n1"},{"type":"t2","name":"n2"}],"debug":true}"""
 
       verifySerialization(payload, expectedJson)
     }
@@ -37,8 +37,8 @@ class PayloadsSpec extends Specification {
     "define serializable Content Alert payload" in {
 
       val payload = ContentAlertPayload(
+        id = "notification_id",
         "myTitle",
-        notificationType = "someType",
         message = "someMessage",
         thumbnailUrl = Some(new URL("http://something.com/thumb.jpg")),
         sender = "someSender",
@@ -48,19 +48,19 @@ class PayloadsSpec extends Specification {
         debug = false,
         shortUrl = "http://a.uk")
 
-      val expectedJson = """{"title":"myTitle","notificationType":"someType","message":"someMessage","thumbnailUrl":"http://something.com/thumb.jpg","sender":"someSender","link":{"url":"http://mylink"},"importance":"Minor","topic":[{"type":"t4","name":"n4"},{"type":"t2","name":"n2"},{"type":"t7","name":"n7"}],"debug":false,"shortUrl":"http://a.uk"}"""
+      val expectedJson = """{"id":"notification_id","title":"myTitle","type":"content","message":"someMessage","thumbnailUrl":"http://something.com/thumb.jpg","sender":"someSender","link":{"url":"http://mylink"},"importance":"Minor","topic":[{"type":"t4","name":"n4"},{"type":"t2","name":"n2"},{"type":"t7","name":"n7"}],"debug":false,"shortUrl":"http://a.uk"}"""
 
       verifySerialization(payload, expectedJson)
     }
 
     "define seriazable Goal Alert Payload" in {
       val payload = GoalAlertPayload(
+        id = "notification_id",
         title = "myTitle",
-        notificationType = "someType",
         message = "some Message",
         thumbnailUrl = Some(new URL("http://url.net")),
         sender = "someSender",
-        goalType = OwnGoalType, //TODO CHECK DIFFERENT GOAL TYPES
+        goalType = OwnGoalType,
         awayTeamName = "someAwayTeam",
         awayTeamScore = 1,
         homeTeamName = "someHomeTeam",
@@ -76,7 +76,8 @@ class PayloadsSpec extends Specification {
         debug = true,
         addedTime = Some("someAddedTime"))
 
-      val expectedJson = """{"title":"myTitle","notificationType":"someType","message":"some Message","thumbnailUrl":"http://url.net","sender":"someSender","goalType":"Own","awayTeamName":"someAwayTeam","awayTeamScore":1,"homeTeamName":"someHomeTeam","homeTeamScore":2,"scoringTeamName":"someScoringTeamName","scorerName":"someFootballersName","goalMins":41,"otherTeamName":"someOtherTeamName","matchId":"someMatchId","mapiUrl":"http://mapi.com/something","importance":"Major","topic":[{"type":"t1","name":"n1"},{"type":"tn","name":"nn"}],"debug":true,"addedTime":"someAddedTime"}"""
+
+      val expectedJson = """{"id":"notification_id","title":"myTitle","type":"goalAlert","message":"some Message","thumbnailUrl":"http://url.net","sender":"someSender","goalType":"Own","awayTeamName":"someAwayTeam","awayTeamScore":1,"homeTeamName":"someHomeTeam","homeTeamScore":2,"scoringTeamName":"someScoringTeamName","scorerName":"someFootballersName","goalMins":41,"otherTeamName":"someOtherTeamName","matchId":"someMatchId","mapiUrl":"http://mapi.com/something","importance":"Major","topic":[{"type":"t1","name":"n1"},{"type":"tn","name":"nn"}],"debug":true,"addedTime":"someAddedTime"}"""
 
       verifySerialization(payload, expectedJson)
 

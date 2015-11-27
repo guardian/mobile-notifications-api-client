@@ -15,19 +15,25 @@ protected class N10nApiClient(val host: String,
 
   override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, Unit]] = {
 
-    if (notificationPayload.topic.isEmpty) return Future(Left(MissingParameterError("topic")))
 
     //TODO for now at least we push the notification to the first topic in the payload.. this should be changed after we do MAPI-1123
-    val topicName = notificationPayload.topic.head.name
+    notificationPayload.topic.toList match {
 
-    val url = s"$host/$endPoint/topic/$topicName?api-key=$apiKey"
-    val json = Json.stringify(Json.toJson(notificationPayload))
-    postJson(url, json) map {
-      case error: HttpError => Left(HttpApiError(error.status))
-      case HttpOk(code, body) => Right()
-    } recover {
-      case t: Throwable => Left(HttpProviderError(t))
+      case Nil => Future(Left(MissingParameterError("topic")))
+
+      case firstTopic :: _ => {
+        val topicUrlPart = firstTopic.`type` + "/" + firstTopic.name
+        val url = s"$host/$endPoint/topic/$topicUrlPart?api-key=$apiKey"
+        val json = Json.stringify(Json.toJson(notificationPayload))
+        postJson(url, json) map {
+          case error: HttpError => Left(HttpApiError(error.status))
+          case HttpOk(code, body) => Right()
+        } recover {
+          case t: Throwable => Left(HttpProviderError(t))
+        }
+      }
     }
   }
+
 
 }

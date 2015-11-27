@@ -27,6 +27,7 @@ object PayloadBuilderImpl extends PayloadBuilder with InternationalEditionSuppor
   }
 
   private def buildBreakingNewsAlert(bnp: BreakingNewsPayload) = Notification(
+    uniqueIdentifier = bnp.id,
     `type` = BreakingNews,
     sender = bnp.sender,
     target = Target(editionsFrom(bnp) flatMap regions.get, bnp.topic),
@@ -39,6 +40,7 @@ object PayloadBuilderImpl extends PayloadBuilder with InternationalEditionSuppor
   )
 
   private def buildContentAlert(cap: ContentAlertPayload) = Notification(
+    uniqueIdentifier = cap.id,
     `type` = ContentNotification,
     sender = cap.sender,
     target = Target(Set.empty, cap.topic),
@@ -51,6 +53,7 @@ object PayloadBuilderImpl extends PayloadBuilder with InternationalEditionSuppor
   )
 
   private def buildGoalAlert(gap: GoalAlertPayload) = Notification(
+    uniqueIdentifier = gap.id,
     `type` = ContentNotification,
     sender = gap.sender,
     target = Target(Set.empty, gap.topic),
@@ -102,7 +105,7 @@ object PayloadBuilderImpl extends PayloadBuilder with InternationalEditionSuppor
     AndroidMessagePayload(
       Map(
         Type -> Custom,
-        NotificationType -> payload.notificationType,
+        NotificationType -> payload.`type`,
         Title -> payload.title,
         Ticker -> payload.message,
         Message -> payload.message,
