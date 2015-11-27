@@ -12,8 +12,7 @@ protected class LegacyApiClient(val host: String,
                                 val clientId: String = "Legacy",
                                 payloadBuilder: PayloadBuilder = PayloadBuilderImpl) extends SimpleHttpApiClient {
 
-  val endPoint = "notifications"
-  private val url = s"$host/$endPoint?api-key=$apiKey"
+  private val url = s"$host/notifications?api-key=$apiKey"
 
   override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, Unit]] = {
     val legacyNotification = payloadBuilder.buildNotification(notificationPayload)

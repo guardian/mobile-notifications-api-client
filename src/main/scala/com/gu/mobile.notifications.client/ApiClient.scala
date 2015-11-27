@@ -44,7 +44,6 @@ trait ApiClient {
 
 protected trait SimpleHttpApiClient extends ApiClient {
   def host: String
-  def endPoint: String
   def httpProvider: HttpProvider
   def apiKey: String
 

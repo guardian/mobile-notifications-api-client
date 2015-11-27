@@ -34,7 +34,7 @@ class N10NClientSpec extends ApiClientSpec[N10nApiClient] {
     host = host
   )
   def apiTest(test: N10nApiClient => Unit): Result = {
-    val successServerResponse = HttpOk(200, "")
+    val successServerResponse = HttpOk(201, """{"id":"someId"}""")
     apiTest(successServerResponse)(test)
   }
 
@@ -44,6 +44,15 @@ class N10NClientSpec extends ApiClientSpec[N10nApiClient] {
     }
     "return HttpApiError error if http provider returns httpError" in apiTest(serverResponse = HttpError(500, "")) {
       n10nClient => n10nClient.send(payload) must beEqualTo(Left(HttpApiError(status = 500))).await
+    }
+    "return UnexpectedApiResponseError if server returns invalid json" in apiTest(serverResponse = HttpOk(201, "not valid json at all")) {
+      legacyApiClient => legacyApiClient.send(payload) must beEqualTo(Left(UnexpectedApiResponseError("not valid json at all"))).await
+    }
+    "return UnexpectedApiResponseError if server returns wrong json format" in apiTest(serverResponse = HttpOk(201, """{"unexpected":"yes"}""")) {
+      legacyApiClient => legacyApiClient.send(payload) must beEqualTo(Left(UnexpectedApiResponseError("""{"unexpected":"yes"}"""))).await
+    }
+    "return UnexpectedApiResponseError if server returns wrong success status code" in apiTest(serverResponse = HttpOk(200, "success but not code 201!")) {
+      legacyApiClient => legacyApiClient.send(payload) must beEqualTo(Left(UnexpectedApiResponseError("Server returned status code 200 and body:success but not code 201!"))).await
     }
 
     "return missing parameter error if payload has no topic" in {

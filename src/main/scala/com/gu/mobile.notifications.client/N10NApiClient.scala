@@ -1,9 +1,15 @@
 package com.gu.mobile.notifications.client
 
-import com.gu.mobile.notifications.client.models.NotificationPayload
-import play.api.libs.json.Json
+import com.gu.mobile.notifications.client.models.{NotificationPayload}
+import play.api.libs.json.{JsError, JsSuccess, Json}
 
 import scala.concurrent.{ExecutionContext, Future}
+
+case class N10NResponse(id: String)
+
+object N10NResponse {
+  implicit val jf = Json.format[N10NResponse]
+}
 
 protected class N10nApiClient(val host: String,
                               val apiKey: String,
@@ -11,7 +17,6 @@ protected class N10nApiClient(val host: String,
                               val clientId: String = "n10n"
                                ) extends SimpleHttpApiClient {
 
-  val endPoint = "push"
 
   override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, Unit]] = {
 
@@ -22,12 +27,12 @@ protected class N10nApiClient(val host: String,
       case Nil => Future(Left(MissingParameterError("topic")))
 
       case firstTopic :: _ => {
-        val topicUrlPart = firstTopic.`type` + "/" + firstTopic.name
-        val url = s"$host/$endPoint/topic/$topicUrlPart?api-key=$apiKey"
+        val url = s"$host/push/topic/$firstTopic?api-key=$apiKey"
         val json = Json.stringify(Json.toJson(notificationPayload))
         postJson(url, json) map {
           case error: HttpError => Left(HttpApiError(error.status))
-          case HttpOk(code, body) => Right()
+          case HttpOk(201, body) => validateResponseJson(body)
+          case HttpOk(code, body) => Left(UnexpectedApiResponseError(s"Server returned status code $code and body:$body"))
         } recover {
           case t: Throwable => Left(HttpProviderError(t))
         }
@@ -35,5 +40,17 @@ protected class N10nApiClient(val host: String,
     }
   }
 
+  private def validateResponseJson(responseBody: String): Either[ApiClientError, Unit] = {
+    try {
+      Json.parse(responseBody).validate[N10NResponse] match {
+        case _: JsSuccess[N10NResponse] => Right()
+        case _: JsError => Left(UnexpectedApiResponseError(responseBody))
+      }
+    }
+    catch {
+      case _: Throwable => Left(UnexpectedApiResponseError(responseBody))
+    }
+  }
 
 }
+
