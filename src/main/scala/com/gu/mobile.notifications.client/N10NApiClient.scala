@@ -31,24 +31,12 @@ protected class N10nApiClient(val host: String,
         val json = Json.stringify(Json.toJson(notificationPayload))
         postJson(url, json) map {
           case error: HttpError => Left(HttpApiError(error.status))
-          case HttpOk(201, body) => validateResponseJson(body)
+          case HttpOk(201, body) => validateFormat[N10NResponse](body)
           case HttpOk(code, body) => Left(UnexpectedApiResponseError(s"Server returned status code $code and body:$body"))
         } recover {
           case t: Throwable => Left(HttpProviderError(t))
         }
       }
-    }
-  }
-
-  private def validateResponseJson(responseBody: String): Either[ApiClientError, Unit] = {
-    try {
-      Json.parse(responseBody).validate[N10NResponse] match {
-        case _: JsSuccess[N10NResponse] => Right()
-        case _: JsError => Left(UnexpectedApiResponseError(responseBody))
-      }
-    }
-    catch {
-      case _: Throwable => Left(UnexpectedApiResponseError(responseBody))
     }
   }
 

@@ -1,6 +1,7 @@
 package com.gu.mobile.notifications.client
 
 import com.gu.mobile.notifications.client.models._
+import play.api.libs.json.{JsError, JsSuccess, Json, Reads}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -61,6 +62,17 @@ protected trait SimpleHttpApiClient extends ApiClient {
       contentType = ContentType("application/json", "UTF-8"),
       body = json.getBytes("UTF-8")
     )
+  }
+  protected def validateFormat[T](jsonBody: String)(implicit jr: Reads[T]): Either[ApiClientError, Unit] = {
+    try {
+      Json.parse(jsonBody).validate[T] match {
+        case _: JsSuccess[T] => Right()
+        case _: JsError => Left(UnexpectedApiResponseError(jsonBody))
+      }
+    }
+    catch {
+      case _:Throwable => Left(UnexpectedApiResponseError(jsonBody))
+    }
   }
 }
 
