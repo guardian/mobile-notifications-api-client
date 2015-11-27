@@ -135,7 +135,7 @@ object PayloadBuilder extends InternationalEditionSupport {
       IOSMessageType -> NewsAlert,
       NotificationType -> BreakingNews.toString(),
       Link -> iosLink,
-      Topics -> payload.topic.map(_.toTopicString).mkString(", ")
+      Topics -> payload.topic.map(_.toTopicString).mkString(",")
     )
 
     IOSMessagePayload(
