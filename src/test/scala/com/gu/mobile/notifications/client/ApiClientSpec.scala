@@ -21,7 +21,7 @@ trait ApiClientSpec[C <: ApiClient] extends Specification with Mockito {
     fakeHttpProvider.post(anyString, any[ContentType], any[Array[Byte]]) returns Future.successful(serverResponse)
 
     val testApiClient = getTestApiClient(fakeHttpProvider)
-    //run the provided code block
+   
     test(testApiClient)
 
     val bodyCapture = new ArgumentCapture[Array[Byte]]

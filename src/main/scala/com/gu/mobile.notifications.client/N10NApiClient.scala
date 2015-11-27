@@ -5,16 +5,16 @@ import play.api.libs.json.Json
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class N10NResponse(id: String)
+case class NextGenResponse(id: String)
 
-object N10NResponse {
-  implicit val jf = Json.format[N10NResponse]
+object NextGenResponse {
+  implicit val jf = Json.format[NextGenResponse]
 }
 
-protected class N10nApiClient(val host: String,
+protected class NextGenApiClient(val host: String,
                               val apiKey: String,
                               val httpProvider: HttpProvider,
-                              val clientId: String = "n10n"
+                              val clientId: String = "nextGen"
                                ) extends SimpleHttpApiClient {
 
 
@@ -31,7 +31,7 @@ protected class N10nApiClient(val host: String,
         val json = Json.stringify(Json.toJson(notificationPayload))
         postJson(url, json) map {
           case error: HttpError => Left(HttpApiError(error.status))
-          case HttpOk(201, body) => validateFormat[N10NResponse](body)
+          case HttpOk(201, body) => validateFormat[NextGenResponse](body)
           case HttpOk(code, body) => Left(UnexpectedApiResponseError(s"Server returned status code $code and body:$body"))
         } recover {
           case e: Exception => Left(HttpProviderError(e))
