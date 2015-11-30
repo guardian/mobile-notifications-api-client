@@ -27,7 +27,8 @@ protected class NextGenApiClient(val host: String,
       case Nil => Future(Left(MissingParameterError("topic")))
 
       case firstTopic :: _ => {
-        val url = s"$host/push/topic/$firstTopic?api-key=$apiKey"
+        val topicUrlPart = firstTopic.`type` + "/" + firstTopic.name
+        val url = s"$host/push/topic/$topicUrlPart?api-key=$apiKey"
         val json = Json.stringify(Json.toJson(notificationPayload))
         postJson(url, json) map {
           case error: HttpError => Left(ApiHttpError(error.status))

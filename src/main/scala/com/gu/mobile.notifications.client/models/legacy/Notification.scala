@@ -19,7 +19,7 @@ case class Topic(
   `type`: String,
   name: String
 ) {
-  override def toString = `type` + "/" + name
+  def toTopicString = `type` + "//" + name
 }
 
 case class Target(
