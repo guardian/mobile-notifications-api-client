@@ -40,10 +40,10 @@ class NextGenApiClientSpec extends ApiClientSpec[NextGenApiClient] {
 
   "NextGenApiClient" should {
     "successfully send payload" in apiTest {
-      client => client.send(payload) must beEqualTo(Right()).await
+      client => client.send(payload) must beRight.await
     }
-    "return HttpApiError error if http provider returns httpError" in apiTest(serverResponse = HttpError(500, "")) {
-      client => client.send(payload) must beEqualTo(Left(HttpApiError(status = 500))).await
+    "return HttpApiError error if http provider returns ApiHttpError" in apiTest(serverResponse = HttpError(500, "")) {
+      client => client.send(payload) must beEqualTo(Left(ApiHttpError(status = 500))).await
     }
     "return UnexpectedApiResponseError if server returns invalid json" in apiTest(serverResponse = HttpOk(201, "not valid json at all")) {
       client => client.send(payload) must beEqualTo(Left(UnexpectedApiResponseError("not valid json at all"))).await

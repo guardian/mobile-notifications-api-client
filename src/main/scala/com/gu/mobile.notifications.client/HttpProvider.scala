@@ -8,9 +8,7 @@ case class HttpOk(status: Int, body: String) extends HttpResponse {
   require(status >= 200 && status < 300)
 }
 
-case class HttpError(status: Int, body: String) extends HttpResponse {
-  def getMessage = s"Server error status $status"
-}
+case class HttpError(status: Int, body: String) extends HttpResponse
 
 case class ContentType(mediaType: String, charset: String)
 

@@ -65,10 +65,10 @@ class LegacyApiClientSpec extends ApiClientSpec[LegacyApiClient] {
   "LegacyApiClient" should {
 
     "successfully send BreakingNewsPayload" in apiTest {
-      legacyApiClient => legacyApiClient.send(payload) must beEqualTo(Right()).await
+      legacyApiClient => legacyApiClient.send(payload) must beRight.await
     }
     "return HttpApiError if http error while sending BreakingNewsPayload" in apiTest(serverResponse = HttpError(500, "")) {
-      legacyApiClient => legacyApiClient.send(payload) must beEqualTo(Left(HttpApiError(status = 500))).await
+      legacyApiClient => legacyApiClient.send(payload) must beEqualTo(Left(ApiHttpError(status = 500))).await
     }
 
     "return UnexpectedApiResponseError if legacy returns unexpected json" in apiTest(serverResponse = HttpOk(200, "{\"something\":\"else\"}")) {

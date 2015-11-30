@@ -21,7 +21,7 @@ case class PartialApiError(errors: List[ErrorWithSource]) extends CompositeApiEr
 
 case class TotalApiError(errors: List[ErrorWithSource]) extends CompositeApiError
 
-case class HttpApiError(status: Int) extends ApiClientError {
+case class ApiHttpError(status: Int) extends ApiClientError {
   val description = s"Http error status $status"
 }
 

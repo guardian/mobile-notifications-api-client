@@ -16,9 +16,9 @@ class CompositeApiClientSpec  extends Specification with Mockito with NoTimeConv
       val api2 = mock[ApiClient]
       val api3 = mock[ApiClient]
 
-      val error1 = HttpApiError(500)
-      val error2 = HttpApiError(400)
-      val error3 = HttpApiError(403)
+      val error1 = ApiHttpError(500)
+      val error2 = ApiHttpError(400)
+      val error3 = ApiHttpError(403)
 
       api1.clientId returns "api1"
       api1.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(Left(error1))
@@ -38,8 +38,8 @@ class CompositeApiClientSpec  extends Specification with Mockito with NoTimeConv
       val api2 = mock[ApiClient]
       val api3 = mock[ApiClient]
 
-      val error1 = HttpApiError(500)
-      val error3 = HttpApiError(403)
+      val error1 = ApiHttpError(500)
+      val error3 = ApiHttpError(403)
 
 
       api1.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(Left(error1))
@@ -66,7 +66,7 @@ class CompositeApiClientSpec  extends Specification with Mockito with NoTimeConv
       api3.send(any[NotificationPayload])(any[ExecutionContext]) returns Future(Right())
 
       val client = new CompositeApiClient(List(api1, api2, api3))
-      client.send(payload) must beEqualTo(Right()).await
+      client.send(payload) must beRight.await
     }
 
   }

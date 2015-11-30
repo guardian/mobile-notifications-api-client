@@ -20,7 +20,7 @@ protected class LegacyApiClient(val host: String,
     val json = Json.stringify(Json.toJson(legacyNotification))
     postJson(url, json) map {
       case HttpOk(code, body) => validateFormat[SendNotificationReply](body)
-      case error: HttpError => Left(HttpApiError(error.status))
+      case error: HttpError => Left(ApiHttpError(error.status))
     } recover {
       case e: Exception => Left(HttpProviderError(e))
     }
