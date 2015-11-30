@@ -1,6 +1,6 @@
 package com.gu.mobile.notifications.client
 
-import com.gu.mobile.notifications.client.legacy.PayloadBuilder
+import com.gu.mobile.notifications.client.legacy.NotificationBuilder
 import com.gu.mobile.notifications.client.models.NotificationTypes.BreakingNews
 import com.gu.mobile.notifications.client.models.Regions.UK
 import com.gu.mobile.notifications.client.models._
@@ -48,14 +48,14 @@ class LegacyApiClientSpec extends ApiClientSpec[LegacyApiClient] {
   val expectedPostBody = """{"type":"news","uniqueIdentifier":"UNIQUE_ID","sender":"sender","target":{"regions":["uk"],"topics":[{"type":"newsstand","name":"newsstandIos"}]},"timeToLiveInSeconds":10,"payloads":{"ios":{"type":"ios","body":"ios_body","customProperties":{"p1":"v1"},"category":"category"},"android":{"type":"android","body":{"k1":"v1"}}},"metadata":{"m1":"v1"}}"""
   val expectedPostUrl = s"$host/notifications?api-key=$apiKey"
 
-  val fakePayloadBuilder = mock[PayloadBuilder]
-  fakePayloadBuilder.buildNotification(payload) returns notification
+  val fakeNotificationBuilder = mock[NotificationBuilder]
+  fakeNotificationBuilder.buildNotification(payload) returns notification
 
   override def getTestApiClient(httpProvider: HttpProvider) = new LegacyApiClient(
     apiKey = apiKey,
     httpProvider = httpProvider,
     host = host,
-    payloadBuilder = fakePayloadBuilder)
+    notificationBuilder = fakeNotificationBuilder)
 
   def apiTest(test: LegacyApiClient => Unit): Result = {
     val successServerResponse = HttpOk(200, "{\"messageId\":\"123\"}")
