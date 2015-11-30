@@ -110,7 +110,8 @@ object NotificationBuilderImpl extends NotificationBuilder with InternationalEdi
         Message -> payload.message,
         Debug -> payload.debug.toString,
         Editions -> payload.editions.mkString(","),
-        Link -> androidLink
+        Link -> androidLink,
+        Topics -> payload.topic.map(_.toTopicString).mkString(",")
       ) ++ Seq(
         Section -> sectionLink,
         Edition -> edition,
@@ -139,7 +140,8 @@ object NotificationBuilderImpl extends NotificationBuilder with InternationalEdi
     val properties = Map(
       IOSMessageType -> NewsAlert,
       NotificationType -> BreakingNews.toString(),
-      Link -> iosLink
+      Link -> iosLink,
+      Topics -> payload.topic.map(_.toTopicString).mkString(",")
     )
 
     IOSMessagePayload(

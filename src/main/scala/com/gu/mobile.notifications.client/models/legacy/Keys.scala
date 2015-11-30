@@ -24,6 +24,7 @@ object AndroidKeys {
   final val AwayTeamName = "AWAY_TEAM_NAME"
   final val HomeTeamScore = "HOME_TEAM_SCORE"
   final val AwayTeamScore = "AWAY_TEAM_SCORE"
+  final val Topics = "topics"
 }
 
 object IosKeys {
