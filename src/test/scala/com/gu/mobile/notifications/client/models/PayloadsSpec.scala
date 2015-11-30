@@ -73,7 +73,6 @@ class PayloadsSpec extends Specification {
         debug = false,
         shortUrl = "shortUrl")
 
-     // val expectedJson1 = """{"id":"notification_id","title":"myTitle","type":"content","message":"someMessage","thumbnailUrl":"http://something.com/thumb.jpg","sender":"someSender","link":{"url":"http://mylink"},"importance":"Minor","topic":[{"type":"t4","name":"n4"},{"type":"t2","name":"n2"},{"type":"t7","name":"n7"}],"debug":false,"shortUrl":"http://a.uk"}"""
       val expectedJson =
         """
           |{
