@@ -15,14 +15,22 @@ This provider will be used by API Client to make an actual calls from your servi
 import com.gu.mobile.notifications.client.HttpProvider
 
 object NotificationHttpProvider extends HttpProvider {
+
+  private def extract(response: Response): HttpResponse = {
+    if (response.status == 200)
+      HttpOk(response.status, response.body)
+    else
+      HttpError(response.status.response.body)
+  }
+  
   override def post(url: String, contentType: ContentType, body: Array[Byte]): Future[HttpResponse] = {
     WS.url(url)
       .withHeaders("Content-Type" -> s"${contentType.mediaType}; charset=${contentType.charset}")
       .post(body)
-      .map(extractHttpResponse)
+      .map(extract)
   }
 
-  override def get(url: String): Future[HttpResponse] = WS.url(url).get().map(extracHttpResponse)
+  override def get(url: String): Future[HttpResponse] = WS.url(url).get().map(extract)
 }
 ```
 Hint: *it is recommended to prefix name of this implemention with your application/serivce/artifact name to avoid name collisions*.
@@ -35,7 +43,7 @@ val httpProvider = <your http provider instance>
 val client = ApiClient(
   host = "http://notifications-host.com", 
   apiKey = "API-KEY", 
-  httpProvider, 
+  httpProvider = httpProvider, 
   legacyHost = "http://old-notifications-host.com",
   legacyApiKey = "OLD-API-KEY"
 )
