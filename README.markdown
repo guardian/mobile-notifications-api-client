@@ -33,7 +33,7 @@ object NotificationHttpProvider extends HttpProvider {
   override def get(url: String): Future[HttpResponse] = WS.url(url).get().map(extract)
 }
 ```
-Hint: *it is recommended to prefix name of this implemention with your application/serivce/artifact name to avoid name collisions*.
+Hint: *it is recommended to prefix name of this implementation with your application/serivce/artifact name to avoid name collisions*.
 ### Create configured Notifications API Client
 
 ```scala
