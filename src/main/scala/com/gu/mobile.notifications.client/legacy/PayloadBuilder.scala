@@ -84,7 +84,7 @@ object PayloadBuilder extends InternationalEditionSupport {
       Message -> payload.message,
       Debug -> payload.debug.toString,
       Editions -> payload.editions.mkString(","),
-      Link -> payload.link.toShortUrl,
+      Link -> payload.link.toDeepLink,
       Topics -> payload.topic.map(_.toTopicString).mkString(",")
     ) ++ Seq(
       Section -> payload.link.contentId,
@@ -102,7 +102,7 @@ object PayloadBuilder extends InternationalEditionSupport {
     val properties = Map(
       IOSMessageType -> NewsAlert,
       NotificationType -> BreakingNews.toString(),
-      Link -> payload.link.toShortUrl,
+      Link -> payload.link.toDeepLink,
       Topics -> payload.topic.map(_.toTopicString).mkString(",")
     )
 
