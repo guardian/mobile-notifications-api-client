@@ -5,13 +5,14 @@ import com.gu.mobile.notifications.client.models.Regions._
 import com.gu.mobile.notifications.client.models._
 import org.specs2.mutable.Specification
 import org.specs2.mock.Mockito
-import com.gu.mobile.notifications.client.legacy.PayloadBuilder._
+import com.gu.mobile.notifications.client.legacy.NotificationBuilderImpl._
 
-class PayloadBuilderSpec extends Specification with Mockito {
+class NotificationBuilderSpec extends Specification with Mockito {
 
   val bnp = BreakingNewsPayload(
+    id = "someId",
     title = "myTitle",
-    notificationType = BreakingNews.toString,
+    `type` = BreakingNews.toString,
     message = "myMessage",
     sender = "test sender",
     editions = Set.empty,
@@ -35,6 +36,7 @@ class PayloadBuilderSpec extends Specification with Mockito {
 
     "return a well constructed Notification if a valid payload is provided" in {
       val notification = buildNotification(bnp)
+      notification.uniqueIdentifier mustEqual bnp.id
       notification.`type` mustEqual BreakingNews
       notification.payloads.isEmpty mustNotEqual true
       notification.metadata mustNotEqual Map.empty

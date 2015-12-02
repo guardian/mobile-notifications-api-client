@@ -47,7 +47,7 @@ class InternationalEditionSupportSpec extends Specification {
     val msg = BreakingNewsPayload(
       title = "custom",
       message = "message",
-      notificationType = BreakingNews.toString,
+      `type` = BreakingNews.toString,
       link = ExternalLink("http://www.theguardian.com/world/2015/oct/30/shaker-aamer-lands-back-in-uk-14-years-in-guantanamo-bay"),
       thumbnailUrl = None,
       imageUrl = None,

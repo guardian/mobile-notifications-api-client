@@ -1,21 +1,43 @@
 package com.gu.mobile.notifications.client.models
 
 import java.net.URL
-import com.gu.mobile.notifications.client.models.Importance.Importance
+import java.util.UUID
+import com.gu.mobile.notifications.client.models.Importance._
 import com.gu.mobile.notifications.client.models.legacy.Topic
+import play.api.libs.json._
+import com.gu.mobile.notifications.client.lib.JsonFormatsHelper._
 
 sealed case class GuardianItemType(mobileAggregatorPrefix: String)
+object GuardianItemType {
+  implicit val jf = Json.writes[GuardianItemType]
+}
 
 object GITSection extends GuardianItemType("section")
 object GITTag extends GuardianItemType("latest")
 object GITContent extends GuardianItemType("item-trimmed")
 
+
 sealed trait Link
 
-case class ExternalLink(url: String) extends Link
+object Link {
+  implicit val jf = new Writes[Link] {
+    override def writes(o: Link): JsValue = o match {
+      case l: ExternalLink => ExternalLink.jf.writes(l)
+      case l: GuardianLinkDetails => GuardianLinkDetails.jf.writes(l)
+    }
+  }
+}
 
+case class ExternalLink(url: String) extends Link
+object ExternalLink {
+  implicit val jf = Json.writes[ExternalLink]
+}
 case class GuardianLinkDetails(contentApiId: String, shortUrl: Option[String], title: String, thumbnail: Option[String], git: GuardianItemType) extends Link {
   val webUrl = s"http://www.theguardian.com/$contentApiId"
+}
+
+object GuardianLinkDetails {
+  implicit val jf = Json.writes[GuardianLinkDetails]
 }
 
 sealed trait GoalType
@@ -23,14 +45,25 @@ object OwnGoalType extends GoalType
 object PenaltyGoalType extends GoalType
 object DefaultGoalType extends GoalType
 
+object GoalType {
+  implicit val jf = new Writes[GoalType] {
+    override def writes(o: GoalType): JsValue = o match {
+      case OwnGoalType => JsString("Own")
+      case PenaltyGoalType => JsString("Penalty")
+      case DefaultGoalType => JsString("Default")
+    }
+  }
+}
+
 sealed trait PayloadType
 object BreakingNewsPayloadType extends PayloadType
 object ContentAlertPayloadType extends PayloadType
 object GoalAlertPayloadType extends PayloadType
 
 sealed trait NotificationPayload {
+  def id:String
   def title: String
-  def notificationType: String
+  def `type`: String
   def message: String
   def thumbnailUrl: Option[URL]
   def sender: String
@@ -39,13 +72,23 @@ sealed trait NotificationPayload {
   def debug: Boolean
 }
 
+object NotificationPayload {
+  implicit val jf = new Writes[NotificationPayload] {
+    override def writes(o: NotificationPayload): JsValue = o match {
+      case n: BreakingNewsPayload => BreakingNewsPayload.jf.writes(n)
+      case n: ContentAlertPayload => ContentAlertPayload.jf.writes(n)
+      case n: GoalAlertPayload => GoalAlertPayload.jf.writes(n)
+    }
+  }
+}
 sealed trait NotificationWithLink extends NotificationPayload {
   def link: Link
 }
 
 case class BreakingNewsPayload(
+  id: String = UUID.randomUUID.toString,
   title: String,
-  notificationType: String = "news",
+  `type`: String = "news",
   message: String,
   thumbnailUrl: Option[URL],
   sender: String,
@@ -57,9 +100,13 @@ case class BreakingNewsPayload(
   debug: Boolean
 ) extends NotificationWithLink
 
+object BreakingNewsPayload {
+  implicit val jf = Json.writes[BreakingNewsPayload]
+}
 case class ContentAlertPayload(
+  id: String = UUID.randomUUID.toString,
   title: String,
-  notificationType: String = "content",
+  `type`: String = "content",
   message: String,
   thumbnailUrl: Option[URL],
   sender: String,
@@ -70,9 +117,13 @@ case class ContentAlertPayload(
   shortUrl: String
 ) extends NotificationWithLink
 
+object ContentAlertPayload {
+  implicit val jf = Json.writes[ContentAlertPayload]
+}
 case class GoalAlertPayload(
+  id: String = UUID.randomUUID.toString,
   title: String,
-  notificationType: String = "goal",
+  `type`: String = "goalAlert",
   message: String,
   thumbnailUrl: Option[URL] = None,
   sender: String,
@@ -92,3 +143,7 @@ case class GoalAlertPayload(
   debug: Boolean,
   addedTime: Option[String]
 ) extends NotificationPayload
+
+object GoalAlertPayload {
+  implicit val jf = Json.writes[GoalAlertPayload]
+}

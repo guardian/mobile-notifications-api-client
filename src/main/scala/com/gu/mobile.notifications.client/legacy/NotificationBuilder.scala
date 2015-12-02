@@ -10,11 +10,14 @@ import IosKeys._
 import com.gu.mobile.notifications.client.messagebuilder.InternationalEditionSupport
 import com.gu.mobile.notifications.client.models.NotificationTypes.{BreakingNews, Content => ContentNotification}
 import com.gu.mobile.notifications.client.models.Regions._
-import com.gu.mobile.notifications.client.models._
+import com.gu.mobile.notifications.client.models.{Link=>_,_}
 
 import scala.PartialFunction._
+trait NotificationBuilder {
+  def buildNotification(notification: NotificationPayload): Notification
+}
 
-object PayloadBuilder extends InternationalEditionSupport {
+object NotificationBuilderImpl extends NotificationBuilder with InternationalEditionSupport {
 
   def buildNotification(notification: NotificationPayload) = notification match {
     case bnp: BreakingNewsPayload => buildBreakingNewsAlert(bnp)
@@ -23,6 +26,7 @@ object PayloadBuilder extends InternationalEditionSupport {
   }
 
   private def buildBreakingNewsAlert(bnp: BreakingNewsPayload) = Notification(
+    uniqueIdentifier = bnp.id,
     `type` = BreakingNews,
     sender = bnp.sender,
     target = Target(editionsFrom(bnp) flatMap regions.get, bnp.topic),
@@ -35,6 +39,7 @@ object PayloadBuilder extends InternationalEditionSupport {
   )
 
   private def buildContentAlert(cap: ContentAlertPayload) = Notification(
+    uniqueIdentifier = cap.id,
     `type` = ContentNotification,
     sender = cap.sender,
     target = Target(Set.empty, cap.topic),
@@ -47,6 +52,7 @@ object PayloadBuilder extends InternationalEditionSupport {
   )
 
   private def buildGoalAlert(gap: GoalAlertPayload) = Notification(
+    uniqueIdentifier = gap.id,
     `type` = ContentNotification,
     sender = gap.sender,
     target = Target(Set.empty, gap.topic),
@@ -98,7 +104,7 @@ object PayloadBuilder extends InternationalEditionSupport {
     AndroidMessagePayload(
       Map(
         Type -> Custom,
-        NotificationType -> payload.notificationType,
+        NotificationType -> payload.`type`,
         Title -> payload.title,
         Ticker -> payload.message,
         Message -> payload.message,

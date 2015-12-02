@@ -1,52 +1,86 @@
 package com.gu.mobile.notifications.client
 
-import com.gu.mobile.notifications.client.legacy.PayloadBuilder
 import com.gu.mobile.notifications.client.models._
-import com.gu.mobile.notifications.client.models.legacy.Notification
-import PayloadBuilder._
+import play.api.libs.json.{JsError, JsSuccess, Json, Reads}
+
 import scala.concurrent.{ExecutionContext, Future}
-import play.api.libs.json._
 
-trait HttpProvider {
-
-  sealed trait HttpResponse
-  case class HttpOk(status: Int, body: String) extends HttpResponse {
-    require(status >= 200 && status < 300)
-  }
-  case class HttpError(status: Int, body: String) extends Throwable with HttpResponse
-  
-  case class ContentType(mediaType: String, charset: String)
-
-  def post(url: String, contentType: ContentType, body: Array[Byte]): Future[HttpResponse]
-  def get(url: String): Future[HttpResponse]
+sealed trait ApiClientError {
+  def description: String
 }
 
-trait ApiClient extends HttpProvider {
-  def host: String
+case class ErrorWithSource(clientId: String, error: ApiClientError) {
+  def description = clientId + ": " + error.description
+}
 
+trait CompositeApiError extends ApiClientError {
+  def errors: List[ErrorWithSource]
+  def description = errors.map(_.description).mkString(", ")
+}
+case class PartialApiError(errors: List[ErrorWithSource]) extends CompositeApiError
+
+case class TotalApiError(errors: List[ErrorWithSource]) extends CompositeApiError
+
+case class ApiHttpError(status: Int) extends ApiClientError {
+  val description = s"Http error status $status"
+}
+
+case class HttpProviderError(throwable: Throwable) extends ApiClientError {
+  def description = throwable.getMessage
+}
+
+case class UnexpectedApiResponseError(serverResponse: String) extends ApiClientError {
+  val description = s"Unexpected response from server: $serverResponse"
+}
+
+case class MissingParameterError(parameterName: String) extends ApiClientError {
+  val description = s"No value provided for parameter: $parameterName"
+}
+
+trait ApiClient {
+  def clientId: String
+  def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, Unit]]
+}
+
+protected trait SimpleHttpApiClient extends ApiClient {
+  def host: String
+  def httpProvider: HttpProvider
   def apiKey: String
 
   def healthcheck(implicit ec: ExecutionContext): Future[Healthcheck] = {
-    get(s"$host/healthcheck").map {
+    httpProvider.get(s"$host/healthcheck").map {
       case HttpOk(200, body) => Ok
       case HttpOk(code, _) => Unhealthy(Some(code))
       case HttpError(code, _) => Unhealthy(Some(code))
     }
   }
 
-  def send(notification: NotificationPayload)(implicit ec: ExecutionContext): Future[SendNotificationReply] = {
-    send(buildNotification(notification))
-  }
-
-  def send(notification: Notification)(implicit ec: ExecutionContext): Future[SendNotificationReply] = {
-    val json = Json.stringify(Json.toJson(notification))
-    post(
-      url = s"$host/notifications?api-key=$apiKey",
+  protected def postJson(destUrl: String, json: String) = {
+    httpProvider.post(
+      url = destUrl,
       contentType = ContentType("application/json", "UTF-8"),
       body = json.getBytes("UTF-8")
-    ) map {
-      case HttpOk(code, body) => Json.fromJson[SendNotificationReply](Json.parse(body)).get
-      case error: HttpError => throw error
+    )
+  }
+  protected def validateFormat[T](jsonBody: String)(implicit jr: Reads[T]): Either[ApiClientError, Unit] = {
+    try {
+      Json.parse(jsonBody).validate[T] match {
+        case _: JsSuccess[T] => Right()
+        case _: JsError => Left(UnexpectedApiResponseError(jsonBody))
+      }
+    }
+    catch {
+      case _: Exception => Left(UnexpectedApiResponseError(jsonBody))
     }
   }
 }
+
+object ApiClient {
+  def apply(host: String, apiKey: String, httpProvider: HttpProvider, legacyHost: String, legacyApiKey: String): ApiClient = {
+    val client = new NextGenApiClient(host = host, apiKey = apiKey, httpProvider = httpProvider)
+    val legacy = new LegacyApiClient(host = legacyHost, apiKey = legacyApiKey, httpProvider = httpProvider)
+    new CompositeApiClient(List(legacy, client))
+  }
+
+}
+
