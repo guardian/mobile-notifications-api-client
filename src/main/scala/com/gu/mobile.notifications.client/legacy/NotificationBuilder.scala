@@ -64,7 +64,7 @@ object NotificationBuilderImpl extends NotificationBuilder with InternationalEdi
 
   private def breakingNewsAlertPayloads(message: BreakingNewsPayload) = MessagePayloads(
     ios = Some(buildIosPayload(message)),
-    android = Some(buildAndroidBreakingNewsPayloads(message))
+    android = Some(buildAndroidBreakingNewsPayload(message))
   )
 
   private def contentAlertPayloads(message: ContentAlertPayload) = MessagePayloads(
@@ -83,7 +83,7 @@ object NotificationBuilderImpl extends NotificationBuilder with InternationalEdi
 
   private def buildIosGoalAlertPayload(payload: GoalAlertPayload) = ???
 
-  private def buildAndroidBreakingNewsPayloads(payload: BreakingNewsPayload) = AndroidMessagePayload(
+  private def buildAndroidBreakingNewsPayload(payload: BreakingNewsPayload) = AndroidMessagePayload(
     Map(
       Type -> Custom,
       NotificationType -> payload.`type`,

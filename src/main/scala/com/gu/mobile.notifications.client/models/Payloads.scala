@@ -17,7 +17,6 @@ object GITTag extends GuardianItemType("latest")
 object GITContent extends GuardianItemType("item-trimmed")
 
 sealed trait Link {
-  def toString: String
   def toDeepLink: String
   def contentId: Option[String]
 }
