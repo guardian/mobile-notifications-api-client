@@ -1,7 +1,5 @@
 package com.gu.mobile.notifications.client.legacy
 
-import java.net.URI
-
 import com.gu.mobile.notifications.client.models.legacy._
 import AndroidMessageTypes._
 import AndroidKeys._
@@ -80,10 +78,6 @@ object PayloadBuilder extends InternationalEditionSupport {
   private def buildIosGoalAlertPayload(payload: GoalAlertPayload) = ???
 
   private def buildAndroidBreakingNewsPayloads(payload: BreakingNewsPayload) = {
-    val androidLink = payload.link match {
-      case GuardianLinkDetails(contentApiId, _, _, _, _) => s"x-gu://www.guardian.co.uk/$contentApiId"
-      case ExternalLink(url) => url
-    }
 
     val sectionLink = condOpt(payload.link) {
       case GuardianLinkDetails(contentApiId, _, _, _, GITSection) => contentApiId
@@ -104,7 +98,7 @@ object PayloadBuilder extends InternationalEditionSupport {
         Message -> payload.message,
         Debug -> payload.debug.toString,
         Editions -> payload.editions.mkString(","),
-        Link -> androidLink,
+        Link -> payload.link.toShortUrl,
         Topics -> payload.topic.map(_.toTopicString).mkString(",")
       ) ++ Seq(
         Section -> sectionLink,
@@ -120,12 +114,6 @@ object PayloadBuilder extends InternationalEditionSupport {
 
   private def buildIosPayload(payload: NotificationWithLink) = {
 
-    val iosLink = payload.link match {
-      case GuardianLinkDetails(_, Some(url), _, _, _) => s"x-gu://" + new URI(url).getPath
-      case details: GuardianLinkDetails => details.webUrl
-      case ExternalLink(url) => url
-    }
-
     val iosCategory = payload.link match {
       case guardianLink: GuardianLinkDetails => guardianLink.shortUrl.map(_ => "ITEM_CATEGORY")
       case _ => None
@@ -134,7 +122,7 @@ object PayloadBuilder extends InternationalEditionSupport {
     val properties = Map(
       IOSMessageType -> NewsAlert,
       NotificationType -> BreakingNews.toString(),
-      Link -> iosLink,
+      Link -> payload.link.toShortUrl,
       Topics -> payload.topic.map(_.toTopicString).mkString(",")
     )
 

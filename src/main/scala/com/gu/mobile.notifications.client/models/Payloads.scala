@@ -1,6 +1,6 @@
 package com.gu.mobile.notifications.client.models
 
-import java.net.URL
+import java.net.{URI, URL}
 import com.gu.mobile.notifications.client.models.Importance.Importance
 import com.gu.mobile.notifications.client.models.legacy.Topic
 
@@ -10,7 +10,17 @@ object GITSection extends GuardianItemType("section")
 object GITTag extends GuardianItemType("latest")
 object GITContent extends GuardianItemType("item-trimmed")
 
-sealed trait Link
+sealed trait Link {
+  override def toString = this match {
+    case gl: GuardianLinkDetails => gl.webUrl
+    case ExternalLink(url) => url
+  }
+  def toShortUrl = this match {
+    case GuardianLinkDetails(_, Some(url), _, _, _) => s"x-gu://" + new URI(url).getPath
+    case GuardianLinkDetails(contentApiId, _, _, _, _) => s"x-gu://www.theguardian.com/$contentApiId"
+    case ExternalLink(url) => url
+  }
+}
 
 case class ExternalLink(url: String) extends Link
 
