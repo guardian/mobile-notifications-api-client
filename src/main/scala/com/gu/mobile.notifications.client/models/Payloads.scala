@@ -44,7 +44,7 @@ case class GuardianLinkDetails(contentApiId: String, shortUrl: Option[String], t
     case None => webUrl.replace("http", "x-gu")
   }
   val contentId = git match {
-    case GITSection =>Some(contentApiId)
+    case GITSection => Some(contentApiId)
     case GITTag => Some(contentApiId)
     case _ => None
   }
@@ -102,7 +102,7 @@ sealed trait NotificationWithLink extends NotificationPayload {
 object BreakingNewsPayload { implicit val jf = Json.writes[BreakingNewsPayload] }
 case class BreakingNewsPayload(
   id: String = UUID.randomUUID.toString,
-  title: String,
+  title: String = "The Guardian",
   `type`: String = "news",
   message: String,
   thumbnailUrl: Option[URL],
