@@ -11,21 +11,25 @@ object GITTag extends GuardianItemType("latest")
 object GITContent extends GuardianItemType("item-trimmed")
 
 sealed trait Link {
-  override def toString = this match {
-    case gl: GuardianLinkDetails => gl.webUrl
-    case ExternalLink(url) => url
-  }
-  def toShortUrl = this match {
-    case GuardianLinkDetails(_, Some(url), _, _, _) => s"x-gu://" + new URI(url).getPath
-    case GuardianLinkDetails(contentApiId, _, _, _, _) => s"x-gu://www.theguardian.com/$contentApiId"
-    case ExternalLink(url) => url
-  }
+  def toString: String
+  def toShortUrl: String
+  def contentId: Option[String]
 }
 
-case class ExternalLink(url: String) extends Link
+case class ExternalLink(url: String) extends Link {
+  override val toString = url
+  override val toShortUrl = url
+  override val contentId = None
+}
 
 case class GuardianLinkDetails(contentApiId: String, shortUrl: Option[String], title: String, thumbnail: Option[String], git: GuardianItemType) extends Link {
   val webUrl = s"http://www.theguardian.com/$contentApiId"
+  override val toString = webUrl
+  override val toShortUrl = shortUrl match {
+    case Some(url) => s"x-gu://" + new URI(url).getPath
+    case None => s"x-gu://$webUrl"
+  }
+  val contentId = Some(contentApiId)
 }
 
 sealed trait GoalType

@@ -10,8 +10,6 @@ import com.gu.mobile.notifications.client.models.NotificationTypes.{BreakingNews
 import com.gu.mobile.notifications.client.models.Regions._
 import com.gu.mobile.notifications.client.models._
 
-import scala.PartialFunction._
-
 object PayloadBuilder extends InternationalEditionSupport {
 
   def buildNotification(notification: NotificationPayload) = notification match {
@@ -77,47 +75,29 @@ object PayloadBuilder extends InternationalEditionSupport {
 
   private def buildIosGoalAlertPayload(payload: GoalAlertPayload) = ???
 
-  private def buildAndroidBreakingNewsPayloads(payload: BreakingNewsPayload) = {
-
-    val sectionLink = condOpt(payload.link) {
-      case GuardianLinkDetails(contentApiId, _, _, _, GITSection) => contentApiId
-    }
-
-    val tagLink = condOpt(payload.link) {
-      case GuardianLinkDetails(contentApiId, _, _, _, GITTag) => contentApiId
-    }
-
-    val edition = if (payload.editions.size == 1) Some(payload.editions.head) else None
-
-    AndroidMessagePayload(
-      Map(
-        Type -> Custom,
-        NotificationType -> payload.notificationType,
-        Title -> payload.title,
-        Ticker -> payload.message,
-        Message -> payload.message,
-        Debug -> payload.debug.toString,
-        Editions -> payload.editions.mkString(","),
-        Link -> payload.link.toShortUrl,
-        Topics -> payload.topic.map(_.toTopicString).mkString(",")
-      ) ++ Seq(
-        Section -> sectionLink,
-        Edition -> edition,
-        Keyword -> tagLink,
-        ImageUrl -> payload.imageUrl,
-        ThumbnailUrl -> payload.thumbnailUrl.map(_.toString)
-      ).collect({
-        case (k, Some(v)) => k -> v
-      })
-    )
-  }
+  private def buildAndroidBreakingNewsPayloads(payload: BreakingNewsPayload) = AndroidMessagePayload(
+    Map(
+      Type -> Custom,
+      NotificationType -> payload.notificationType,
+      Title -> payload.title,
+      Ticker -> payload.message,
+      Message -> payload.message,
+      Debug -> payload.debug.toString,
+      Editions -> payload.editions.mkString(","),
+      Link -> payload.link.toShortUrl,
+      Topics -> payload.topic.map(_.toTopicString).mkString(",")
+    ) ++ Seq(
+      Section -> payload.link.contentId,
+      Edition -> (if (payload.editions.size == 1) Some(payload.editions.head) else None),
+      Keyword -> payload.link.contentId,
+      ImageUrl -> payload.imageUrl,
+      ThumbnailUrl -> payload.thumbnailUrl.map(_.toString)
+    ).collect({
+      case (k, Some(v)) => k -> v
+    })
+  )
 
   private def buildIosPayload(payload: NotificationWithLink) = {
-
-    val iosCategory = payload.link match {
-      case guardianLink: GuardianLinkDetails => guardianLink.shortUrl.map(_ => "ITEM_CATEGORY")
-      case _ => None
-    }
 
     val properties = Map(
       IOSMessageType -> NewsAlert,
@@ -129,7 +109,7 @@ object PayloadBuilder extends InternationalEditionSupport {
     IOSMessagePayload(
       body = payload.message,
       customProperties = properties,
-      category = iosCategory
+      category = payload.link.contentId.map(_ => "ITEM_CATEGORY")
     )
   }
 
