@@ -3,7 +3,7 @@ package com.gu.mobile.notifications.client.models.legacy
 import java.util.UUID
 import com.gu.mobile.notifications.client.models.NotificationTypes.NotificationType
 import play.api.libs.json._
-import com.gu.mobile.notifications.client.models.Regions._
+import com.gu.mobile.notifications.client.models.Editions._
 
 object Topic {
   val FootballTeamType = "football-team"
@@ -23,7 +23,7 @@ case class Topic(
 }
 
 case class Target(
-  regions: Set[Region],
+  regions: Set[Edition],
   topics: Set[Topic]
 )
 

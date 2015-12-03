@@ -1,7 +1,7 @@
 package com.gu.mobile.notifications.client.legacy
 
 import com.gu.mobile.notifications.client.models.NotificationTypes.BreakingNews
-import com.gu.mobile.notifications.client.models.Regions._
+import com.gu.mobile.notifications.client.models.Editions._
 import com.gu.mobile.notifications.client.models._
 import org.specs2.mutable.Specification
 import org.specs2.mock.Mockito
@@ -12,10 +12,8 @@ class NotificationBuilderSpec extends Specification with Mockito {
   val bnp = BreakingNewsPayload(
     id = "someId",
     title = "myTitle",
-    `type` = BreakingNews.toString,
     message = "myMessage",
     sender = "test sender",
-    editions = Set.empty,
     imageUrl = None,
     thumbnailUrl = None,
     link = ExternalLink("http://mylink"),
@@ -42,7 +40,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
       notification.metadata mustNotEqual Map.empty
       notification.timeToLiveInSeconds must beGreaterThan(0)
       notification.target.topics mustEqual bnp.topic
-      notification.target.regions mustEqual (editionsFrom(bnp) flatMap regions.get)
+      notification.target.regions mustEqual editionsFrom(bnp)
       notification.sender mustEqual "test sender"
     }
 

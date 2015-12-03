@@ -3,13 +3,13 @@ package com.gu.mobile.notifications.client.legacy
 import com.gu.mobile.notifications.client.models.legacy._
 import AndroidMessageTypes._
 import AndroidKeys._
+import AndroidKeys.{Editions => EditionsKey, Edition => EditionKey}
 import IosMessageTypes._
 import IosKeys._
 import com.gu.mobile.notifications.client.messagebuilder.InternationalEditionSupport
 import com.gu.mobile.notifications.client.models.NotificationTypes.{BreakingNews, Content => ContentNotification}
-import com.gu.mobile.notifications.client.models.Regions._
-import com.gu.mobile.notifications.client.models.{Link=>_,_}
-import scala.PartialFunction._
+import com.gu.mobile.notifications.client.models.Editions._
+import com.gu.mobile.notifications.client.models.{Link => _, _}
 
 trait NotificationBuilder {
   def buildNotification(notification: NotificationPayload): Notification
@@ -27,7 +27,7 @@ object NotificationBuilderImpl extends NotificationBuilder with InternationalEdi
     uniqueIdentifier = bnp.id,
     `type` = BreakingNews,
     sender = bnp.sender,
-    target = Target(editionsFrom(bnp) flatMap regions.get, bnp.topic),
+    target = Target(editionsFrom(bnp), bnp.topic),
     payloads = breakingNewsAlertPayloads(bnp),
     metadata = Map(
       "title" -> bnp.title,
@@ -64,7 +64,7 @@ object NotificationBuilderImpl extends NotificationBuilder with InternationalEdi
 
   private def breakingNewsAlertPayloads(message: BreakingNewsPayload) = MessagePayloads(
     ios = Some(buildIosPayload(message)),
-    android = Some(buildAndroidBreakingNewsPayload(message))
+    android = Some(buildAndroidBreakingNewsPayload(message, editionsFrom(message)))
   )
 
   private def contentAlertPayloads(message: ContentAlertPayload) = MessagePayloads(
@@ -83,20 +83,20 @@ object NotificationBuilderImpl extends NotificationBuilder with InternationalEdi
 
   private def buildIosGoalAlertPayload(payload: GoalAlertPayload) = ???
 
-  private def buildAndroidBreakingNewsPayload(payload: BreakingNewsPayload) = AndroidMessagePayload(
+  private def buildAndroidBreakingNewsPayload(payload: BreakingNewsPayload, editions: Set[Edition]) = AndroidMessagePayload(
     Map(
       Type -> Custom,
-      NotificationType -> payload.`type`,
+      NotificationType -> payload.`type`.toString,
       Title -> payload.title,
       Ticker -> payload.message,
       Message -> payload.message,
       Debug -> payload.debug.toString,
-      Editions -> payload.editions.mkString(","),
+      EditionsKey -> editions.mkString(","),
       Link -> payload.link.toDeepLink,
-      Topics -> payload.topic.map(_.toTopicString).mkString(",")
+      Topics -> payload.topic.filterNot(_.`type` == "breaking").map(_.toTopicString).mkString(",")
     ) ++ Seq(
       Section -> payload.link.contentId,
-      Edition -> (if (payload.editions.size == 1) Some(payload.editions.head) else None),
+      EditionKey -> (if (editions.size == 1) Some(editions.head.toString) else None),
       Keyword -> payload.link.contentId,
       ImageUrl -> payload.imageUrl,
       ThumbnailUrl -> payload.thumbnailUrl.map(_.toString)

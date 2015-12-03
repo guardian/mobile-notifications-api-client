@@ -1,43 +1,43 @@
 package com.gu.mobile.notifications.client.messagebuilder
 
+import com.gu.mobile.notifications.client.models.legacy.Topic
 import com.gu.mobile.notifications.client.models.{ExternalLink, Importance, BreakingNewsPayload}
 import com.gu.mobile.notifications.client.models.NotificationTypes.BreakingNews
-import com.gu.mobile.notifications.client.models.Regions.{Region, UK, US, AU, International}
+import com.gu.mobile.notifications.client.models.Editions.{Edition, UK, US, AU, International}
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 
 class InternationalEditionSupportSpec extends Specification {
   "International edition support" should {
-    val AllEditions: Set[Region] = Set(UK, US, AU)
-    val AllEditionsAsString = AllEditions.map(_.toString)
+    val AllEditionsTopics: Set[Topic] = Set(Topic("breaking", "uk"), Topic("breaking", "us"), Topic("breaking", "au"))
 
     "extract editions from message" in {
       "add International edition when message contains all editions" in new internationalEdition {
-        val editions = withSupport.editionsFrom(msg.copy(editions = AllEditionsAsString))
+        val editions = withSupport.editionsFrom(msg.copy(topic = AllEditionsTopics))
 
-        editions must contain(International.toString)
+        editions must contain(International)
       }
 
       "return original editions if message contains only UK edition" in new internationalEdition {
-        val ukOnly = Set("uk")
-        val editions = withSupport.editionsFrom(msg.copy(editions = ukOnly))
+        val ukOnly = Set(Topic("breaking", "uk"))
+        val editions = withSupport.editionsFrom(msg.copy(topic = ukOnly))
 
-        editions must beEqualTo(ukOnly)
+        editions must beEqualTo(Set(UK))
       }
     }
 
     "extract regions from message" in {
       "add International region when message contains all editions" in new internationalEdition {
-        val regions = withSupport.regionsFrom(msg.copy(editions = AllEditionsAsString))
+        val editions = withSupport.editionsFrom(msg.copy(topic = AllEditionsTopics))
 
-        regions must contain(International)
+        editions must contain(International)
       }
 
       "return original regions if message contains only UK edition" in new internationalEdition {
-        val ukOnly = Set("uk")
-        val regions = withSupport.regionsFrom(msg.copy(editions = ukOnly))
+        val ukOnly = Set(Topic("breaking","uk"))
+        val editions = withSupport.editionsFrom(msg.copy(topic = ukOnly))
 
-        regions must beEqualTo(Set(UK))
+        editions must beEqualTo(Set(UK))
       }
     }
   }
@@ -47,11 +47,9 @@ class InternationalEditionSupportSpec extends Specification {
     val msg = BreakingNewsPayload(
       title = "custom",
       message = "message",
-      `type` = BreakingNews.toString,
       link = ExternalLink("http://www.theguardian.com/world/2015/oct/30/shaker-aamer-lands-back-in-uk-14-years-in-guantanamo-bay"),
       thumbnailUrl = None,
       imageUrl = None,
-      editions = Set.empty,
       sender = "sender",
       importance = Importance.Major,
       topic = Set.empty,
