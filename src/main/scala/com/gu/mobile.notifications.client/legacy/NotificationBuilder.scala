@@ -10,6 +10,7 @@ import com.gu.mobile.notifications.client.messagebuilder.InternationalEditionSup
 import com.gu.mobile.notifications.client.models.NotificationTypes.{BreakingNews, Content => ContentNotification}
 import com.gu.mobile.notifications.client.models.Editions._
 import com.gu.mobile.notifications.client.models.{Link => _, _}
+import com.gu.mobile.notifications.client.models.legacy.Topic.BreakingType
 
 trait NotificationBuilder {
   def buildNotification(notification: NotificationPayload): Notification
@@ -93,7 +94,7 @@ object NotificationBuilderImpl extends NotificationBuilder with InternationalEdi
       Debug -> payload.debug.toString,
       EditionsKey -> editions.mkString(","),
       Link -> payload.link.toDeepLink,
-      Topics -> payload.topic.filterNot(_.`type` == "breaking").map(_.toTopicString).mkString(",")
+      Topics -> payload.topic.filterNot(_.`type` == BreakingType).map(_.toTopicString).mkString(",")
     ) ++ Seq(
       Section -> payload.link.contentId,
       EditionKey -> (if (editions.size == 1) Some(editions.head.toString) else None),

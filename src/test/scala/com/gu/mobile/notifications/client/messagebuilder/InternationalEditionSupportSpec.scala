@@ -1,27 +1,24 @@
 package com.gu.mobile.notifications.client.messagebuilder
 
 import com.gu.mobile.notifications.client.models.legacy.Topic
+import com.gu.mobile.notifications.client.models.legacy.Topic._
 import com.gu.mobile.notifications.client.models.{ExternalLink, Importance, BreakingNewsPayload}
-import com.gu.mobile.notifications.client.models.NotificationTypes.BreakingNews
-import com.gu.mobile.notifications.client.models.Editions.{Edition, UK, US, AU, International}
+import com.gu.mobile.notifications.client.models.Editions.{UK, International}
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 
 class InternationalEditionSupportSpec extends Specification {
   "International edition support" should {
-    val AllEditionsTopics: Set[Topic] = Set(Topic("breaking", "uk"), Topic("breaking", "us"), Topic("breaking", "au"))
+    val AllEditionsTopics: Set[Topic] = Set(BreakingNewsUk, BreakingNewsUs, BreakingNewsAu)
 
     "extract editions from message" in {
       "add International edition when message contains all editions" in new internationalEdition {
         val editions = withSupport.editionsFrom(msg.copy(topic = AllEditionsTopics))
-
         editions must contain(International)
       }
 
       "return original editions if message contains only UK edition" in new internationalEdition {
-        val ukOnly = Set(Topic("breaking", "uk"))
-        val editions = withSupport.editionsFrom(msg.copy(topic = ukOnly))
-
+        val editions = withSupport.editionsFrom(msg.copy(topic = Set(BreakingNewsUk)))
         editions must beEqualTo(Set(UK))
       }
     }
@@ -29,14 +26,11 @@ class InternationalEditionSupportSpec extends Specification {
     "extract regions from message" in {
       "add International region when message contains all editions" in new internationalEdition {
         val editions = withSupport.editionsFrom(msg.copy(topic = AllEditionsTopics))
-
         editions must contain(International)
       }
 
       "return original regions if message contains only UK edition" in new internationalEdition {
-        val ukOnly = Set(Topic("breaking","uk"))
-        val editions = withSupport.editionsFrom(msg.copy(topic = ukOnly))
-
+        val editions = withSupport.editionsFrom(msg.copy(topic = Set(BreakingNewsUk)))
         editions must beEqualTo(Set(UK))
       }
     }

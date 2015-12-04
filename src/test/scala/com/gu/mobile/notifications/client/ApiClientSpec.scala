@@ -29,8 +29,8 @@ trait ApiClientSpec[C <: ApiClient] extends Specification with Mockito {
     val contentTypeCapture = new ArgumentCapture[ContentType]
 
     there was one(fakeHttpProvider).post(urlCapture, contentTypeCapture, bodyCapture)
-    urlCapture.value mustEqual (expectedPostUrl)
-    contentTypeCapture.value mustEqual (ContentType("application/json", "UTF-8"))
-    new String(bodyCapture.value) mustEqual (expectedPostBody)
+    urlCapture.value mustEqual expectedPostUrl
+    contentTypeCapture.value mustEqual ContentType("application/json", "UTF-8")
+    new String(bodyCapture.value) mustEqual expectedPostBody
   }
 }

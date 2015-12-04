@@ -5,7 +5,7 @@ import java.net.URL
 import com.gu.mobile.notifications.client.models.legacy.Topic
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
-
+import com.gu.mobile.notifications.client.models.legacy.Topic._
 
 class PayloadsSpec extends Specification {
 
@@ -24,8 +24,9 @@ class PayloadsSpec extends Specification {
         thumbnailUrl = Some(new URL("http://media.guim.co.uk/09951387fda453719fe1fee3e5dcea4efa05e4fa/0_181_3596_2160/140.jpg")),
         link = ExternalLink("http://mylink"),
         importance = Importance.Major,
-        topic = Set(Topic("breaking", "uk")),
-        debug = true)
+        topic = Set(BreakingNewsUk),
+        debug = true
+      )
       val expectedJson =
         """
           |{
@@ -68,7 +69,7 @@ class PayloadsSpec extends Specification {
         sender = "test",
         link = internalLink,
         importance = Importance.Minor,
-        topic = Set(Topic("tag-series", "environment/series/keep-it-in-the-ground"), Topic("t2", "n2")),
+        topic = Set(Topic(TagSeriesType, "environment/series/keep-it-in-the-ground"), Topic("t2", "n2")),
         debug = false,
         shortUrl = "shortUrl")
 
@@ -123,9 +124,9 @@ class PayloadsSpec extends Specification {
         mapiUrl = "http://football.mobile-apps.guardianapis.com/match-info/3833380",
         importance = Importance.Major,
         topic = Set(
-          Topic("football-team", "29"),
-          Topic("football-team", "41"),
-          Topic("football-match", "3833380")
+          Topic(FootballTeamType, "29"),
+          Topic(FootballTeamType, "41"),
+          Topic(FootballMatchType, "3833380")
         ),
         debug = true,
         addedTime = Some("someAddedTime"))
