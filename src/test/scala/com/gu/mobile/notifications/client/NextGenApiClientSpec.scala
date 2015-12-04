@@ -13,10 +13,8 @@ class NextGenApiClientSpec extends ApiClientSpec[NextGenApiClient] {
 
   val payload = BreakingNewsPayload(
     title = "myTitle",
-    `type` = BreakingNews.toString,
     message = "myMessage",
     sender = "test sender",
-    editions = Set.empty,
     imageUrl = None,
     thumbnailUrl = None,
     link = ExternalLink("http://mylink"),
@@ -58,10 +56,8 @@ class NextGenApiClientSpec extends ApiClientSpec[NextGenApiClient] {
     "return missing parameter error if payload has no topic" in {
       val payloadWithNoTopics = BreakingNewsPayload(
         title = "myTitle",
-        `type` = BreakingNews.toString,
         message = "myMessage",
         sender = "test sender",
-        editions = Set.empty,
         imageUrl = None,
         thumbnailUrl = None,
         link = ExternalLink("http://mylink"),

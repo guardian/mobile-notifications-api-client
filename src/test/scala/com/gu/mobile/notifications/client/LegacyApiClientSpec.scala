@@ -2,7 +2,7 @@ package com.gu.mobile.notifications.client
 
 import com.gu.mobile.notifications.client.legacy.NotificationBuilder
 import com.gu.mobile.notifications.client.models.NotificationTypes.BreakingNews
-import com.gu.mobile.notifications.client.models.Regions.UK
+import com.gu.mobile.notifications.client.models.Editions.UK
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy._
 import org.specs2.execute.Result
@@ -23,10 +23,8 @@ class LegacyApiClientSpec extends ApiClientSpec[LegacyApiClient] {
 
   val payload = BreakingNewsPayload(
     title = "myTitle",
-    `type` = BreakingNews.toString,
     message = "myMessage",
     sender = "test sender",
-    editions = Set.empty,
     imageUrl = None,
     thumbnailUrl = None,
     link = ExternalLink("http://mylink"),
