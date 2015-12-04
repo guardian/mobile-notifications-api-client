@@ -9,11 +9,12 @@ trait InternationalEditionSupport {
 
   def editionsFrom(message: BreakingNewsPayload): Set[Edition] = {
     val breakingNewsTopics = message.topic.filter(_.`type` == BreakingType)
-      val editions: Set[Edition] = breakingNewsTopics map { _.name match {
-        case UK.toString => UK
-        case US.toString => US
-        case AU.toString => AU
-        case International.toString => International
+      val editions: Set[Edition] = breakingNewsTopics flatMap { _.name match {
+        case UK.toString => Some(UK)
+        case US.toString => Some(US)
+        case AU.toString => Some(AU)
+        case International.toString => Some(International)
+        case _ => None
       }
     }
     if (editions == AllEditions) editions + International else editions
