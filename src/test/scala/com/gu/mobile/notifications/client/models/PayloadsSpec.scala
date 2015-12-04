@@ -36,7 +36,6 @@ class PayloadsSpec extends Specification {
           |  "message" : "Mali hotel attack: UN counts 27 bodies as hostage situation ends",
           |  "thumbnailUrl" : "http://media.guim.co.uk/09951387fda453719fe1fee3e5dcea4efa05e4fa/0_181_3596_2160/140.jpg",
           |  "sender": "test",
-          |  "editions":["uk"],
           |  "link" : {
           |    "url": "http://mylink"
           |  },
@@ -136,7 +135,7 @@ class PayloadsSpec extends Specification {
          |{
          |  "id" : "3e0bc788-a27c-4864-bb71-77a80aadcce4",
          |  "title" : "The Guardian",
-         |  "type" : "goalAlert",
+         |  "type" : "goal",
          |  "message" : "Leicester 2-1 Watford\nDeeney 75min",
          |  "thumbnailUrl":"http://url.net",
          |  "sender" : "someSender",

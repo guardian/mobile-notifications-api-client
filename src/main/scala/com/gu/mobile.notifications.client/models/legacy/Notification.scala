@@ -75,5 +75,5 @@ case class Notification(
 )
 
 object Notification {
-  implicit val jf = Json.format[Notification]
+  implicit val jf = Json.writes[Notification]
 }

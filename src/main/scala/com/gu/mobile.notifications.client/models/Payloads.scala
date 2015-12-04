@@ -3,7 +3,7 @@ package com.gu.mobile.notifications.client.models
 import java.net.{URI, URL}
 import com.gu.mobile.notifications.client.models.Importance.Importance
 import java.util.UUID
-import com.gu.mobile.notifications.client.models.NotificationTypes.{BreakingNews, Content, GoalAlert, NotificationType}
+import com.gu.mobile.notifications.client.models.NotificationTypes._
 import com.gu.mobile.notifications.client.models.legacy.Topic
 import play.api.libs.json._
 import com.gu.mobile.notifications.client.lib.JsonFormatsHelper._
@@ -99,7 +99,7 @@ sealed trait NotificationWithLink extends NotificationPayload {
   def link: Link
 }
 
-object BreakingNewsPayload { implicit val jf = Json.writes[BreakingNewsPayload] }
+object BreakingNewsPayload { val jf = Json.writes[BreakingNewsPayload] withTypeString BreakingNews.toString }
 case class BreakingNewsPayload(
   id: String = UUID.randomUUID.toString,
   title: String = "The Guardian",
@@ -115,7 +115,7 @@ case class BreakingNewsPayload(
   val `type` = BreakingNews
 }
 
-object ContentAlertPayload { implicit val jf = Json.writes[ContentAlertPayload] }
+object ContentAlertPayload { implicit val jf = Json.writes[ContentAlertPayload] withTypeString Content.toString }
 case class ContentAlertPayload(
   id: String = UUID.randomUUID.toString,
   title: String,
@@ -131,7 +131,7 @@ case class ContentAlertPayload(
   val `type` = Content
 }
 
-object GoalAlertPayload { implicit val jf = Json.writes[GoalAlertPayload] }
+object GoalAlertPayload { implicit val jf = Json.writes[GoalAlertPayload] withTypeString GoalAlert.toString }
 case class GoalAlertPayload(
   id: String = UUID.randomUUID.toString,
   title: String,
