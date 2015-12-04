@@ -1,6 +1,6 @@
 package com.gu.mobile.notifications.client.models
 
-import java.net.{URI, URL}
+import java.net.URL
 import com.gu.mobile.notifications.client.models.Importance.Importance
 import java.util.UUID
 import com.gu.mobile.notifications.client.models.NotificationTypes._

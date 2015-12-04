@@ -120,6 +120,11 @@ object NotificationBuilderImpl extends NotificationBuilder with InternationalEdi
 
   private def buildIosPayload(payload: NotificationWithLink) = {
 
+    val iosCategory = payload.link match {
+      case guardianLink: GuardianLinkDetails => guardianLink.shortUrl.map(_ => "ITEM_CATEGORY")
+      case _ => None
+    }
+
     val properties = Map(
       IOSMessageType -> NewsAlert,
       NotificationType -> BreakingNews.toString(),
@@ -130,7 +135,7 @@ object NotificationBuilderImpl extends NotificationBuilder with InternationalEdi
     IOSMessagePayload(
       body = payload.message,
       customProperties = properties,
-      category = payload.link.contentId.map(_ => "ITEM_CATEGORY")
+      category = iosCategory
     )
   }
 
