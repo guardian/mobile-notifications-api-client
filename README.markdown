@@ -6,7 +6,7 @@
 Scala client for the Guardian Mobile Notifications API.
 
 ## Integrating with your application
-Add to build.sbt: `libraryDependencies += "com.gu" % "mobile-notifications-client_2.11" % "0.5.9"`
+Add to build.sbt: `libraryDependencies += "com.gu" % "mobile-notifications-client_2.11" % "0.5.11"`
 ## Configure API Client
 ### Implement `HttpProvider` trait methods. 
 This provider will be used by API Client to make an actual calls from your service. Example trait implementation:
@@ -33,7 +33,7 @@ object NotificationHttpProvider extends HttpProvider {
   override def get(url: String): Future[HttpResponse] = WS.url(url).get().map(extract)
 }
 ```
-Hint: *it is recommended to prefix name of this implementation with your application/serivce/artifact name to avoid name collisions*.
+Hint: *it is recommended to prefix name of this implementation with your application/service/artifact name to avoid name collisions*.
 ### Create configured Notifications API Client
 
 ```scala
@@ -51,20 +51,17 @@ val client = ApiClient(
 ## Using client
 ### Sending notification
 You have to construct notification payload using one of the case classes from `com.gu.mobile.notifications.client.models.NotificationPayload` hierarchy
-and send that object through wire using `ApiClient.send` method. 
+and send that object through the wire using `ApiClient.send` method. 
 #### Example: sending Breaking News alert
 ```scala
 val payload = BreakingNewsPayload(
-  title = "Xi Jinping and Obama speak at Paris climate talks",
-  `type` = BreakingNews.toString,
   message = "195 countries and nearly 150 world leaders including Barack Obama and Xi Jinping meet in Paris for COP21 UN climate change conference",
   sender = "test sender",
-  editions = Set("UK", "US"),
   imageUrl = None,
   thumbnailUrl = None,
   link = ExternalLink("http://mylink"),
   importance = Importance.Major,
-  topic = Set(Topic("breaking", "environment/climate-change"))
+  topic = Set(BreakingNewsUk, "environment/climate-change"))
 )
 
 client.send(payload)
