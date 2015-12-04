@@ -19,14 +19,6 @@ object NotificationTypes {
 
   object NotificationType {
     implicit val jf = new Writes[NotificationType] {
-//      override def reads(json: JsValue): JsResult[NotificationType] = json match {
-//        case JsString("news") => JsSuccess(BreakingNews)
-//        case JsString("goal") => JsSuccess(GoalAlert)
-//        case JsString("content") => JsSuccess(Content)
-//        case JsString(unkown) => JsError(s"Unkown notification type $unkown")
-//        case _ => JsError("Invalid json for NotificationType")
-//      }
-
       override def writes(nType: NotificationType): JsValue = JsString(nType.toString)
     }
   }
