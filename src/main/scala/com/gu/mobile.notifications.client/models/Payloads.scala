@@ -19,7 +19,6 @@ object GITContent extends GuardianItemType("item-trimmed")
 
 sealed trait Link {
   def toDeepLink: String
-  def contentId: Option[String]
 }
 object Link {
   implicit val jf = new Writes[Link] {
@@ -34,20 +33,15 @@ object ExternalLink { implicit val jf = Json.writes[ExternalLink] }
 case class ExternalLink(url: String) extends Link {
   override val toString = url
   val toDeepLink = url
-  val contentId = None
 }
 case class GuardianLinkDetails(contentApiId: String, shortUrl: Option[String], title: String, thumbnail: Option[String], git: GuardianItemType) extends Link {
   val webUrl = s"http://www.theguardian.com/$contentApiId"
   override val toString = webUrl
   val toDeepLink = shortUrl match {
-    case Some(url) => s"x-gu://" + new URI(url).getPath
-    case None => webUrl.replace("http", "x-gu")
+    case Some(url) => replaceProtocol(url)
+    case None => replaceProtocol(webUrl)
   }
-  val contentId = git match {
-    case GITSection => Some(contentApiId)
-    case GITTag => Some(contentApiId)
-    case _ => None
-  }
+  def replaceProtocol(url: String) = if (url.startsWith("https")) url.replace("https", "x-gu") else url.replace("http", "x-gu")
 }
 
 object GuardianLinkDetails {
