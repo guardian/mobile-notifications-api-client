@@ -3,6 +3,7 @@ package com.gu.mobile.notifications.client
 import com.gu.mobile.notifications.client.legacy.NotificationBuilder
 import com.gu.mobile.notifications.client.models.NotificationTypes.BreakingNews
 import com.gu.mobile.notifications.client.models.Editions.UK
+import com.gu.mobile.notifications.client.models.TopicTypes._
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy._
 import org.specs2.execute.Result
@@ -37,7 +38,7 @@ class LegacyApiClientSpec extends ApiClientSpec[LegacyApiClient] {
     `type` = BreakingNews,
     uniqueIdentifier = "UNIQUE_ID",
     sender = "sender",
-    target = Target(regions = Set(UK), topics = Set(Topic.NewsstandIos)),
+    target = Target(regions = Set(UK), topics = Set(Topic(Newsstand, "newsstandIos"))),
     timeToLiveInSeconds = 10,
     payloads = MessagePayloads(Some(iosPayload), Some(androidPayload)),
     metadata = Map("m1" -> "v1")

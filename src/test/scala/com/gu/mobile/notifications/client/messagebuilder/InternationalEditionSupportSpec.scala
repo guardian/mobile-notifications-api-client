@@ -1,13 +1,17 @@
 package com.gu.mobile.notifications.client.messagebuilder
 
-import com.gu.mobile.notifications.client.models.legacy.Topic
-import com.gu.mobile.notifications.client.models.legacy.Topic._
-import com.gu.mobile.notifications.client.models.{ExternalLink, Importance, BreakingNewsPayload}
-import com.gu.mobile.notifications.client.models.Editions.{UK, International}
+
+import com.gu.mobile.notifications.client.models.TopicTypes._
+import com.gu.mobile.notifications.client.models.{Topic, ExternalLink, Importance, BreakingNewsPayload}
+import com.gu.mobile.notifications.client.models.Editions._
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 
 class InternationalEditionSupportSpec extends Specification {
+  val BreakingNewsUk = Topic(Breaking, UK.toString)
+  val BreakingNewsUs = Topic(Breaking, US.toString)
+  val BreakingNewsAu = Topic(Breaking, AU.toString)
+
   "International edition support" should {
     val AllEditionsTopics: Set[Topic] = Set(BreakingNewsUk, BreakingNewsUs, BreakingNewsAu)
 

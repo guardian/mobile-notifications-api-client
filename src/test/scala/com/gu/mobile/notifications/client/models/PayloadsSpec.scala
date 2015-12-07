@@ -2,10 +2,11 @@ package com.gu.mobile.notifications.client.models
 
 import java.net.URL
 
-import com.gu.mobile.notifications.client.models.legacy.Topic
+import com.gu.mobile.notifications.client.models.Editions.UK
+import com.gu.mobile.notifications.client.models.TopicTypes._
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
-import com.gu.mobile.notifications.client.models.legacy.Topic._
+
 
 class PayloadsSpec extends Specification {
 
@@ -24,7 +25,7 @@ class PayloadsSpec extends Specification {
         thumbnailUrl = Some(new URL("http://media.guim.co.uk/09951387fda453719fe1fee3e5dcea4efa05e4fa/0_181_3596_2160/140.jpg")),
         link = ExternalLink("http://mylink"),
         importance = Importance.Major,
-        topic = Set(BreakingNewsUk),
+        topic = Set(Topic(Breaking, UK.toString)),
         debug = true
       )
       val expectedJson =
@@ -68,7 +69,7 @@ class PayloadsSpec extends Specification {
         sender = "test",
         link = internalLink,
         importance = Importance.Minor,
-        topic = Set(Topic(TagSeriesType, "environment/series/keep-it-in-the-ground"), Topic("t2", "n2")),
+        topic = Set(Topic(TagSeries, "environment/series/keep-it-in-the-ground"), Topic(Breaking, "n2")),
         debug = false,
         shortUrl = "shortUrl")
 
@@ -93,7 +94,7 @@ class PayloadsSpec extends Specification {
           |    "type" : "tag-series",
           |    "name" : "environment/series/keep-it-in-the-ground"
           |  },{
-          |    "type" : "t2",
+          |    "type" : "breaking",
           |    "name" : "n2"
           |    }],
           |    "debug" : false,
@@ -123,9 +124,9 @@ class PayloadsSpec extends Specification {
         mapiUrl = "http://football.mobile-apps.guardianapis.com/match-info/3833380",
         importance = Importance.Major,
         topic = Set(
-          Topic(FootballTeamType, "29"),
-          Topic(FootballTeamType, "41"),
-          Topic(FootballMatchType, "3833380")
+          Topic(FootballTeam, "29"),
+          Topic(FootballTeam, "41"),
+          Topic(FootballMatch, "3833380")
         ),
         debug = true,
         addedTime = Some("someAddedTime"))

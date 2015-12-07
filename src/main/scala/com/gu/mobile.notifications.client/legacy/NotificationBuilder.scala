@@ -1,5 +1,6 @@
 package com.gu.mobile.notifications.client.legacy
 
+import com.gu.mobile.notifications.client.models.TopicTypes.Breaking
 import com.gu.mobile.notifications.client.models.legacy._
 import AndroidMessageTypes._
 import AndroidKeys._
@@ -10,7 +11,6 @@ import com.gu.mobile.notifications.client.messagebuilder.InternationalEditionSup
 import com.gu.mobile.notifications.client.models.NotificationTypes.{BreakingNews, Content => ContentNotification}
 import com.gu.mobile.notifications.client.models.Editions._
 import com.gu.mobile.notifications.client.models.{Link => _, _}
-import com.gu.mobile.notifications.client.models.legacy.Topic.BreakingType
 import scala.PartialFunction._
 
 trait NotificationBuilder {
@@ -105,7 +105,7 @@ object NotificationBuilderImpl extends NotificationBuilder with InternationalEdi
         Debug -> payload.debug.toString,
         EditionsKey -> editions.mkString(","),
         Link -> payload.link.toDeepLink,
-        Topics -> payload.topic.filterNot(_.`type` == BreakingType).map(_.toTopicString).mkString(",")
+        Topics -> payload.topic.filterNot(_.`type` == Breaking).map(_.toTopicString).mkString(",")
       ) ++ Seq(
         Section -> sectionLink,
         EditionKey -> (if (editions.size == 1) Some(editions.head.toString) else None),
