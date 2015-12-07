@@ -19,13 +19,11 @@ trait NotificationBuilder {
 object NotificationBuilderImpl extends NotificationBuilder {
 
   def buildNotification(notification: NotificationPayload) = notification match {
-    case bnp: BreakingNewsPayload =>   buildBreakingNewsAlert(bnp)
+    case bnp: BreakingNewsPayload => buildBreakingNewsAlert(bnp)
     case cap: ContentAlertPayload => throw new UnsupportedOperationException("Method not implemented")
     case gap: GoalAlertPayload => throw new UnsupportedOperationException("Method not implemented")
   }
-  private def extractEditions(bnp: BreakingNewsPayload) = {
 
-  }
   private def buildBreakingNewsAlert(bnp: BreakingNewsPayload) = {
 
     val editions = bnp.topic.map(Edition.fromTopic).flatten

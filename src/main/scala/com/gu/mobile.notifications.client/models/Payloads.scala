@@ -7,7 +7,6 @@ import com.gu.mobile.notifications.client.models.NotificationTypes._
 import play.api.libs.json._
 import com.gu.mobile.notifications.client.lib.JsonFormatsHelper._
 
-
 sealed case class GuardianItemType(mobileAggregatorPrefix: String)
 object GuardianItemType {
   implicit val jf = Json.writes[GuardianItemType]
