@@ -1,5 +1,7 @@
 package com.gu.mobile.notifications.client.models
 
+import com.gu.mobile.notifications.client.models.Editions._
+import com.gu.mobile.notifications.client.models.TopicTypes._
 import play.api.libs.json._
 
 sealed trait TopicType
@@ -9,7 +11,8 @@ object TopicType {
     override def writes(o: TopicType): JsValue = JsString(o.toString)
   }
 }
-object TopicTypes{
+
+object TopicTypes {
   case object Breaking extends TopicType { override def toString = "breaking" }
   case object Content extends TopicType { override def toString = "content" }
   case object TagContributor extends TopicType { override def toString = "tag-contributor" }
@@ -22,10 +25,17 @@ object TopicTypes{
   case object Newsstand extends TopicType { override def toString = "newsstand" }
 }
 
-
 case class Topic(`type`: TopicType, name: String) {
   def toTopicString = `type`.toString + "//" + name
 }
 object Topic {
   implicit val jf = Json.writes[Topic]
+
+  val BreakingNewsUk = Topic(Breaking, UK.toString)
+  val BreakingNewsUs = Topic(Breaking, US.toString)
+  val BreakingNewsAu = Topic(Breaking, AU.toString)
+  val BreakingNewsInternational = Topic(Breaking, International.toString)
+  val BreakingNewsSport = Topic(Breaking, "sport")
+  val NewsstandIos = Topic(Newsstand, "newsstandIos")
 }
+

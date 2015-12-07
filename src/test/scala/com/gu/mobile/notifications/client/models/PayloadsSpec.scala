@@ -4,6 +4,7 @@ import java.net.URL
 
 import com.gu.mobile.notifications.client.models.Editions.UK
 import com.gu.mobile.notifications.client.models.TopicTypes._
+import com.gu.mobile.notifications.client.models.Topic._
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
 
@@ -25,7 +26,7 @@ class PayloadsSpec extends Specification {
         thumbnailUrl = Some(new URL("http://media.guim.co.uk/09951387fda453719fe1fee3e5dcea4efa05e4fa/0_181_3596_2160/140.jpg")),
         link = ExternalLink("http://mylink"),
         importance = Importance.Major,
-        topic = Set(Topic(Breaking, UK.toString)),
+        topic = Set(BreakingNewsUk),
         debug = true
       )
       val expectedJson =

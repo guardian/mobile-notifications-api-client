@@ -38,7 +38,7 @@ class LegacyApiClientSpec extends ApiClientSpec[LegacyApiClient] {
     `type` = BreakingNews,
     uniqueIdentifier = "UNIQUE_ID",
     sender = "sender",
-    target = Target(regions = Set(UK), topics = Set(Topic(Newsstand, "newsstandIos"))),
+    target = Target(regions = Set(UK), topics = Set(Topic.NewsstandIos)),
     timeToLiveInSeconds = 10,
     payloads = MessagePayloads(Some(iosPayload), Some(androidPayload)),
     metadata = Map("m1" -> "v1")
