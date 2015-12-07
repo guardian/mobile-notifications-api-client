@@ -1,42 +1,50 @@
 package com.gu.mobile.notifications.client.legacy
 
-import com.gu.mobile.notifications.client.models.TopicTypes.Breaking
-import com.gu.mobile.notifications.client.models.legacy._
-import AndroidMessageTypes._
-import AndroidKeys._
-import AndroidKeys.{Editions => EditionsKey, Edition => EditionKey}
-import IosMessageTypes._
-import IosKeys._
-import com.gu.mobile.notifications.client.messagebuilder.InternationalEditionSupport
+import com.gu.mobile.notifications.client.models.Editions.Edition
 import com.gu.mobile.notifications.client.models.NotificationTypes.{BreakingNews, Content => ContentNotification}
-import com.gu.mobile.notifications.client.models.Editions._
+import com.gu.mobile.notifications.client.models.Topic._
+import com.gu.mobile.notifications.client.models.legacy.AndroidKeys.{Edition => EditionKey, Editions => EditionsKey, _}
+import com.gu.mobile.notifications.client.models.legacy.AndroidMessageTypes._
+import com.gu.mobile.notifications.client.models.legacy.IosKeys._
+import com.gu.mobile.notifications.client.models.legacy.IosMessageTypes._
+import com.gu.mobile.notifications.client.models.legacy._
 import com.gu.mobile.notifications.client.models.{Link => _, _}
+
 import scala.PartialFunction._
 
 trait NotificationBuilder {
   def buildNotification(notification: NotificationPayload): Notification
 }
 
-object NotificationBuilderImpl extends NotificationBuilder with InternationalEditionSupport {
+object NotificationBuilderImpl extends NotificationBuilder {
 
   def buildNotification(notification: NotificationPayload) = notification match {
-    case bnp: BreakingNewsPayload => buildBreakingNewsAlert(bnp)
+    case bnp: BreakingNewsPayload =>   buildBreakingNewsAlert(bnp)
     case cap: ContentAlertPayload => throw new UnsupportedOperationException("Method not implemented")
     case gap: GoalAlertPayload => throw new UnsupportedOperationException("Method not implemented")
   }
+  private def extractEditions(bnp: BreakingNewsPayload) = {
 
-  private def buildBreakingNewsAlert(bnp: BreakingNewsPayload) = Notification(
-    uniqueIdentifier = bnp.id,
-    `type` = BreakingNews,
-    sender = bnp.sender,
-    target = Target(editionsFrom(bnp), bnp.topic),
-    payloads = breakingNewsAlertPayloads(bnp),
-    metadata = Map(
-      "title" -> bnp.title,
-      "message" -> bnp.message,
-      "link" -> bnp.link.toString
+  }
+  private def buildBreakingNewsAlert(bnp: BreakingNewsPayload) = {
+
+    val editions = bnp.topic.map(Edition.fromTopic).flatten
+    val nonEditionTopics = bnp.topic.filter(Edition.fromTopic(_).isEmpty)
+    val strippedPayload = bnp.copy(topic = nonEditionTopics)
+
+    Notification(
+      uniqueIdentifier = bnp.id,
+      `type` = BreakingNews,
+      sender = bnp.sender,
+      target = Target(editions, nonEditionTopics),
+      payloads = breakingNewsAlertPayloads(strippedPayload, editions),
+      metadata = Map(
+        "title" -> bnp.title,
+        "message" -> bnp.message,
+        "link" -> bnp.link.toString
+      )
     )
-  )
+  }
 
   private def buildContentAlert(cap: ContentAlertPayload) = Notification(
     uniqueIdentifier = cap.id,
@@ -64,9 +72,9 @@ object NotificationBuilderImpl extends NotificationBuilder with InternationalEdi
     )
   )
 
-  private def breakingNewsAlertPayloads(message: BreakingNewsPayload) = MessagePayloads(
+  private def breakingNewsAlertPayloads(message: BreakingNewsPayload, editions: Set[Edition]) = MessagePayloads(
     ios = Some(buildIosPayload(message)),
-    android = Some(buildAndroidBreakingNewsPayload(message, editionsFrom(message)))
+    android = Some(buildAndroidBreakingNewsPayload(message, editions))
   )
 
   private def contentAlertPayloads(message: ContentAlertPayload) = MessagePayloads(
@@ -105,7 +113,7 @@ object NotificationBuilderImpl extends NotificationBuilder with InternationalEdi
         Debug -> payload.debug.toString,
         EditionsKey -> editions.mkString(","),
         Link -> payload.link.toDeepLink,
-        Topics -> payload.topic.filterNot(_.`type` == Breaking).map(_.toTopicString).mkString(",")
+        Topics -> payload.topic.map(_.toTopicString).mkString(",")
       ) ++ Seq(
         Section -> sectionLink,
         EditionKey -> (if (editions.size == 1) Some(editions.head.toString) else None),

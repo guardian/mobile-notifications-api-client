@@ -30,7 +30,6 @@ case class Topic(`type`: TopicType, name: String) {
 }
 object Topic {
   implicit val jf = Json.writes[Topic]
-
   val BreakingNewsUk = Topic(Breaking, UK.toString)
   val BreakingNewsUs = Topic(Breaking, US.toString)
   val BreakingNewsAu = Topic(Breaking, AU.toString)

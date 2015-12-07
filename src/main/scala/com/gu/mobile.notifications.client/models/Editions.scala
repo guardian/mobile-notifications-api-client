@@ -1,5 +1,7 @@
 package com.gu.mobile.notifications.client.models
 
+import com.gu.mobile.notifications.client.models.Topic._
+import com.gu.mobile.notifications.client.models.TopicTypes.Breaking
 import play.api.libs.json._
 
 object Editions {
@@ -30,6 +32,12 @@ object Editions {
   }
 
   object Edition {
+
+    def fromTopic(t: Topic): Option[Edition] = t match {
+      case Topic(Breaking, x) => regions.get(x)
+      case _ => None
+    }
+
     implicit val jf = new Format[Edition] {
       override def reads(json: JsValue): JsResult[Edition] = json match {
         case JsString("uk") => JsSuccess(UK)
@@ -39,7 +47,6 @@ object Editions {
         case JsString(unknown) => JsError(s"Unkown region [$unknown]")
         case _ => JsError(s"Unknown type $json")
       }
-
       override def writes(region: Edition): JsValue = JsString(region.toString)
     }
   }
