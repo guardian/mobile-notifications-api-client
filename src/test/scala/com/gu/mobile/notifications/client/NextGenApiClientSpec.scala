@@ -1,6 +1,7 @@
 package com.gu.mobile.notifications.client
 
 import com.gu.mobile.notifications.client.models.NotificationTypes.BreakingNews
+import com.gu.mobile.notifications.client.models.TopicTypes._
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy._
 import org.specs2.execute.Result
@@ -19,11 +20,11 @@ class NextGenApiClientSpec extends ApiClientSpec[NextGenApiClient] {
     thumbnailUrl = None,
     link = ExternalLink("http://mylink"),
     importance = Importance.Major,
-    topic = Set(Topic("t1", "n1"), Topic("t2", "n2")),
+    topic = Set(Topic(Breaking, "n1"), Topic(FootballMatch, "n2")),
     debug = true
   )
 
-  val expectedPostUrl = s"$host/push/topic/t1/n1?api-key=$apiKey"
+  val expectedPostUrl = s"$host/push/topic/$Breaking/n1?api-key=$apiKey"
   val expectedPostBody = Json.stringify(Json.toJson(payload))
 
   override def getTestApiClient(httpProvider: HttpProvider) = new NextGenApiClient(

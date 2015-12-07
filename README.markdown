@@ -17,7 +17,7 @@ import com.gu.mobile.notifications.client.HttpProvider
 object NotificationHttpProvider extends HttpProvider {
 
   private def extract(response: Response): HttpResponse = {
-    if (response.status == 200)
+    if (response.status >= 200 && response.status < 300)
       HttpOk(response.status, response.body)
     else
       HttpError(response.status.response.body)

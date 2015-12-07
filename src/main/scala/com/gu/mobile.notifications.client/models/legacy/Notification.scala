@@ -2,37 +2,10 @@ package com.gu.mobile.notifications.client.models.legacy
 
 import java.util.UUID
 import com.gu.mobile.notifications.client.models.NotificationTypes.NotificationType
+import com.gu.mobile.notifications.client.models.Topic
 import play.api.libs.json._
 import com.gu.mobile.notifications.client.models.Editions._
 
-object Topic {
-  val UserType = "user-type"
-  val BreakingType = "breaking"
-  val ContentType = "content"
-  val TagContributorType = "tag-contributor"
-  val TagKeywordType = "tag-keyword"
-  val TagSeriesType = "tag-series"
-  val TagBlogType = "tag-blog"
-  val FootballTeamType = "football-team"
-  val FootballMatchType = "football-match"
-  val NewsstandType = "newsstand"
-
-  val BreakingNewsUk = Topic(BreakingType, UK.toString)
-  val BreakingNewsUs = Topic(BreakingType, US.toString)
-  val BreakingNewsAu = Topic(BreakingType, AU.toString)
-  val BreakingNewsInternational = Topic(BreakingType, International.toString)
-  val BreakingNewsSport = Topic(BreakingType, "sport")
-  val NewsstandIos = Topic(NewsstandType, "newsstandIos")
-
-  implicit val jf = Json.format[Topic]
-}
-
-case class Topic(
-  `type`: String,
-  name: String
-) {
-  def toTopicString = `type` + "//" + name
-}
 
 case class Target(
   regions: Set[Edition],
@@ -40,13 +13,13 @@ case class Target(
 )
 
 object Target {
-  implicit val jf = Json.format[Target]
+  implicit val jf = Json.writes[Target]
 }
 
 case class Recipient(userId: String)
 
 object Recipient {
-  implicit val jf = Json.format[Recipient]
+  implicit val jf = Json.writes[Recipient]
 }
 case class Notification(
   /** Type has no meaning in Guardian Notifications API - it is for ease of querying and must be established by

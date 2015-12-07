@@ -4,7 +4,6 @@ import java.net.URL
 import com.gu.mobile.notifications.client.models.Importance.Importance
 import java.util.UUID
 import com.gu.mobile.notifications.client.models.NotificationTypes._
-import com.gu.mobile.notifications.client.models.legacy.Topic
 import play.api.libs.json._
 import com.gu.mobile.notifications.client.lib.JsonFormatsHelper._
 
