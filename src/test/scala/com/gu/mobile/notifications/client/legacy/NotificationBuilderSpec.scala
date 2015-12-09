@@ -31,7 +31,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
     sender = "test sender",
     imageUrl = None,
     thumbnailUrl = None,
-    link = GuardianLinkDetails("contentId", Some("gu.com/p/3tx47"), "myTitle", None, GITContent),
+    link = GuardianLinkDetails("contentId", Some("/p/4fv33"), "myTitle", None, GITContent),
     importance = Importance.Major,
     topic = Set.empty,
     debug = true
@@ -96,7 +96,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
 
       val expectedIosPayload = IOSMessagePayload(
         body = "myMessage",
-        customProperties = Map("t" -> "m", "notificationType" -> "news", "link" -> "x-gu://gu.com/p/3tx47", "topics" -> ""),
+        customProperties = Map("t" -> "m", "notificationType" -> "news", "link" -> "x-gu:///p/4fv33", "topics" -> ""),
         category = Some("ITEM_CATEGORY")
       )
 
