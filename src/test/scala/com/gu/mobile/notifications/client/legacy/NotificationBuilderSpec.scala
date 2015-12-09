@@ -24,6 +24,19 @@ class NotificationBuilderSpec extends Specification with Mockito {
     debug = true
   )
 
+  val bnpGuardianLink = BreakingNewsPayload(
+    id = "someId",
+    title = "myTitle",
+    message = "myMessage",
+    sender = "test sender",
+    imageUrl = None,
+    thumbnailUrl = None,
+    link = GuardianLinkDetails("contentId", Some("gu.com/p/3tx47"), "myTitle", None, GITContent),
+    importance = Importance.Major,
+    topic = Set.empty,
+    debug = true
+  )
+
   "buildNotification" should {
     "throw an exception if the type is ContentAlertPayload" in {
        buildNotification(mock[ContentAlertPayload]) must throwA[UnsupportedOperationException]
@@ -63,6 +76,34 @@ class NotificationBuilderSpec extends Specification with Mockito {
       notification.target.topics mustEqual bnp.topic
       notification.target.regions mustEqual Set.empty
       notification.sender mustEqual "test sender"
+      notification.payloads.android.get mustEqual expectedAndroidPayload
+      notification.payloads.ios.get mustEqual expectedIosPayload
+    }
+
+    "return the correct link format for each platform" in {
+      val expectedAndroidPayload = AndroidMessagePayload(
+        Map("topics" -> "",
+          "editions" -> "",
+          "debug" -> "true",
+          "notificationType" -> "news",
+          "link" -> "x-gu://www.guardian.co.uk/contentId",
+          "message" -> "myMessage",
+          "title" -> "myTitle",
+          "type" -> "custom",
+          "ticker" -> "myMessage"
+        )
+      )
+
+      val expectedIosPayload = IOSMessagePayload(
+        body = "myMessage",
+        customProperties = Map("t" -> "m", "notificationType" -> "news", "link" -> "x-gu://gu.com/p/3tx47", "topics" -> ""),
+        category = Some("ITEM_CATEGORY")
+      )
+
+      val notification = buildNotification(bnpGuardianLink)
+      notification.uniqueIdentifier mustEqual bnpGuardianLink.id
+      notification.`type` mustEqual BreakingNews
+      notification.payloads.isEmpty mustNotEqual true
       notification.payloads.android.get mustEqual expectedAndroidPayload
       notification.payloads.ios.get mustEqual expectedIosPayload
     }
