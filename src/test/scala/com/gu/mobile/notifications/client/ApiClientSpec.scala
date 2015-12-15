@@ -4,6 +4,7 @@ import org.specs2.execute.Result
 import org.specs2.mock.Mockito
 import org.specs2.mock.mockito.ArgumentCapture
 import org.specs2.mutable.Specification
+import play.api.libs.json.Json
 
 import scala.concurrent.Future
 
@@ -31,6 +32,6 @@ trait ApiClientSpec[C <: ApiClient] extends Specification with Mockito {
     there was one(fakeHttpProvider).post(urlCapture, contentTypeCapture, bodyCapture)
     urlCapture.value mustEqual expectedPostUrl
     contentTypeCapture.value mustEqual ContentType("application/json", "UTF-8")
-    new String(bodyCapture.value) mustEqual expectedPostBody
+    Json.parse(bodyCapture.value) mustEqual Json.parse(expectedPostBody)
   }
 }
