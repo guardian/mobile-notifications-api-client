@@ -1,7 +1,7 @@
 import sbtrelease._
 import ReleaseStateTransformations._
 
-name := "mobile-notifications-client"
+name := "mobile-notifications-client-play-2.4"
 
 organization := "com.gu"
 
@@ -15,7 +15,7 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play-json" % "2.3.2",
+  "com.typesafe.play" %% "play-json" % "2.4.6",
   "net.databinder.dispatch" %% "dispatch-core" % "0.11.1" % Test,
   "org.specs2" %% "specs2" % "2.3.13" % "test",
   "com.github.tomakehurst" % "wiremock" % "1.33" % "test"
