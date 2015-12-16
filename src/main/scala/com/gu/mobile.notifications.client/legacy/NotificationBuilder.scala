@@ -66,7 +66,7 @@ object NotificationBuilderImpl extends NotificationBuilder {
     metadata = Map(
       "title" -> gap.title,
       "message" -> gap.message,
-      "link" -> gap.mapiUrl
+      "link" -> gap.mapiUrl.toString
     )
   )
 
