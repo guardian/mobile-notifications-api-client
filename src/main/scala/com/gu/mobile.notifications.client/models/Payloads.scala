@@ -1,6 +1,6 @@
 package com.gu.mobile.notifications.client.models
 
-import java.net.URL
+import java.net.URI
 import com.gu.mobile.notifications.client.models.Importance.Importance
 import java.util.UUID
 import com.gu.mobile.notifications.client.models.NotificationTypes._
@@ -64,7 +64,7 @@ sealed trait NotificationPayload {
   def title: String
   def `type`: NotificationType
   def message: String
-  def thumbnailUrl: Option[URL]
+  def thumbnailUrl: Option[URI]
   def sender: String
   def importance: Importance
   def topic: Set[Topic]
@@ -89,7 +89,7 @@ case class BreakingNewsPayload(
   id: String = UUID.randomUUID.toString,
   title: String = "The Guardian",
   message: String,
-  thumbnailUrl: Option[URL],
+  thumbnailUrl: Option[URI],
   sender: String,
   link: Link,
   imageUrl: Option[String],
@@ -105,7 +105,7 @@ case class ContentAlertPayload(
   id: String = UUID.randomUUID.toString,
   title: String,
   message: String,
-  thumbnailUrl: Option[URL],
+  thumbnailUrl: Option[URI],
   sender: String,
   link: Link,
   importance: Importance,
@@ -121,7 +121,7 @@ case class GoalAlertPayload(
   id: String = UUID.randomUUID.toString,
   title: String,
   message: String,
-  thumbnailUrl: Option[URL] = None,
+  thumbnailUrl: Option[URI] = None,
   sender: String,
   goalType: GoalType,
   awayTeamName: String,
@@ -133,7 +133,7 @@ case class GoalAlertPayload(
   goalMins: Int,
   otherTeamName: String,
   matchId: String,
-  mapiUrl: String,
+  mapiUrl: URI,
   importance: Importance,
   topic: Set[Topic],
   debug: Boolean,
