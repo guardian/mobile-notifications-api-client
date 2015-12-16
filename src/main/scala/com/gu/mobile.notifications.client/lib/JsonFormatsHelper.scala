@@ -1,6 +1,6 @@
 package com.gu.mobile.notifications.client.lib
 
-import java.net.URL
+import java.net.URI
 
 import play.api.libs.json._
 import play.api.libs.json.JsObject
@@ -52,10 +52,10 @@ object JsonFormatsHelper {
     }
   }
 
-  implicit val urlFormat = new Format[URL] {
-    override def writes(o: URL): JsValue = JsString(o.toExternalForm)
-    override def reads(json: JsValue): JsResult[URL] = json match {
-      case JsString(url) => Try(JsSuccess(new URL(url))).getOrElse(JsError(s"Invalid url: $url"))
+  implicit val urlFormat = new Format[URI] {
+    override def writes(o: URI): JsValue = JsString(o.toString)
+    override def reads(json: JsValue): JsResult[URI] = json match {
+      case JsString(uri) => Try(JsSuccess(new URI(uri))).getOrElse(JsError(s"Invalid uri: $uri"))
       case _ => JsError("Invalid url type")
     }
   }
