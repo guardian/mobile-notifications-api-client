@@ -1,12 +1,15 @@
 #!/bin/bash
 
-SBT_BOOT_DIR=$HOME/.sbt/boot/
+JAVA_CMD=java
+[ -n "$JDK_HOME" ] && JAVA_CMD=$JDK_HOME/bin/java
+echo "Using Java command: $JAVA_CMD"
 
+SBT_BOOT_DIR=$HOME/.sbt/boot/
 if [ ! -d "$SBT_BOOT_DIR" ]; then
   mkdir -p $SBT_BOOT_DIR
 fi
 
-cat /dev/null | java -Xmx1536M -XX:MaxPermSize=384M -XX:+UseCompressedOops -XX:+CMSClassUnloadingEnabled \
+cat /dev/null | ${JAVA_CMD} -Xmx1536M -XX:MaxPermSize=384M -XX:+UseCompressedOops -XX:+CMSClassUnloadingEnabled \
     -Dsbt.log.noformat=true \
     -Dbuild.configuation.name="$TEAMCITY_BUILDCONF_NAME" \
     -Dbuild.number="$BUILD_NUMBER" \
