@@ -35,7 +35,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
       buildNotification(notif) must throwA[UnsupportedOperationException]
     }
 
-    "return a well constructed Notification if a valid payload is provided" in new BreakingNewsScope {
+    "return a well constructed Notification if a valid breaking news payload is provided" in new BreakingNewsScope {
       val notification = buildNotification(bnp)
 
       notification.uniqueIdentifier mustEqual bnp.id
