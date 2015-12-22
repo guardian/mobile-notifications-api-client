@@ -3,12 +3,12 @@ package com.gu.mobile.notifications.client.legacy
 import java.net.URI
 import com.gu.mobile.notifications.client.models.Editions.Edition
 import com.gu.mobile.notifications.client.models.NotificationTypes.{BreakingNews, Content => ContentNotification}
-import com.gu.mobile.notifications.client.models.legacy.AndroidKeys.{Edition => EditionKey, Editions => EditionsKey, _}
+import com.gu.mobile.notifications.client.models.legacy.AndroidKeys.{Link => LinkKey, Edition => EditionKey, Editions => EditionsKey, _}
 import com.gu.mobile.notifications.client.models.legacy.AndroidMessageTypes._
 import com.gu.mobile.notifications.client.models.legacy.IosKeys._
 import com.gu.mobile.notifications.client.models.legacy.IosMessageTypes._
 import com.gu.mobile.notifications.client.models.legacy._
-import com.gu.mobile.notifications.client.models.{Link => _, _}
+import com.gu.mobile.notifications.client.models._
 
 import scala.PartialFunction._
 
@@ -20,7 +20,7 @@ object NotificationBuilderImpl extends NotificationBuilder {
 
   def buildNotification(notification: NotificationPayload) = notification match {
     case bnp: BreakingNewsPayload => buildBreakingNewsAlert(bnp)
-    case cap: ContentAlertPayload => throw new UnsupportedOperationException("Method not implemented")
+    case cap: ContentAlertPayload => buildContentAlert(cap)
     case gap: GoalAlertPayload => throw new UnsupportedOperationException("Method not implemented")
   }
 
@@ -85,18 +85,28 @@ object NotificationBuilderImpl extends NotificationBuilder {
     android = Some(buildAndroidGoalAlertPayload(message))
   )
 
-  private def buildAndroidContentAlertPayloads(payload: ContentAlertPayload) = ???
+  private def buildAndroidContentAlertPayloads(payload: ContentAlertPayload) = {
+    AndroidMessagePayload(
+      Map(
+        Type -> Custom,
+        Title -> payload.title,
+        Ticker -> payload.message,
+        Message -> payload.message,
+        LinkKey ->  toAndroidLink(payload.link)
+      ) ++ payload.thumbnailUrl.map(ThumbnailUrl -> _.toString)
+    )
+  }
 
   private def buildAndroidGoalAlertPayload(payload: GoalAlertPayload) = ???
 
   private def buildIosGoalAlertPayload(payload: GoalAlertPayload) = ???
 
-  private def buildAndroidBreakingNewsPayload(payload: BreakingNewsPayload, editions: Set[Edition]) = {
+  private def toAndroidLink(link: Link) = link match {
+    case GuardianLinkDetails(contentApiId, _, _, _, _) => s"x-gu://www.guardian.co.uk/$contentApiId"
+    case ExternalLink(url) => url
+  }
 
-    val androidLink = payload.link match {
-      case GuardianLinkDetails(contentApiId, _, _, _, _) => s"x-gu://www.guardian.co.uk/$contentApiId"
-      case ExternalLink(url) => url
-    }
+  private def buildAndroidBreakingNewsPayload(payload: BreakingNewsPayload, editions: Set[Edition]) = {
 
     val sectionLink = condOpt(payload.link) {
       case GuardianLinkDetails(contentApiId, _, _, _, GITSection) => contentApiId
@@ -115,7 +125,7 @@ object NotificationBuilderImpl extends NotificationBuilder {
         Message -> payload.message,
         Debug -> payload.debug.toString,
         EditionsKey -> editions.mkString(","),
-        Link -> androidLink,
+        LinkKey ->  toAndroidLink(payload.link),
         Topics -> payload.topic.map(_.toTopicString).mkString(",")
       ) ++ Seq(
         Section -> sectionLink,
@@ -144,8 +154,8 @@ object NotificationBuilderImpl extends NotificationBuilder {
 
     val properties = Map(
       IOSMessageType -> NewsAlert,
-      NotificationType -> BreakingNews.toString(),
-      Link -> iosLink,
+      NotificationType -> payload.`type`.toString,
+      LinkKey -> iosLink,
       Topics -> payload.topic.map(_.toTopicString).mkString(",")
     )
 
