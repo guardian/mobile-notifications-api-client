@@ -1,14 +1,15 @@
 package com.gu.mobile.notifications.client.legacy
 
 import java.net.URI
+
 import com.gu.mobile.notifications.client.models.Editions.Edition
 import com.gu.mobile.notifications.client.models.NotificationTypes.{BreakingNews, Content => ContentNotification}
-import com.gu.mobile.notifications.client.models.legacy.AndroidKeys.{Link => LinkKey, Edition => EditionKey, Editions => EditionsKey, _}
+import com.gu.mobile.notifications.client.models._
+import com.gu.mobile.notifications.client.models.legacy.AndroidKeys.{Edition => EditionKey, Editions => EditionsKey, Link => LinkKey, _}
 import com.gu.mobile.notifications.client.models.legacy.AndroidMessageTypes._
 import com.gu.mobile.notifications.client.models.legacy.IosKeys._
 import com.gu.mobile.notifications.client.models.legacy.IosMessageTypes._
 import com.gu.mobile.notifications.client.models.legacy._
-import com.gu.mobile.notifications.client.models._
 
 import scala.PartialFunction._
 

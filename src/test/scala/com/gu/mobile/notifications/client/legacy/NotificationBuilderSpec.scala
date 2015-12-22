@@ -1,14 +1,12 @@
 package com.gu.mobile.notifications.client.legacy
 
-import java.net.{URI, URL}
+import java.net.URI
 
 import com.gu.mobile.notifications.client.legacy.NotificationBuilderImpl._
 import com.gu.mobile.notifications.client.models.Editions._
-import com.gu.mobile.notifications.client.models.NotificationTypes
 import com.gu.mobile.notifications.client.models.Topic._
-import com.gu.mobile.notifications.client.models.TopicTypes
-import com.gu.mobile.notifications.client.models._
-import com.gu.mobile.notifications.client.models.legacy.{Target, AndroidMessagePayload, IOSMessagePayload}
+import com.gu.mobile.notifications.client.models.legacy.{AndroidMessagePayload, IOSMessagePayload, Target}
+import com.gu.mobile.notifications.client.models.{NotificationTypes, TopicTypes, _}
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
