@@ -5,15 +5,15 @@ import play.api.libs.json._
 object NotificationPayloadTypes {
   sealed trait NotificationPayloadType
 
-  case object BreakingNewsType extends NotificationPayloadType {
+  case object BreakingNews extends NotificationPayloadType {
     override def toString = "news"
   }
 
-  case object ContentAlertType extends NotificationPayloadType {
+  case object ContentAlert extends NotificationPayloadType {
     override def toString = "content"
   }
 
-  case object GoalAlertType extends NotificationPayloadType {
+  case object GoalAlert extends NotificationPayloadType {
     override def toString = "goal"
   }
 
