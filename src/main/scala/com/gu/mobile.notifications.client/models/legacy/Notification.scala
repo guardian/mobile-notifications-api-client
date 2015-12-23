@@ -1,7 +1,7 @@
 package com.gu.mobile.notifications.client.models.legacy
 
 import java.util.UUID
-import com.gu.mobile.notifications.client.models.NotificationTypes.NotificationType
+import NotificationTypes.NotificationType
 import com.gu.mobile.notifications.client.models.Topic
 import play.api.libs.json._
 import com.gu.mobile.notifications.client.models.Editions._

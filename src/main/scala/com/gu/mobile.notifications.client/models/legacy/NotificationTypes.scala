@@ -1,4 +1,4 @@
-package com.gu.mobile.notifications.client.models
+package com.gu.mobile.notifications.client.models.legacy
 
 import play.api.libs.json._
 
@@ -10,7 +10,7 @@ object NotificationTypes {
   }
 
   case object Content extends NotificationType {
-    override def toString = "content"
+    override def toString = "tag"
   }
 
   case object GoalAlert extends NotificationType {

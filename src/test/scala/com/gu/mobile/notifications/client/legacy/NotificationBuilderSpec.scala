@@ -5,8 +5,8 @@ import java.net.URI
 import com.gu.mobile.notifications.client.legacy.NotificationBuilderImpl._
 import com.gu.mobile.notifications.client.models.Editions._
 import com.gu.mobile.notifications.client.models.Topic._
-import com.gu.mobile.notifications.client.models.legacy.{AndroidMessagePayload, IOSMessagePayload, Target}
-import com.gu.mobile.notifications.client.models.{NotificationTypes, TopicTypes, _}
+import com.gu.mobile.notifications.client.models.legacy.{NotificationTypes, AndroidMessagePayload, IOSMessagePayload, Target}
+import com.gu.mobile.notifications.client.models._
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
