@@ -1,9 +1,7 @@
 package com.gu.mobile.notifications.client
 
-import com.gu.mobile.notifications.client.models.NotificationTypes.BreakingNews
 import com.gu.mobile.notifications.client.models.TopicTypes._
 import com.gu.mobile.notifications.client.models._
-import com.gu.mobile.notifications.client.models.legacy._
 import org.specs2.execute.Result
 import play.api.libs.json.Json
 

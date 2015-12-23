@@ -1,11 +1,11 @@
 package com.gu.mobile.notifications.client.models
 
 import java.net.URI
-import com.gu.mobile.notifications.client.models.Importance.Importance
 import java.util.UUID
-import com.gu.mobile.notifications.client.models.NotificationTypes._
-import play.api.libs.json._
+
 import com.gu.mobile.notifications.client.lib.JsonFormatsHelper._
+import com.gu.mobile.notifications.client.models.Importance.Importance
+import play.api.libs.json._
 
 sealed case class GuardianItemType(mobileAggregatorPrefix: String)
 object GuardianItemType {
@@ -54,15 +54,10 @@ object GoalType {
   }
 }
 
-sealed trait PayloadType
-object BreakingNewsPayloadType extends PayloadType
-object ContentAlertPayloadType extends PayloadType
-object GoalAlertPayloadType extends PayloadType
-
 sealed trait NotificationPayload {
   def id: String
   def title: String
-  def `type`: NotificationType
+  def `type`: NotificationPayloadType
   def message: String
   def thumbnailUrl: Option[URI]
   def sender: String
@@ -84,7 +79,7 @@ sealed trait NotificationWithLink extends NotificationPayload {
   def link: Link
 }
 
-object BreakingNewsPayload { val jf = Json.writes[BreakingNewsPayload] withTypeString BreakingNews.toString }
+object BreakingNewsPayload { val jf = Json.writes[BreakingNewsPayload] withTypeString NotificationPayloadType.BreakingNews.toString }
 case class BreakingNewsPayload(
   id: String = UUID.randomUUID.toString,
   title: String = "The Guardian",
@@ -97,10 +92,10 @@ case class BreakingNewsPayload(
   topic: Set[Topic],
   debug: Boolean
 ) extends NotificationWithLink {
-  val `type` = BreakingNews
+  val `type` = NotificationPayloadType.BreakingNews
 }
 
-object ContentAlertPayload { implicit val jf = Json.writes[ContentAlertPayload] withTypeString Content.toString }
+object ContentAlertPayload { implicit val jf = Json.writes[ContentAlertPayload] withTypeString NotificationPayloadType.ContentAlert.toString }
 case class ContentAlertPayload(
   id: String = UUID.randomUUID.toString,
   title: String,
@@ -113,10 +108,10 @@ case class ContentAlertPayload(
   debug: Boolean,
   shortUrl: String
 ) extends NotificationWithLink {
-  val `type` = Content
+  val `type` = NotificationPayloadType.ContentAlert
 }
 
-object GoalAlertPayload { implicit val jf = Json.writes[GoalAlertPayload] withTypeString GoalAlert.toString }
+object GoalAlertPayload { implicit val jf = Json.writes[GoalAlertPayload] withTypeString NotificationPayloadType.GoalAlert.toString }
 case class GoalAlertPayload(
   id: String = UUID.randomUUID.toString,
   title: String,
@@ -139,5 +134,5 @@ case class GoalAlertPayload(
   debug: Boolean,
   addedTime: Option[String]
 ) extends NotificationPayload {
-  val `type` = GoalAlert
+  val `type` = NotificationPayloadType.GoalAlert
 }

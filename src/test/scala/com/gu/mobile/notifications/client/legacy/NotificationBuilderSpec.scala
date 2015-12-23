@@ -5,8 +5,8 @@ import java.net.URI
 import com.gu.mobile.notifications.client.legacy.NotificationBuilderImpl._
 import com.gu.mobile.notifications.client.models.Editions._
 import com.gu.mobile.notifications.client.models.Topic._
-import com.gu.mobile.notifications.client.models.legacy.{AndroidMessagePayload, IOSMessagePayload, Target}
-import com.gu.mobile.notifications.client.models.{NotificationTypes, TopicTypes, _}
+import com.gu.mobile.notifications.client.models.legacy.{NotificationType, AndroidMessagePayload, IOSMessagePayload, Target}
+import com.gu.mobile.notifications.client.models._
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -18,7 +18,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
       val notification = buildNotification(cap)
 
       notification.uniqueIdentifier mustEqual cap.id
-      notification.`type` mustEqual NotificationTypes.Content
+      notification.`type` mustEqual NotificationType.Content
       notification.sender mustEqual cap.sender
       notification.target mustEqual Target(Set.empty, cap.topic)
       notification.metadata mustEqual expectedMetadata
@@ -39,7 +39,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
       val notification = buildNotification(bnp)
 
       notification.uniqueIdentifier mustEqual bnp.id
-      notification.`type` mustEqual NotificationTypes.BreakingNews
+      notification.`type` mustEqual NotificationType.BreakingNews
       notification.payloads.isEmpty mustNotEqual true
       notification.metadata mustNotEqual Map.empty
       notification.timeToLiveInSeconds must beGreaterThan(0)
@@ -54,7 +54,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
 
       val notification = buildNotification(bnpGuardianLink)
       notification.uniqueIdentifier mustEqual bnpGuardianLink.id
-      notification.`type` mustEqual NotificationTypes.BreakingNews
+      notification.`type` mustEqual NotificationType.BreakingNews
       notification.payloads.isEmpty mustNotEqual true
       notification.payloads.android.get mustEqual expectedAndroidPayload
       notification.payloads.ios.get mustEqual expectedIosPayload
@@ -85,7 +85,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
 
     "return a Notification if the type is BreakingNewsPayload" in new BreakingNewsScope {
       val notification = buildNotification(bnp)
-      notification.`type` mustEqual NotificationTypes.BreakingNews
+      notification.`type` mustEqual NotificationType.BreakingNews
     }
   }
 

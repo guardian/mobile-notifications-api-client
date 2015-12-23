@@ -3,9 +3,8 @@ package com.gu.mobile.notifications.client.legacy
 import java.net.URI
 
 import com.gu.mobile.notifications.client.models.Editions.Edition
-import com.gu.mobile.notifications.client.models.NotificationTypes.{BreakingNews, Content => ContentNotification}
 import com.gu.mobile.notifications.client.models._
-import com.gu.mobile.notifications.client.models.legacy.AndroidKeys.{Edition => EditionKey, Editions => EditionsKey, Link => LinkKey, _}
+import com.gu.mobile.notifications.client.models.legacy.AndroidKeys.{NotificationType => NotificationTypeKey, Edition => EditionKey, Editions => EditionsKey, Link => LinkKey, _}
 import com.gu.mobile.notifications.client.models.legacy.AndroidMessageTypes._
 import com.gu.mobile.notifications.client.models.legacy.IosKeys._
 import com.gu.mobile.notifications.client.models.legacy.IosMessageTypes._
@@ -33,7 +32,7 @@ object NotificationBuilderImpl extends NotificationBuilder {
 
     Notification(
       uniqueIdentifier = bnp.id,
-      `type` = BreakingNews,
+      `type` = NotificationType.BreakingNews,
       sender = bnp.sender,
       target = Target(editions, nonEditionTopics),
       payloads = breakingNewsAlertPayloads(strippedPayload, editions),
@@ -47,7 +46,7 @@ object NotificationBuilderImpl extends NotificationBuilder {
 
   private def buildContentAlert(cap: ContentAlertPayload) = Notification(
     uniqueIdentifier = cap.id,
-    `type` = ContentNotification,
+    `type` = NotificationType.Content,
     sender = cap.sender,
     target = Target(Set.empty, cap.topic),
     payloads = contentAlertPayloads(cap),
@@ -60,7 +59,7 @@ object NotificationBuilderImpl extends NotificationBuilder {
 
   private def buildGoalAlert(gap: GoalAlertPayload) = Notification(
     uniqueIdentifier = gap.id,
-    `type` = ContentNotification,
+    `type` = NotificationType.GoalAlert,
     sender = gap.sender,
     target = Target(Set.empty, gap.topic),
     payloads = goalAlertPayload(gap),
@@ -120,7 +119,7 @@ object NotificationBuilderImpl extends NotificationBuilder {
     AndroidMessagePayload(
       Map(
         Type -> Custom,
-        NotificationType -> payload.`type`.toString,
+        NotificationTypeKey -> payload.`type`.toString,
         Title -> payload.title,
         Ticker -> payload.message,
         Message -> payload.message,
@@ -155,7 +154,7 @@ object NotificationBuilderImpl extends NotificationBuilder {
 
     val properties = Map(
       IOSMessageType -> NewsAlert,
-      NotificationType -> payload.`type`.toString,
+      NotificationTypeKey -> payload.`type`.toString,
       LinkKey -> iosLink,
       Topics -> payload.topic.map(_.toTopicString).mkString(",")
     )
