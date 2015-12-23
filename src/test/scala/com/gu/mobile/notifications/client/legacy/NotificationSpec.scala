@@ -2,7 +2,7 @@ package com.gu.mobile.notifications.client.legacy
 
 import com.gu.mobile.notifications.client.models.Editions.{UK, US}
 import com.gu.mobile.notifications.client.models.{TopicTypes, Topic}
-import com.gu.mobile.notifications.client.models.legacy.NotificationTypes.{BreakingNews, Content}
+import com.gu.mobile.notifications.client.models.legacy.NotificationType
 import com.gu.mobile.notifications.client.models.legacy._
 import org.specs2.mutable.Specification
 import play.api.libs.json.Json
@@ -37,7 +37,7 @@ class NotificationSpec extends Specification {
         "link" -> "http://somelink.com/something")
 
       val notification = Notification(
-        `type` = BreakingNews,
+        `type` = NotificationType.BreakingNews,
         timeToLiveInSeconds = 10,
         uniqueIdentifier = "someID",
         sender = "some sender",
@@ -124,7 +124,7 @@ class NotificationSpec extends Specification {
         "link" -> "webUrl")
 
       val notification = Notification(
-        `type` = Content,
+        `type` = NotificationType.Content,
         timeToLiveInSeconds = 10,
         uniqueIdentifier = "contentNotifications/newArticle/newId",
         sender = "mobile-notifications-content",

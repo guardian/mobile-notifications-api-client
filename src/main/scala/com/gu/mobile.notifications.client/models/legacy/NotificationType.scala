@@ -2,8 +2,12 @@ package com.gu.mobile.notifications.client.models.legacy
 
 import play.api.libs.json._
 
-object NotificationTypes {
-  sealed trait NotificationType
+sealed trait NotificationType
+
+object NotificationType {
+  implicit val jf = new Writes[NotificationType] {
+    override def writes(nType: NotificationType): JsValue = JsString(nType.toString)
+  }
 
   case object BreakingNews extends NotificationType {
     override def toString = "news"
@@ -17,9 +21,5 @@ object NotificationTypes {
     override def toString = "goal"
   }
 
-  object NotificationType {
-    implicit val jf = new Writes[NotificationType] {
-      override def writes(nType: NotificationType): JsValue = JsString(nType.toString)
-    }
-  }
 }
+
