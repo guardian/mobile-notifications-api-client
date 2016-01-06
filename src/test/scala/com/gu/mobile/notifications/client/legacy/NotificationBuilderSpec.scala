@@ -197,7 +197,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
       ))
 
     val expectedIosPayload = IOSMessagePayload(
-      body = "myMessage",
+      body = "myTitle",
       customProperties = Map(
         "t" -> "m",
         "notificationType" -> "content",
