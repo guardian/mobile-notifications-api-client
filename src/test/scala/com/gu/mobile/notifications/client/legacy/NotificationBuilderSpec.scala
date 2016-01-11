@@ -182,8 +182,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
       link = GuardianLinkDetails(contentApiId = "capiId", shortUrl = Some("http://gu.com/short/url"), title = "some title", thumbnail = None, git = GITContent),
       importance = Importance.Minor,
       topic = Set(Topic(TopicTypes.Content, "topicName"), Topic(TopicTypes.Content, "topicName2")),
-      debug = true,
-      shortUrl = "shorturl"
+      debug = true
     )
 
     val expectedAndroidPayload = AndroidMessagePayload(
