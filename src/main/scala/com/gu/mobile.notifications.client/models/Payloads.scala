@@ -105,8 +105,7 @@ case class ContentAlertPayload(
   link: Link,
   importance: Importance,
   topic: Set[Topic],
-  debug: Boolean,
-  shortUrl: String
+  debug: Boolean
 ) extends NotificationWithLink {
   val `type` = NotificationPayloadType.ContentAlert
 }

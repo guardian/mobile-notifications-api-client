@@ -13,16 +13,16 @@ object TopicType {
 }
 
 object TopicTypes {
-  case object Breaking extends TopicType { override def toString = "breaking" }
-  case object Content extends TopicType { override def toString = "content" }
-  case object TagContributor extends TopicType { override def toString = "tag-contributor" }
-  case object TagKeyword extends TopicType { override def toString = "tag-keyword" }
-  case object TagSeries extends TopicType { override def toString = "tag-series" }
-  case object TagBlog extends TopicType { override def toString = "tag-blog" }
-  case object FootballTeam extends TopicType { override def toString = "football-team" }
-  case object FootballMatch extends TopicType { override def toString = "football-match" }
-  case object User extends TopicType { override def toString = "user-type" }
-  case object Newsstand extends TopicType { override def toString = "newsstand" }
+  case object Breaking extends TopicType { override val toString = "breaking" }
+  case object Content extends TopicType { override val toString = "content" }
+  case object TagContributor extends TopicType { override val toString = "tag-contributor" }
+  case object TagKeyword extends TopicType { override val toString = "tag-keyword" }
+  case object TagSeries extends TopicType { override val toString = "tag-series" }
+  case object TagBlog extends TopicType { override val toString = "tag-blog" }
+  case object FootballTeam extends TopicType { override val toString = "football-team" }
+  case object FootballMatch extends TopicType { override val toString = "football-match" }
+  case object User extends TopicType { override val toString = "user-type" }
+  case object Newsstand extends TopicType { override val toString = "newsstand" }
 }
 
 case class Topic(`type`: TopicType, name: String) {

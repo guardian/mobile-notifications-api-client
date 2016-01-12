@@ -70,8 +70,7 @@ class PayloadsSpec extends Specification {
         link = internalLink,
         importance = Importance.Minor,
         topic = Set(Topic(TagSeries, "environment/series/keep-it-in-the-ground"), Topic(Breaking, "n2")),
-        debug = false,
-        shortUrl = "shortUrl")
+        debug = false)
 
       val expectedJson =
         """
@@ -97,8 +96,7 @@ class PayloadsSpec extends Specification {
           |    "type" : "breaking",
           |    "name" : "n2"
           |    }],
-          |    "debug" : false,
-          |  "shortUrl" : "shortUrl"
+          |    "debug" : false
           |}
         """.stripMargin
       verifySerialization(payload, expectedJson)
