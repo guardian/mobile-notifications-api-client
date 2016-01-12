@@ -70,19 +70,19 @@ object NotificationBuilderImpl extends NotificationBuilder {
     )
   )
 
-  private def breakingNewsAlertPayloads(message: BreakingNewsPayload, editions: Set[Edition]) = MessagePayloads(
-    ios = Some(buildIosPayload(message)),
-    android = Some(buildAndroidBreakingNewsPayload(message, editions))
+  private def breakingNewsAlertPayloads(payload: BreakingNewsPayload, editions: Set[Edition]) = MessagePayloads(
+    ios = Some(buildIosPayload(payload)),
+    android = Some(buildAndroidBreakingNewsPayload(payload, editions))
   )
 
-  private def contentAlertPayloads(message: ContentAlertPayload) = MessagePayloads(
-    ios = Some(buildIosPayload(message)),
-    android = Some(buildAndroidContentAlertPayloads(message))
+  private def contentAlertPayloads(payload: ContentAlertPayload) = MessagePayloads(
+    ios = Some(buildContentAlertIosPayload(payload)),
+    android = Some(buildAndroidContentAlertPayloads(payload))
   )
 
-  private def goalAlertPayload(message: GoalAlertPayload) = MessagePayloads(
-    ios = Some(buildIosGoalAlertPayload(message)),
-    android = Some(buildAndroidGoalAlertPayload(message))
+  private def goalAlertPayload(payload: GoalAlertPayload) = MessagePayloads(
+    ios = Some(buildIosGoalAlertPayload(payload)),
+    android = Some(buildAndroidGoalAlertPayload(payload))
   )
 
   private def buildAndroidContentAlertPayloads(payload: ContentAlertPayload) = {
@@ -139,7 +139,14 @@ object NotificationBuilderImpl extends NotificationBuilder {
     )
   }
 
-  private def buildIosPayload(payload: NotificationWithLink) = {
+
+
+  private def iosCategory(payload: NotificationWithLink) = payload.link match {
+    case guardianLink: GuardianLinkDetails => guardianLink.shortUrl.map(_ => "ITEM_CATEGORY")
+    case _ => None
+  }
+
+  private def iosProperties(payload: NotificationWithLink) = {
 
     val iosLink = payload.link match {
       case GuardianLinkDetails(_, Some(url), _, _, _) => s"x-gu://" + new URI(url).getPath
@@ -147,22 +154,28 @@ object NotificationBuilderImpl extends NotificationBuilder {
       case ExternalLink(url) => url
     }
 
-    val iosCategory = payload.link match {
-      case guardianLink: GuardianLinkDetails => guardianLink.shortUrl.map(_ => "ITEM_CATEGORY")
-      case _ => None
-    }
-
-    val properties = Map(
+    Map(
       IOSMessageType -> NewsAlert,
       NotificationTypeKey -> payload.`type`.toString,
       LinkKey -> iosLink,
       Topics -> payload.topic.map(_.toTopicString).mkString(",")
     )
+  }
 
+
+  private def buildIosPayload(payload: NotificationWithLink) = {
     IOSMessagePayload(
       body = payload.message,
-      customProperties = properties,
-      category = iosCategory
+      customProperties = iosProperties(payload),
+      category = iosCategory(payload)
+    )
+  }
+
+  private def buildContentAlertIosPayload(payload: ContentAlertPayload) = {
+    IOSMessagePayload(
+      body = payload.title,
+      customProperties = iosProperties(payload),
+      category = iosCategory(payload)
     )
   }
 
