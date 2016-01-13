@@ -5,7 +5,7 @@ name := "mobile-notifications-client"
 
 organization := "com.gu"
 
-scalaVersion := "2.11.2"
+scalaVersion := "2.11.7"
 
 crossScalaVersions := Seq("2.10.3", "2.10.4", "2.11.2")
 
@@ -21,9 +21,9 @@ libraryDependencies ++= Seq(
   "com.github.tomakehurst" % "wiremock" % "1.33" % "test"
 )
 
-releaseSettings
+//releaseSettings
 
-sonatypeSettings
+//sonatypeSettings
 
 description := "Scala client for the Guardian Push Notifications API"
 
@@ -32,20 +32,20 @@ scmInfo := Some(ScmInfo(
   "scm:git:git@github.com:guardian/mobile-notifications-api-client.git"
 ))
 
-pomExtra := (
+pomExtra in Global := {
   <url>https://github.com/guardian/mobile-notifications-api-client</url>
-  <developers>
-    <developer>
-      <id>robertberry</id>
-      <name>Robert Berry</name>
-      <url>https://github.com/robertberry</url>
-    </developer>
-  </developers>
-)
+    <developers>
+      <developer>
+        <id>robertberry</id>
+        <name>Robert Berry</name>
+        <url>https://github.com/robertberry</url>
+      </developer>
+    </developers>
+}
 
 licenses := Seq("Apache V2" -> url("http://www.apache.org/licenses/LICENSE-2.0.html"))
 
-ReleaseKeys.releaseProcess := Seq[ReleaseStep](
+releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
   inquireVersions,
   runClean,
@@ -53,15 +53,9 @@ ReleaseKeys.releaseProcess := Seq[ReleaseStep](
   setReleaseVersion,
   commitReleaseVersion,
   tagRelease,
-  ReleaseStep(
-    action = state => Project.extract(state).runTask(PgpKeys.publishSigned, state)._1,
-    enableCrossBuild = true
-  ),
+  ReleaseStep(action = Command.process("publishSigned", _)),
   setNextVersion,
   commitNextVersion,
-  ReleaseStep(
-    state => Project.extract(state).runTask(SonatypeKeys.sonatypeReleaseAll, state)._1,
-    enableCrossBuild = true
-  ),
+  ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
   pushChanges
 )
