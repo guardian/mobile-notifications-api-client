@@ -21,10 +21,6 @@ libraryDependencies ++= Seq(
   "com.github.tomakehurst" % "wiremock" % "1.33" % "test"
 )
 
-//releaseSettings
-
-//sonatypeSettings
-
 description := "Scala client for the Guardian Push Notifications API"
 
 scmInfo := Some(ScmInfo(
@@ -36,9 +32,9 @@ pomExtra in Global := {
   <url>https://github.com/guardian/mobile-notifications-api-client</url>
     <developers>
       <developer>
-        <id>robertberry</id>
-        <name>Robert Berry</name>
-        <url>https://github.com/robertberry</url>
+        <id>@guardian</id>
+        <name>The guardian</name>
+        <url>https://github.com/guardian</url>
       </developer>
     </developers>
 }
