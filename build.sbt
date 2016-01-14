@@ -7,7 +7,9 @@ organization := "com.gu"
 
 scalaVersion := "2.11.7"
 
-crossScalaVersions := Seq("2.10.3", "2.10.4", "2.11.2")
+crossScalaVersions := Seq("2.10.4", "2.11.2")
+
+releaseCrossBuild := true
 
 resolvers ++= Seq(
   "Guardian GitHub Releases" at "http://guardian.github.io/maven/repo-releases",
