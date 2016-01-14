@@ -192,7 +192,8 @@ class NotificationBuilderSpec extends Specification with Mockito {
         "message" -> "myMessage",
         "title" -> "myTitle",
         "type" -> "custom",
-        "ticker" -> "myMessage"
+        "ticker" -> "myMessage",
+        "topics" -> "content//topicName,content//topicName2"
       ))
 
     val expectedIosPayload = IOSMessagePayload(
