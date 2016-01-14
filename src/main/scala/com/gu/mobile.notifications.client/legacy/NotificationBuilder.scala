@@ -92,7 +92,8 @@ object NotificationBuilderImpl extends NotificationBuilder {
         Title -> payload.title,
         Ticker -> payload.message,
         Message -> payload.message,
-        LinkKey ->  toAndroidLink(payload.link)
+        LinkKey ->  toAndroidLink(payload.link),
+        Topics -> payload.topic.map(_.toTopicString).mkString(",")
       ) ++ payload.thumbnailUrl.map(ThumbnailUrl -> _.toString)
     )
   }
