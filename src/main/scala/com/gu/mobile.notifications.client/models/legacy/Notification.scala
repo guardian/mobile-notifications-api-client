@@ -1,6 +1,7 @@
 package com.gu.mobile.notifications.client.models.legacy
 
 import java.util.UUID
+import com.gu.mobile.notifications.client.models.Importance.Importance
 import com.gu.mobile.notifications.client.models.Topic
 import play.api.libs.json._
 import com.gu.mobile.notifications.client.models.Editions._
@@ -43,7 +44,8 @@ case class Notification(
     * If the client wants anything more advanced they should maintain their own data store using the notification ID
     * returned by Pushy when they deliver the notification.
     */
-  metadata: Map[String, String]
+  metadata: Map[String, String],
+  importance: Importance
 )
 
 object Notification {

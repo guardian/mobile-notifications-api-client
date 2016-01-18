@@ -2,6 +2,7 @@ package com.gu.mobile.notifications.client
 
 import com.gu.mobile.notifications.client.legacy.NotificationBuilder
 import com.gu.mobile.notifications.client.models.Editions.UK
+import com.gu.mobile.notifications.client.models.Importance.Major
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy._
 import org.specs2.execute.Result
@@ -39,10 +40,11 @@ class LegacyApiClientSpec extends ApiClientSpec[LegacyApiClient] {
     target = Target(regions = Set(UK), topics = Set(Topic.NewsstandIos)),
     timeToLiveInSeconds = 10,
     payloads = MessagePayloads(Some(iosPayload), Some(androidPayload)),
-    metadata = Map("m1" -> "v1")
+    metadata = Map("m1" -> "v1"),
+    importance = Major
   )
 
-  val expectedPostBody = """{"type":"news","uniqueIdentifier":"UNIQUE_ID","sender":"sender","target":{"regions":["uk"],"topics":[{"type":"newsstand","name":"newsstandIos"}]},"timeToLiveInSeconds":10,"payloads":{"ios":{"type":"ios","body":"ios_body","customProperties":{"p1":"v1"},"category":"category"},"android":{"type":"android","body":{"k1":"v1"}}},"metadata":{"m1":"v1"}}"""
+  val expectedPostBody = """{"type":"news","uniqueIdentifier":"UNIQUE_ID","sender":"sender","target":{"regions":["uk"],"topics":[{"type":"newsstand","name":"newsstandIos"}]},"timeToLiveInSeconds":10,"payloads":{"ios":{"type":"ios","body":"ios_body","customProperties":{"p1":"v1"},"category":"category"},"android":{"type":"android","body":{"k1":"v1"}}},"metadata":{"m1":"v1"}, "importance":"Major"}"""
   val expectedPostUrl = s"$host/notifications?api-key=$apiKey"
 
   val fakeNotificationBuilder = mock[NotificationBuilder]
