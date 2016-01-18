@@ -17,7 +17,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
     "return a well constructed Notification if a valid ContentAlertPayload is provided" in new ContentAlertScope {
       val notification = buildNotification(cap)
 
-      notification.uniqueIdentifier mustEqual cap.id
+      notification.uniqueIdentifier mustEqual "contentNotifications/newArticle/capiId"
       notification.`type` mustEqual NotificationType.Content
       notification.sender mustEqual cap.sender
       notification.target mustEqual Target(Set.empty, cap.topic)
@@ -79,8 +79,8 @@ class NotificationBuilderSpec extends Specification with Mockito {
       notification.target.regions mustEqual Set(UK, US)
 
       val androidBody = notification.payloads.android.get.body
-      androidBody("topics") mustEqual ("breaking//sport,newsstand//newsstandIos")
-      androidBody("editions") mustEqual ("uk,us")
+      androidBody("topics") mustEqual "breaking//sport,newsstand//newsstandIos"
+      androidBody("editions") mustEqual "uk,us"
     }
 
     "return a Notification if the type is BreakingNewsPayload" in new BreakingNewsScope {
