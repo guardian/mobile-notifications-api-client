@@ -30,6 +30,17 @@ class NotificationBuilderSpec extends Specification with Mockito {
       notification.payloads.ios.get mustEqual expectedIosPayload
     }
 
+    "compute an ID for an article" in new ContentAlertScope {
+      val notification = buildNotification(cap)
+      notification.uniqueIdentifier mustEqual "contentNotifications/newArticle/capiId"
+    }
+
+    "compute an ID for a liveblog block" in new ContentAlertScope {
+      val content = cap.copy(link = link.copy(blockId = Some("block-abcdefgh")))
+      val notification = buildNotification(content)
+      notification.uniqueIdentifier mustEqual "contentNotifications/newBlock/capiId/block-abcdefgh"
+    }
+
     "throw an exception if the type is GoalAlertPayload" in {
       val notif = mock[GoalAlertPayload]
       buildNotification(notif) must throwA[UnsupportedOperationException]
@@ -173,13 +184,15 @@ class NotificationBuilderSpec extends Specification with Mockito {
 
   trait ContentAlertScope extends Scope {
 
+    val link = GuardianLinkDetails(contentApiId = "capiId", shortUrl = Some("http://gu.com/short/url"), title = "some title", thumbnail = None, git = GITContent)
+
     val cap = ContentAlertPayload(
       id = "contentAlertId",
       title = "myTitle",
       message = "myMessage",
       thumbnailUrl = Some(new URI("http://thumb.url.com")),
       sender = "mySender",
-      link = GuardianLinkDetails(contentApiId = "capiId", shortUrl = Some("http://gu.com/short/url"), title = "some title", thumbnail = None, git = GITContent),
+      link = link,
       importance = Importance.Minor,
       topic = Set(Topic(TopicTypes.Content, "topicName"), Topic(TopicTypes.Content, "topicName2")),
       debug = true
