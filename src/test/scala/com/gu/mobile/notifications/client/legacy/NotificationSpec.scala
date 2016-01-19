@@ -1,6 +1,7 @@
 package com.gu.mobile.notifications.client.legacy
 
 import com.gu.mobile.notifications.client.models.Editions.{UK, US}
+import com.gu.mobile.notifications.client.models.Importance.{Minor, Major}
 import com.gu.mobile.notifications.client.models.{TopicTypes, Topic}
 import com.gu.mobile.notifications.client.models.legacy.NotificationType
 import com.gu.mobile.notifications.client.models.legacy._
@@ -43,7 +44,8 @@ class NotificationSpec extends Specification {
         sender = "some sender",
         target = Target(Set(UK, US), Set(Topic.BreakingNewsUk)),
         payloads = MessagePayloads(Some(iosPayload), Some(androidPayload)),
-        metadata = metadata
+        metadata = metadata,
+        importance = Major
       )
 
       val expectedJson =
@@ -95,7 +97,8 @@ class NotificationSpec extends Specification {
           |      "title":"someTitle",
           |      "message":"some message",
           |      "link":"http://somelink.com/something"
-          |   }
+          |   },
+          |   "importance": "Major"
           |}
         """.stripMargin
 
@@ -130,7 +133,8 @@ class NotificationSpec extends Specification {
         sender = "mobile-notifications-content",
         target = Target(Set.empty, Set(Topic(TopicTypes.TagContributor, "tagId1"), Topic(TopicTypes.TagKeyword, "tagId2"), Topic(TopicTypes.TagSeries, "tagId3"))),
         payloads = MessagePayloads(Some(iosPayload), Some(androidPayload)),
-        metadata = metadata
+        metadata = metadata,
+        importance = Minor
       )
       val expectedJson =
         """{
@@ -182,7 +186,8 @@ class NotificationSpec extends Specification {
           |      "title":"Following: webTitle",
           |      "message":"webTitle",
           |      "link":"webUrl"
-          |   }
+          |   },
+          |   "importance":"Minor"
           |}
         """.stripMargin
       verifySerialization(notification, expectedJson)

@@ -28,6 +28,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
       notification.sender mustEqual "mySender"
       notification.payloads.android.get mustEqual expectedAndroidPayload
       notification.payloads.ios.get mustEqual expectedIosPayload
+      notification.importance mustEqual Importance.Minor
     }
 
     "compute an ID for an article" in new ContentAlertScope {
@@ -59,6 +60,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
       notification.sender mustEqual "test sender"
       notification.payloads.android.get mustEqual expectedAndroidPayload
       notification.payloads.ios.get mustEqual expectedIosPayload
+      notification.importance mustEqual Importance.Major
     }
 
     "return the correct link format for each platform" in new PlatFormLinkTestScope {
@@ -92,6 +94,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
       val androidBody = notification.payloads.android.get.body
       androidBody("topics") mustEqual "breaking//sport,newsstand//newsstandIos"
       androidBody("editions") mustEqual "uk,us"
+      notification.importance mustEqual Importance.Major
     }
 
     "return a Notification if the type is BreakingNewsPayload" in new BreakingNewsScope {

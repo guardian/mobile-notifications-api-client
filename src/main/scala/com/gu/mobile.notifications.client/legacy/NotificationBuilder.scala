@@ -41,7 +41,8 @@ object NotificationBuilderImpl extends NotificationBuilder {
         "title" -> bnp.title,
         "message" -> bnp.message,
         "link" -> bnp.link.toString
-      )
+      ),
+      importance = bnp.importance
     )
   }
 
@@ -55,7 +56,8 @@ object NotificationBuilderImpl extends NotificationBuilder {
       "title" -> cap.title,
       "message" -> cap.message,
       "link" -> cap.link.toString
-    )
+    ),
+    importance = cap.importance
   )
 
   private def contentAlertId(cap: ContentAlertPayload): String = {
@@ -84,7 +86,8 @@ object NotificationBuilderImpl extends NotificationBuilder {
       "title" -> gap.title,
       "message" -> gap.message,
       "link" -> gap.mapiUrl.toString
-    )
+    ),
+    importance = gap.importance
   )
 
   private def breakingNewsAlertPayloads(payload: BreakingNewsPayload, editions: Set[Edition]) = MessagePayloads(
