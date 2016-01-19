@@ -30,7 +30,13 @@ object ExternalLink { implicit val jf = Json.writes[ExternalLink] }
 case class ExternalLink(url: String) extends Link {
   override val toString = url
 }
-case class GuardianLinkDetails(contentApiId: String, shortUrl: Option[String], title: String, thumbnail: Option[String], git: GuardianItemType) extends Link {
+case class GuardianLinkDetails(
+  contentApiId: String,
+  shortUrl: Option[String],
+  title: String,
+  thumbnail: Option[String],
+  git: GuardianItemType,
+  blockId: Option[String] = None) extends Link {
   val webUrl = s"http://www.theguardian.com/$contentApiId"
   override val toString = webUrl
 }

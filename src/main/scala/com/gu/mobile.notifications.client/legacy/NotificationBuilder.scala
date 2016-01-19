@@ -1,6 +1,7 @@
 package com.gu.mobile.notifications.client.legacy
 
 import java.net.URI
+import java.util.UUID
 
 import com.gu.mobile.notifications.client.models.Editions.Edition
 import com.gu.mobile.notifications.client.models._
@@ -40,12 +41,13 @@ object NotificationBuilderImpl extends NotificationBuilder {
         "title" -> bnp.title,
         "message" -> bnp.message,
         "link" -> bnp.link.toString
-      )
+      ),
+      importance = bnp.importance
     )
   }
 
   private def buildContentAlert(cap: ContentAlertPayload) = Notification(
-    uniqueIdentifier = cap.id,
+    uniqueIdentifier = contentAlertId(cap),
     `type` = NotificationType.Content,
     sender = cap.sender,
     target = Target(Set.empty, cap.topic),
@@ -54,8 +56,25 @@ object NotificationBuilderImpl extends NotificationBuilder {
       "title" -> cap.title,
       "message" -> cap.message,
       "link" -> cap.link.toString
-    )
+    ),
+    importance = cap.importance
   )
+
+  private def contentAlertId(cap: ContentAlertPayload): String = {
+    def newContentIdentifier(contentApiId: String): String = s"contentNotifications/newArticle/$contentApiId"
+    def newBlockIdentifier(contentApiId: String, blockId: String): String = s"contentNotifications/newBlock/$contentApiId/$blockId"
+    val contentCoordinates = cap.link match {
+      case GuardianLinkDetails(contentApiId, _, _, _, _, blockId) => (Some(contentApiId), blockId)
+      case _ => (None, None)
+    }
+
+    contentCoordinates match {
+      case (Some(contentApiId), Some(blockId)) => newBlockIdentifier(contentApiId, blockId)
+      case (Some(contentApiId), None) => newContentIdentifier(contentApiId)
+      case (None, _) => UUID.randomUUID.toString
+    }
+  }
+
 
   private def buildGoalAlert(gap: GoalAlertPayload) = Notification(
     uniqueIdentifier = gap.id,
@@ -67,7 +86,8 @@ object NotificationBuilderImpl extends NotificationBuilder {
       "title" -> gap.title,
       "message" -> gap.message,
       "link" -> gap.mapiUrl.toString
-    )
+    ),
+    importance = gap.importance
   )
 
   private def breakingNewsAlertPayloads(payload: BreakingNewsPayload, editions: Set[Edition]) = MessagePayloads(
@@ -103,18 +123,18 @@ object NotificationBuilderImpl extends NotificationBuilder {
   private def buildIosGoalAlertPayload(payload: GoalAlertPayload) = ???
 
   private def toAndroidLink(link: Link) = link match {
-    case GuardianLinkDetails(contentApiId, _, _, _, _) => s"x-gu://www.guardian.co.uk/$contentApiId"
+    case GuardianLinkDetails(contentApiId, _, _, _, _, _) => s"x-gu://www.guardian.co.uk/$contentApiId"
     case ExternalLink(url) => url
   }
 
   private def buildAndroidBreakingNewsPayload(payload: BreakingNewsPayload, editions: Set[Edition]) = {
 
     val sectionLink = condOpt(payload.link) {
-      case GuardianLinkDetails(contentApiId, _, _, _, GITSection) => contentApiId
+      case GuardianLinkDetails(contentApiId, _, _, _, GITSection, _) => contentApiId
     }
 
     val tagLink = condOpt(payload.link) {
-      case GuardianLinkDetails(contentApiId, _, _, _, GITTag) => contentApiId
+      case GuardianLinkDetails(contentApiId, _, _, _, GITTag, _) => contentApiId
     }
 
     AndroidMessagePayload(
@@ -150,7 +170,7 @@ object NotificationBuilderImpl extends NotificationBuilder {
   private def iosProperties(payload: NotificationWithLink) = {
 
     val iosLink = payload.link match {
-      case GuardianLinkDetails(_, Some(url), _, _, _) => s"x-gu://" + new URI(url).getPath
+      case GuardianLinkDetails(_, Some(url), _, _, _, _) => s"x-gu://" + new URI(url).getPath
       case details: GuardianLinkDetails => details.webUrl
       case ExternalLink(url) => url
     }

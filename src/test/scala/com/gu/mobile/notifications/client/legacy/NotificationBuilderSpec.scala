@@ -17,7 +17,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
     "return a well constructed Notification if a valid ContentAlertPayload is provided" in new ContentAlertScope {
       val notification = buildNotification(cap)
 
-      notification.uniqueIdentifier mustEqual cap.id
+      notification.uniqueIdentifier mustEqual "contentNotifications/newArticle/capiId"
       notification.`type` mustEqual NotificationType.Content
       notification.sender mustEqual cap.sender
       notification.target mustEqual Target(Set.empty, cap.topic)
@@ -28,6 +28,18 @@ class NotificationBuilderSpec extends Specification with Mockito {
       notification.sender mustEqual "mySender"
       notification.payloads.android.get mustEqual expectedAndroidPayload
       notification.payloads.ios.get mustEqual expectedIosPayload
+      notification.importance mustEqual Importance.Minor
+    }
+
+    "compute an ID for an article" in new ContentAlertScope {
+      val notification = buildNotification(cap)
+      notification.uniqueIdentifier mustEqual "contentNotifications/newArticle/capiId"
+    }
+
+    "compute an ID for a liveblog block" in new ContentAlertScope {
+      val content = cap.copy(link = link.copy(blockId = Some("block-abcdefgh")))
+      val notification = buildNotification(content)
+      notification.uniqueIdentifier mustEqual "contentNotifications/newBlock/capiId/block-abcdefgh"
     }
 
     "throw an exception if the type is GoalAlertPayload" in {
@@ -48,6 +60,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
       notification.sender mustEqual "test sender"
       notification.payloads.android.get mustEqual expectedAndroidPayload
       notification.payloads.ios.get mustEqual expectedIosPayload
+      notification.importance mustEqual Importance.Major
     }
 
     "return the correct link format for each platform" in new PlatFormLinkTestScope {
@@ -79,8 +92,9 @@ class NotificationBuilderSpec extends Specification with Mockito {
       notification.target.regions mustEqual Set(UK, US)
 
       val androidBody = notification.payloads.android.get.body
-      androidBody("topics") mustEqual ("breaking//sport,newsstand//newsstandIos")
-      androidBody("editions") mustEqual ("uk,us")
+      androidBody("topics") mustEqual "breaking//sport,newsstand//newsstandIos"
+      androidBody("editions") mustEqual "uk,us"
+      notification.importance mustEqual Importance.Major
     }
 
     "return a Notification if the type is BreakingNewsPayload" in new BreakingNewsScope {
@@ -173,13 +187,15 @@ class NotificationBuilderSpec extends Specification with Mockito {
 
   trait ContentAlertScope extends Scope {
 
+    val link = GuardianLinkDetails(contentApiId = "capiId", shortUrl = Some("http://gu.com/short/url"), title = "some title", thumbnail = None, git = GITContent)
+
     val cap = ContentAlertPayload(
       id = "contentAlertId",
       title = "myTitle",
       message = "myMessage",
       thumbnailUrl = Some(new URI("http://thumb.url.com")),
       sender = "mySender",
-      link = GuardianLinkDetails(contentApiId = "capiId", shortUrl = Some("http://gu.com/short/url"), title = "some title", thumbnail = None, git = GITContent),
+      link = link,
       importance = Importance.Minor,
       topic = Set(Topic(TopicTypes.Content, "topicName"), Topic(TopicTypes.Content, "topicName2")),
       debug = true
