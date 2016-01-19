@@ -61,7 +61,7 @@ object NotificationBuilderImpl extends NotificationBuilder {
   private def contentAlertId(cap: ContentAlertPayload): String = {
     def newContentIdentifier(contentApiId: String): String = s"contentNotifications/newArticle/$contentApiId"
     def newBlockIdentifier(contentApiId: String, blockId: String): String = s"contentNotifications/newBlock/$contentApiId/$blockId"
-    def contentCoordinates = cap.link match {
+    val contentCoordinates = cap.link match {
       case GuardianLinkDetails(contentApiId, _, _, _, _, blockId) => (Some(contentApiId), blockId)
       case _ => (None, None)
     }
