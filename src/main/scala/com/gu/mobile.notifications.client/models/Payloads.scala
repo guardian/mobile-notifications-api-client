@@ -93,7 +93,7 @@ case class BreakingNewsPayload(
   thumbnailUrl: Option[URI],
   sender: String,
   link: Link,
-  imageUrl: Option[String],
+  imageUrl: Option[URI],
   importance: Importance,
   topic: Set[Topic],
   debug: Boolean
@@ -109,6 +109,7 @@ case class ContentAlertPayload(
   thumbnailUrl: Option[URI],
   sender: String,
   link: Link,
+  imageUrl: Option[URI] = None,
   importance: Importance,
   topic: Set[Topic],
   debug: Boolean
