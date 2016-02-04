@@ -114,7 +114,12 @@ object NotificationBuilderImpl extends NotificationBuilder {
         Message -> payload.message,
         LinkKey ->  toAndroidLink(payload.link),
         Topics -> payload.topic.map(_.toTopicString).mkString(",")
-      ) ++ payload.thumbnailUrl.map(ThumbnailUrl -> _.toString)
+      ) ++ Seq(
+        ImageUrl -> payload.imageUrl.map(_.toString),
+        ThumbnailUrl -> payload.thumbnailUrl.map(_.toString)
+      ).collect({
+        case (k, Some(v)) => k -> v
+      })
     )
   }
 
@@ -152,7 +157,7 @@ object NotificationBuilderImpl extends NotificationBuilder {
         Section -> sectionLink,
         EditionKey -> (if (editions.size == 1) Some(editions.head.toString) else None),
         Keyword -> tagLink,
-        ImageUrl -> payload.imageUrl,
+        ImageUrl -> payload.imageUrl.map(_.toString),
         ThumbnailUrl -> payload.thumbnailUrl.map(_.toString)
       ).collect({
         case (k, Some(v)) => k -> v
