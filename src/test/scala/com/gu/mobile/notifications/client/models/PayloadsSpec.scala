@@ -21,7 +21,7 @@ class PayloadsSpec extends Specification {
         title = "The Guardian",
         message = "Mali hotel attack: UN counts 27 bodies as hostage situation ends",
         sender = "test",
-        imageUrl = Some("https://mobile.guardianapis.com/img/media/a5fb401022d09b2f624a0cc0484c563fd1b6ad93/0_308_4607_2764/master/4607.jpg/6ad3110822bdb2d1d7e8034bcef5dccf?width=800&height=-&quality=85"),
+        imageUrl = Some(new URI("https://mobile.guardianapis.com/img/media/a5fb401022d09b2f624a0cc0484c563fd1b6ad93/0_308_4607_2764/master/4607.jpg/6ad3110822bdb2d1d7e8034bcef5dccf?width=800&height=-&quality=85")),
         thumbnailUrl = Some(new URI("http://media.guim.co.uk/09951387fda453719fe1fee3e5dcea4efa05e4fa/0_181_3596_2160/140.jpg")),
         link = ExternalLink("http://mylink"),
         importance = Importance.Major,

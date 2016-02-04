@@ -31,6 +31,15 @@ class NotificationBuilderSpec extends Specification with Mockito {
       notification.importance mustEqual Importance.Minor
     }
 
+    "return a notification with an imageURI if it is on the ContentAlertPayload" in new ContentAlertScope {
+      val contentAlertPayload = cap.copy(imageUrl = Some(new URI("http://big-image.url.com")))
+      val expectedAndroidPayloadWithImage = expectedAndroidPayload.copy(body = expectedAndroidPayload.body ++ Map("imageUrl" -> "http://big-image.url.com"))
+
+      val notification = buildNotification(contentAlertPayload)
+
+      notification.payloads.android.get mustEqual expectedAndroidPayloadWithImage
+    }
+
     "compute an ID for an article" in new ContentAlertScope {
       val notification = buildNotification(cap)
       notification.uniqueIdentifier mustEqual "contentNotifications/newArticle/capiId"
