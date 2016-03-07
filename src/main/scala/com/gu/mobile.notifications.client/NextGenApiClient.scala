@@ -20,10 +20,7 @@ protected class NextGenApiClient(val host: String,
   private val url = s"$host/push?api-key=$apiKey"
 
   override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, Unit]] = {
-    //TODO do we still need to return an error if no topics are provided?
-    if (notificationPayload.topic.isEmpty)
-      Future.successful(Left(MissingParameterError("topic")))
-    else {
+
       val json = Json.stringify(Json.toJson(notificationPayload))
       postJson(url, json) map {
         case error: HttpError => Left(ApiHttpError(error.status))
@@ -33,6 +30,6 @@ protected class NextGenApiClient(val host: String,
         case e: Exception => Left(HttpProviderError(e))
       }
     }
-  }
+
 }
 
