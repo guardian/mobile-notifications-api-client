@@ -22,7 +22,7 @@ class NextGenApiClientSpec extends ApiClientSpec[NextGenApiClient] {
     debug = true
   )
 
-  val expectedPostUrl = s"$host/push?api-key=$apiKey"
+  val expectedPostUrl = s"$host/push/topic?api-key=$apiKey"
   val expectedPostBody = Json.stringify(Json.toJson(payload))
 
   override def getTestApiClient(httpProvider: HttpProvider) = new NextGenApiClient(
