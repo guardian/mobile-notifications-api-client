@@ -52,23 +52,6 @@ class NextGenApiClientSpec extends ApiClientSpec[NextGenApiClient] {
       client => client.send(payload) must beEqualTo(Left(UnexpectedApiResponseError("Server returned status code 200 and body:success but not code 201!"))).await
     }
 
-    "return missing parameter error if payload has no topic" in {
-      val payloadWithNoTopics = BreakingNewsPayload(
-        title = "myTitle",
-        message = "myMessage",
-        sender = "test sender",
-        imageUrl = None,
-        thumbnailUrl = None,
-        link = ExternalLink("http://mylink"),
-        importance = Importance.Major,
-        topic = Set.empty,
-        debug = true
-      )
-
-      val client = getTestApiClient(mock[HttpProvider])
-      client.send(payloadWithNoTopics) must beEqualTo(Left(MissingParameterError("topic"))).await
-    }
-
     "return HttpProviderError if http provider throws exception" in {
       val throwable = new RuntimeException("something went wrong!!")
       val fakeHttpProvider = mock[HttpProvider]
