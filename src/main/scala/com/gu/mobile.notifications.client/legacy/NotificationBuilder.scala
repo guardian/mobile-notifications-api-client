@@ -1,17 +1,11 @@
 package com.gu.mobile.notifications.client.legacy
 
-import java.net.URI
 import java.util.UUID
 
 import com.gu.mobile.notifications.client.models.Editions.Edition
 import com.gu.mobile.notifications.client.models._
-import com.gu.mobile.notifications.client.models.legacy.AndroidKeys.{NotificationType => NotificationTypeKey, Edition => EditionKey, Editions => EditionsKey, Link => LinkKey, _}
-import com.gu.mobile.notifications.client.models.legacy.AndroidMessageTypes._
-import com.gu.mobile.notifications.client.models.legacy.IosKeys._
-import com.gu.mobile.notifications.client.models.legacy.IosMessageTypes._
 import com.gu.mobile.notifications.client.models.legacy._
 
-import scala.PartialFunction._
 
 trait NotificationBuilder {
   def buildNotification(notification: NotificationPayload): Notification
@@ -22,7 +16,7 @@ object NotificationBuilderImpl extends NotificationBuilder {
   def buildNotification(notification: NotificationPayload) = notification match {
     case bnp: BreakingNewsPayload => buildBreakingNewsAlert(bnp)
     case cap: ContentAlertPayload => buildContentAlert(cap)
-    case gap: GoalAlertPayload => throw new UnsupportedOperationException("Method not implemented")
+    case gap: GoalAlertPayload => buildGoalAlert(gap)
   }
 
   private def buildBreakingNewsAlert(bnp: BreakingNewsPayload) = {
@@ -36,7 +30,7 @@ object NotificationBuilderImpl extends NotificationBuilder {
       `type` = NotificationType.BreakingNews,
       sender = bnp.sender,
       target = Target(editions, nonEditionTopics),
-      payloads = breakingNewsAlertPayloads(strippedPayload, editions),
+      payloads = payloads(strippedPayload, editions),
       metadata = Map(
         "title" -> bnp.title,
         "message" -> bnp.message,
@@ -51,7 +45,7 @@ object NotificationBuilderImpl extends NotificationBuilder {
     `type` = NotificationType.Content,
     sender = cap.sender,
     target = Target(Set.empty, cap.topic),
-    payloads = contentAlertPayloads(cap),
+    payloads = payloads(cap),
     metadata = Map(
       "title" -> cap.title,
       "message" -> cap.message,
@@ -81,7 +75,7 @@ object NotificationBuilderImpl extends NotificationBuilder {
     `type` = NotificationType.GoalAlert,
     sender = gap.sender,
     target = Target(Set.empty, gap.topic),
-    payloads = goalAlertPayload(gap),
+    payloads = payloads(gap),
     metadata = Map(
       "title" -> gap.title,
       "message" -> gap.message,
@@ -90,119 +84,10 @@ object NotificationBuilderImpl extends NotificationBuilder {
     importance = gap.importance
   )
 
-  private def breakingNewsAlertPayloads(payload: BreakingNewsPayload, editions: Set[Edition]) = MessagePayloads(
-    ios = Some(buildIosPayload(payload)),
-    android = Some(buildAndroidBreakingNewsPayload(payload, editions))
+  private def payloads(payload: NotificationPayload, editions: Set[Edition] = Set.empty) = MessagePayloads(
+    ios = Some(IosPayloadBuilder.build(payload)),
+    android = Some(AndroidPayloadBuilder.build(payload, editions))
   )
 
-  private def contentAlertPayloads(payload: ContentAlertPayload) = MessagePayloads(
-    ios = Some(buildContentAlertIosPayload(payload)),
-    android = Some(buildAndroidContentAlertPayloads(payload))
-  )
-
-  private def goalAlertPayload(payload: GoalAlertPayload) = MessagePayloads(
-    ios = Some(buildIosGoalAlertPayload(payload)),
-    android = Some(buildAndroidGoalAlertPayload(payload))
-  )
-
-  private def buildAndroidContentAlertPayloads(payload: ContentAlertPayload) = {
-    AndroidMessagePayload(
-      Map(
-        Type -> Custom,
-        Title -> payload.title,
-        Ticker -> payload.message,
-        Message -> payload.message,
-        LinkKey ->  toAndroidLink(payload.link),
-        Topics -> payload.topic.map(_.toTopicString).mkString(",")
-      ) ++ Seq(
-        ImageUrl -> payload.imageUrl.map(_.toString),
-        ThumbnailUrl -> payload.thumbnailUrl.map(_.toString)
-      ).collect({
-        case (k, Some(v)) => k -> v
-      })
-    )
-  }
-
-  private def buildAndroidGoalAlertPayload(payload: GoalAlertPayload) = ???
-
-  private def buildIosGoalAlertPayload(payload: GoalAlertPayload) = ???
-
-  private def toAndroidLink(link: Link) = link match {
-    case GuardianLinkDetails(contentApiId, _, _, _, _, _) => s"x-gu://www.guardian.co.uk/$contentApiId"
-    case ExternalLink(url) => url
-  }
-
-  private def buildAndroidBreakingNewsPayload(payload: BreakingNewsPayload, editions: Set[Edition]) = {
-
-    val sectionLink = condOpt(payload.link) {
-      case GuardianLinkDetails(contentApiId, _, _, _, GITSection, _) => contentApiId
-    }
-
-    val tagLink = condOpt(payload.link) {
-      case GuardianLinkDetails(contentApiId, _, _, _, GITTag, _) => contentApiId
-    }
-
-    AndroidMessagePayload(
-      Map(
-        Type -> Custom,
-        NotificationTypeKey -> payload.`type`.toString,
-        Title -> payload.title,
-        Ticker -> payload.message,
-        Message -> payload.message,
-        Debug -> payload.debug.toString,
-        EditionsKey -> editions.mkString(","),
-        LinkKey ->  toAndroidLink(payload.link),
-        Topics -> payload.topic.map(_.toTopicString).mkString(",")
-      ) ++ Seq(
-        Section -> sectionLink,
-        EditionKey -> (if (editions.size == 1) Some(editions.head.toString) else None),
-        Keyword -> tagLink,
-        ImageUrl -> payload.imageUrl.map(_.toString),
-        ThumbnailUrl -> payload.thumbnailUrl.map(_.toString)
-      ).collect({
-        case (k, Some(v)) => k -> v
-      })
-    )
-  }
-
-
-
-  private def iosCategory(payload: NotificationWithLink) = payload.link match {
-    case guardianLink: GuardianLinkDetails => guardianLink.shortUrl.map(_ => "ITEM_CATEGORY")
-    case _ => None
-  }
-
-  private def iosProperties(payload: NotificationWithLink) = {
-
-    val iosLink = payload.link match {
-      case GuardianLinkDetails(_, Some(url), _, _, _, _) => s"x-gu://" + new URI(url).getPath
-      case details: GuardianLinkDetails => details.webUrl
-      case ExternalLink(url) => url
-    }
-
-    Map(
-      IOSMessageType -> NewsAlert,
-      NotificationTypeKey -> payload.`type`.toString,
-      LinkKey -> iosLink,
-      Topics -> payload.topic.map(_.toTopicString).mkString(",")
-    )
-  }
-
-
-  private def buildIosPayload(payload: NotificationWithLink) = {
-    IOSMessagePayload(
-      body = payload.message,
-      customProperties = iosProperties(payload),
-      category = iosCategory(payload)
-    )
-  }
-
-  private def buildContentAlertIosPayload(payload: ContentAlertPayload) = {
-    IOSMessagePayload(
-      body = payload.title,
-      customProperties = iosProperties(payload),
-      category = iosCategory(payload)
-    )
-  }
 
 }

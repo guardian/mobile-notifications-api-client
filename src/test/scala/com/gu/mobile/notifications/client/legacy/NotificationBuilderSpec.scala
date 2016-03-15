@@ -1,11 +1,13 @@
 package com.gu.mobile.notifications.client.legacy
 
 import java.net.URI
+import java.util.UUID
 
 import com.gu.mobile.notifications.client.legacy.NotificationBuilderImpl._
 import com.gu.mobile.notifications.client.models.Editions._
+import com.gu.mobile.notifications.client.models.Importance.{Major, Minor}
 import com.gu.mobile.notifications.client.models.Topic._
-import com.gu.mobile.notifications.client.models.legacy.{NotificationType, AndroidMessagePayload, IOSMessagePayload, Target}
+import com.gu.mobile.notifications.client.models.legacy._
 import com.gu.mobile.notifications.client.models._
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
@@ -15,20 +17,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
 
   "buildNotification" should {
     "return a well constructed Notification if a valid ContentAlertPayload is provided" in new ContentAlertScope {
-      val notification = buildNotification(cap)
-
-      notification.uniqueIdentifier mustEqual "contentNotifications/newArticle/capiId"
-      notification.`type` mustEqual NotificationType.Content
-      notification.sender mustEqual cap.sender
-      notification.target mustEqual Target(Set.empty, cap.topic)
-      notification.metadata mustEqual expectedMetadata
-      notification.timeToLiveInSeconds must beGreaterThan(0)
-      notification.target.topics mustEqual cap.topic
-      notification.target.regions mustEqual Set.empty
-      notification.sender mustEqual "mySender"
-      notification.payloads.android.get mustEqual expectedAndroidPayload
-      notification.payloads.ios.get mustEqual expectedIosPayload
-      notification.importance mustEqual Importance.Minor
+      buildNotification(cap) mustEqual expectedNotification
     }
 
     "return a notification with an imageURI if it is on the ContentAlertPayload" in new ContentAlertScope {
@@ -51,25 +40,12 @@ class NotificationBuilderSpec extends Specification with Mockito {
       notification.uniqueIdentifier mustEqual "contentNotifications/newBlock/capiId/block-abcdefgh"
     }
 
-    "throw an exception if the type is GoalAlertPayload" in {
-      val notif = mock[GoalAlertPayload]
-      buildNotification(notif) must throwA[UnsupportedOperationException]
+    "return a well constructed Notification if a valid goal alert is provided" in new GoalAlertScope {
+      buildNotification(gap) mustEqual expectedNotification
     }
 
     "return a well constructed Notification if a valid breaking news payload is provided" in new BreakingNewsScope {
-      val notification = buildNotification(bnp)
-
-      notification.uniqueIdentifier mustEqual bnp.id
-      notification.`type` mustEqual NotificationType.BreakingNews
-      notification.payloads.isEmpty mustNotEqual true
-      notification.metadata mustNotEqual Map.empty
-      notification.timeToLiveInSeconds must beGreaterThan(0)
-      notification.target.topics mustEqual bnp.topic
-      notification.target.regions mustEqual Set.empty
-      notification.sender mustEqual "test sender"
-      notification.payloads.android.get mustEqual expectedAndroidPayload
-      notification.payloads.ios.get mustEqual expectedIosPayload
-      notification.importance mustEqual Importance.Major
+      buildNotification(bnp) mustEqual expectedNotification
     }
 
     "return the correct link format for each platform" in new PlatFormLinkTestScope {
@@ -91,7 +67,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
         imageUrl = None,
         thumbnailUrl = None,
         link = ExternalLink("http://mylink"),
-        importance = Importance.Major,
+        importance = Major,
         topic = Set(BreakingNewsUk, BreakingNewsUs, BreakingNewsSport, NewsstandIos),
         debug = true
       )
@@ -103,13 +79,9 @@ class NotificationBuilderSpec extends Specification with Mockito {
       val androidBody = notification.payloads.android.get.body
       androidBody("topics") mustEqual "breaking//sport,newsstand//newsstandIos"
       androidBody("editions") mustEqual "uk,us"
-      notification.importance mustEqual Importance.Major
+      notification.importance mustEqual Major
     }
 
-    "return a Notification if the type is BreakingNewsPayload" in new BreakingNewsScope {
-      val notification = buildNotification(bnp)
-      notification.`type` mustEqual NotificationType.BreakingNews
-    }
   }
 
   trait PlatFormLinkTestScope extends Scope {
@@ -121,7 +93,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
       imageUrl = None,
       thumbnailUrl = None,
       link = ExternalLink("http://mylink"),
-      importance = Importance.Major,
+      importance = Major,
       topic = Set.empty,
       debug = true
     )
@@ -134,7 +106,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
       imageUrl = None,
       thumbnailUrl = None,
       link = GuardianLinkDetails("contentId", Some("/p/4fv33"), "myTitle", None, GITContent),
-      importance = Importance.Major,
+      importance = Major,
       topic = Set.empty,
       debug = true
     )
@@ -169,7 +141,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
       imageUrl = None,
       thumbnailUrl = None,
       link = ExternalLink("http://mylink"),
-      importance = Importance.Major,
+      importance = Major,
       topic = Set.empty,
       debug = true
     )
@@ -192,6 +164,21 @@ class NotificationBuilderSpec extends Specification with Mockito {
       customProperties = Map("t" -> "m", "notificationType" -> "news", "link" -> "http://mylink", "topics" -> ""),
       category = None
     )
+
+    val expectedNotification = Notification(
+      uniqueIdentifier = "someId",
+      `type` = NotificationType.BreakingNews,
+      sender = "test sender",
+      target = Target(Set.empty, Set.empty),
+      payloads = MessagePayloads(Some(expectedIosPayload), Some(expectedAndroidPayload)),
+      metadata = Map(
+        "title" -> "myTitle",
+        "message" -> "myMessage",
+        "link" -> "http://mylink"
+      ),
+      importance = Major
+    )
+
   }
 
   trait ContentAlertScope extends Scope {
@@ -205,7 +192,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
       thumbnailUrl = Some(new URI("http://thumb.url.com")),
       sender = "mySender",
       link = link,
-      importance = Importance.Minor,
+      importance = Minor,
       topic = Set(Topic(TopicTypes.Content, "topicName"), Topic(TopicTypes.Content, "topicName2")),
       debug = true
     )
@@ -235,6 +222,81 @@ class NotificationBuilderSpec extends Specification with Mockito {
       "title" -> "myTitle",
       "message" -> "myMessage",
       "link" -> "http://www.theguardian.com/capiId"
+    )
+
+    val expectedNotification = Notification(
+      uniqueIdentifier = "contentNotifications/newArticle/capiId",
+      `type` = NotificationType.Content,
+      sender = "mySender",
+      target = Target(Set.empty, cap.topic),
+      payloads = MessagePayloads(Some(expectedIosPayload), Some(expectedAndroidPayload)),
+      metadata = expectedMetadata,
+      importance = Minor
+    )
+  }
+
+  trait GoalAlertScope extends Scope {
+
+    val link = GuardianLinkDetails(contentApiId = "capiId", shortUrl = Some("http://gu.com/short/url"), title = "some title", thumbnail = None, git = GITContent)
+
+    val gap = GoalAlertPayload(
+      id = "ID",
+      title = "goal alert title",
+      message = "goal alert message",
+      thumbnailUrl = None,
+      sender = "goalAlertSender",
+      goalType = OwnGoalType,
+      awayTeamName = "away",
+      awayTeamScore = 7,
+      homeTeamName = "home",
+      homeTeamScore = 6,
+      scoringTeamName = "scoringTeam",
+      scorerName = "scorerName",
+      goalMins = 91,
+      otherTeamName = "otherTeam",
+      matchId = "matchId",
+      mapiUrl = new URI("http://mapi.url.com"),
+      importance = Major,
+      topic = Set.empty, // TODO topics?
+      debug = true,
+      addedTime = Some("addedTime") //TODO why is this a String?
+    )
+
+    val expectedAndroidPayload = AndroidMessagePayload(
+      Map(
+        "type" -> "goalAlert",
+        "AWAY_TEAM_NAME" -> "away",
+        "AWAY_TEAM_SCORE" -> 7.toString,
+        "HOME_TEAM_NAME" -> "home",
+        "HOME_TEAM_SCORE" -> 6.toString,
+        "SCORER_NAME" -> "scorerName",
+        "GOAL_MINS" -> 91.toString,
+        "OTHER_TEAM_NAME" -> "otherTeam",
+        "SCORING_TEAM_NAME" -> "scoringTeam",
+        "matchId" -> "matchId",
+        "mapiUrl" -> "http://mapi.url.com",
+        "debug" -> "true"
+      ))
+
+    val expectedIosPayload = IOSMessagePayload(
+      body = "goal alert message",
+      customProperties = Map("t" -> "g")
+    )
+
+    val expectedMetadata = Map(
+      "title" -> "goal alert title",
+      "message" -> "goal alert message",
+      "link" -> "http://mapi.url.com"
+    )
+
+    val expectedNotification = Notification(
+      uniqueIdentifier = "ID",
+      `type` = NotificationType.GoalAlert,
+      sender = "goalAlertSender",
+      target = Target(Set.empty, Set.empty),
+      payloads = MessagePayloads(Some(expectedIosPayload), Some(expectedAndroidPayload)),
+      metadata = expectedMetadata,
+      importance = Major
     )
   }
 
