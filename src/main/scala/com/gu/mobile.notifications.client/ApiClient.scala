@@ -33,10 +33,6 @@ case class UnexpectedApiResponseError(serverResponse: String) extends ApiClientE
   val description = s"Unexpected response from server: $serverResponse"
 }
 
-case class MissingParameterError(parameterName: String) extends ApiClientError {
-  val description = s"No value provided for parameter: $parameterName"
-}
-
 trait ApiClient {
   def clientId: String
   def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, Unit]]

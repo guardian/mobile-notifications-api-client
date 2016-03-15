@@ -22,7 +22,7 @@ class NextGenApiClientSpec extends ApiClientSpec[NextGenApiClient] {
     debug = true
   )
 
-  val expectedPostUrl = s"$host/push/topic/$Breaking/n1?api-key=$apiKey"
+  val expectedPostUrl = s"$host/push/topic?api-key=$apiKey"
   val expectedPostBody = Json.stringify(Json.toJson(payload))
 
   override def getTestApiClient(httpProvider: HttpProvider) = new NextGenApiClient(
@@ -50,23 +50,6 @@ class NextGenApiClientSpec extends ApiClientSpec[NextGenApiClient] {
     }
     "return UnexpectedApiResponseError if server returns wrong success status code" in apiTest(serverResponse = HttpOk(200, "success but not code 201!")) {
       client => client.send(payload) must beEqualTo(Left(UnexpectedApiResponseError("Server returned status code 200 and body:success but not code 201!"))).await
-    }
-
-    "return missing parameter error if payload has no topic" in {
-      val payloadWithNoTopics = BreakingNewsPayload(
-        title = "myTitle",
-        message = "myMessage",
-        sender = "test sender",
-        imageUrl = None,
-        thumbnailUrl = None,
-        link = ExternalLink("http://mylink"),
-        importance = Importance.Major,
-        topic = Set.empty,
-        debug = true
-      )
-
-      val client = getTestApiClient(mock[HttpProvider])
-      client.send(payloadWithNoTopics) must beEqualTo(Left(MissingParameterError("topic"))).await
     }
 
     "return HttpProviderError if http provider throws exception" in {
