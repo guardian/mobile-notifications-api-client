@@ -6,7 +6,6 @@ import com.gu.mobile.notifications.client.models.Editions.Edition
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy._
 
-
 trait NotificationBuilder {
   def buildNotification(notification: NotificationPayload): Notification
 }
@@ -69,17 +68,21 @@ object NotificationBuilderImpl extends NotificationBuilder {
     }
   }
 
-
   private def buildGoalAlert(gap: GoalAlertPayload) = Notification(
-    uniqueIdentifier = gap.id,
+    uniqueIdentifier = s"goalAlert/${gap.matchId}/${gap.homeTeamScore}-${gap.awayTeamScore}/${gap.goalMins}",
     `type` = NotificationType.GoalAlert,
     sender = gap.sender,
     target = Target(Set.empty, gap.topic),
     payloads = payloads(gap),
+    timeToLiveInSeconds = (150 - gap.goalMins) * 60,
     metadata = Map(
-      "title" -> gap.title,
-      "message" -> gap.message,
-      "link" -> gap.mapiUrl.toString
+      "matchId" -> gap.matchId,
+      "homeTeamName" -> gap.homeTeamName,
+      "homeTeamScore" -> gap.homeTeamScore.toString,
+      "awayTeamName" -> gap.awayTeamName,
+      "awayTeamScore" -> gap.awayTeamScore.toString,
+      "scorer" -> gap.scorerName,
+      "minute" -> gap.goalMins.toString
     ),
     importance = gap.importance
   )

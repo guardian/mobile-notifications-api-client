@@ -1,14 +1,13 @@
 package com.gu.mobile.notifications.client.legacy
 
 import java.net.URI
-import java.util.UUID
 
 import com.gu.mobile.notifications.client.legacy.NotificationBuilderImpl._
 import com.gu.mobile.notifications.client.models.Editions._
 import com.gu.mobile.notifications.client.models.Importance.{Major, Minor}
 import com.gu.mobile.notifications.client.models.Topic._
-import com.gu.mobile.notifications.client.models.legacy._
 import com.gu.mobile.notifications.client.models._
+import com.gu.mobile.notifications.client.models.legacy._
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -236,64 +235,107 @@ class NotificationBuilderSpec extends Specification with Mockito {
   }
 
   trait GoalAlertScope extends Scope {
-
+    val goalAlertTitle = "goal alert title"
+    val goalAlertSender = "goalAlertSender"
+    val goalAlertMessage = "goal alert Message"
     val link = GuardianLinkDetails(contentApiId = "capiId", shortUrl = Some("http://gu.com/short/url"), title = "some title", thumbnail = None, git = GITContent)
+    val homeTeamName = "home"
+    val awayTeamName = "away"
+    val homeTeamId = "homeTeamId"
+    val awayTeamId = "awayTeamId"
+    val matchId = "matchId"
+    val scoringTeamName = "scoringTeam"
+    val otherTeamName = "otherTeam"
+    val scorerName = "scorerName"
+    val minutes = 91
+    val awayScore = 7
+    val homeScore = 6
+    val goalMins = 91
+    val mapiURl = "http://mapi.url.com"
 
+    val topics = Set(
+      Topic(
+        TopicTypes.FootballTeam,
+        homeTeamId
+      ),
+      Topic(
+        TopicTypes.FootballTeam,
+        awayTeamId
+      ),
+      Topic(
+        TopicTypes.FootballMatch,
+        matchId
+      ),
+      //the old apps registered by the team NAME.
+      Topic(
+        TopicTypes.FootballTeam,
+        homeTeamName
+      ),
+      Topic(
+        TopicTypes.FootballTeam,
+        awayTeamName
+      )
+    )
     val gap = GoalAlertPayload(
       id = "ID",
-      title = "goal alert title",
-      message = "goal alert message",
+      title = goalAlertTitle,
+      message = goalAlertMessage,
       thumbnailUrl = None,
-      sender = "goalAlertSender",
+      sender = goalAlertSender,
       goalType = OwnGoalType,
-      awayTeamName = "away",
-      awayTeamScore = 7,
-      homeTeamName = "home",
-      homeTeamScore = 6,
-      scoringTeamName = "scoringTeam",
-      scorerName = "scorerName",
-      goalMins = 91,
-      otherTeamName = "otherTeam",
-      matchId = "matchId",
-      mapiUrl = new URI("http://mapi.url.com"),
+      awayTeamName = awayTeamName,
+      awayTeamScore = awayScore,
+      homeTeamName = homeTeamName,
+      homeTeamScore = homeScore,
+      scoringTeamName = scoringTeamName,
+      scorerName = scorerName,
+      goalMins = goalMins,
+      otherTeamName = otherTeamName,
+      matchId = matchId,
+      mapiUrl = new URI(mapiURl),
       importance = Major,
-      topic = Set.empty, // TODO topics?
+      topic = topics,
       debug = true,
-      addedTime = Some("addedTime") //TODO why is this a String?
+      addedTime = Some("addedTime")
     )
 
     val expectedAndroidPayload = AndroidMessagePayload(
       Map(
         "type" -> "goalAlert",
-        "AWAY_TEAM_NAME" -> "away",
-        "AWAY_TEAM_SCORE" -> 7.toString,
-        "HOME_TEAM_NAME" -> "home",
-        "HOME_TEAM_SCORE" -> 6.toString,
-        "SCORER_NAME" -> "scorerName",
-        "GOAL_MINS" -> 91.toString,
-        "OTHER_TEAM_NAME" -> "otherTeam",
-        "SCORING_TEAM_NAME" -> "scoringTeam",
+        "AWAY_TEAM_NAME" -> awayTeamName,
+        "AWAY_TEAM_SCORE" -> awayScore.toString,
+        "HOME_TEAM_NAME" -> homeTeamName,
+        "HOME_TEAM_SCORE" -> homeScore.toString,
+        "SCORER_NAME" -> scorerName,
+        "GOAL_MINS" -> goalMins.toString,
+        "OTHER_TEAM_NAME" -> otherTeamName,
+        "SCORING_TEAM_NAME" -> scoringTeamName,
         "matchId" -> "matchId",
-        "mapiUrl" -> "http://mapi.url.com",
+        "mapiUrl" -> mapiURl,
         "debug" -> "true"
       ))
 
     val expectedIosPayload = IOSMessagePayload(
-      body = "goal alert message",
+      body = goalAlertMessage,
       customProperties = Map("t" -> "g")
     )
 
     val expectedMetadata = Map(
-      "title" -> "goal alert title",
-      "message" -> "goal alert message",
-      "link" -> "http://mapi.url.com"
+      "matchId" -> matchId,
+      "homeTeamName" -> homeTeamName,
+      "homeTeamScore" -> homeScore.toString,
+      "awayTeamName" -> awayTeamName,
+      "awayTeamScore" -> awayScore.toString,
+      "scorer" -> scorerName,
+      "minute" -> goalMins.toString
     )
 
     val expectedNotification = Notification(
-      uniqueIdentifier = "ID",
+      uniqueIdentifier = "goalAlert/matchId/6-7/91",
+      timeToLiveInSeconds = 3540,
       `type` = NotificationType.GoalAlert,
-      sender = "goalAlertSender",
-      target = Target(Set.empty, Set.empty),
+      sender = goalAlertSender,
+      target = Target(Set.empty, topics),
       payloads = MessagePayloads(Some(expectedIosPayload), Some(expectedAndroidPayload)),
       metadata = expectedMetadata,
       importance = Major
