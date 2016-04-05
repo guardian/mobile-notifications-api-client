@@ -123,7 +123,7 @@ case class GoalAlertPayload(
   title: String,
   message: String,
   thumbnailUrl: Option[URI] = None,
-  sender: String, //not in notifications footbal
+  sender: String,
   goalType: GoalType,
   awayTeamName: String,
   awayTeamScore: Int,
@@ -135,8 +135,8 @@ case class GoalAlertPayload(
   otherTeamName: String,
   matchId: String,
   mapiUrl: URI,
-  importance: Importance,//not in not football
-  topic: Set[Topic], //not in notifications-football
+  importance: Importance,
+  topic: Set[Topic],
   debug: Boolean,
   addedTime: Option[String]
 ) extends NotificationPayload {
