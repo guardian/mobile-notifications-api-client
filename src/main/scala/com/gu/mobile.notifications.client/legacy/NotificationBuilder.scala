@@ -29,7 +29,7 @@ object NotificationBuilderImpl extends NotificationBuilder {
       `type` = NotificationType.BreakingNews,
       sender = bnp.sender,
       target = Target(editions, nonEditionTopics),
-      payloads = payloads(strippedPayload, editions),
+      payloads = buildPlatFormPayloads(strippedPayload, editions),
       metadata = Map(
         "title" -> bnp.title,
         "message" -> bnp.message,
@@ -44,7 +44,7 @@ object NotificationBuilderImpl extends NotificationBuilder {
     `type` = NotificationType.Content,
     sender = cap.sender,
     target = Target(Set.empty, cap.topic),
-    payloads = payloads(cap),
+    payloads = buildPlatFormPayloads(cap),
     metadata = Map(
       "title" -> cap.title,
       "message" -> cap.message,
@@ -73,7 +73,7 @@ object NotificationBuilderImpl extends NotificationBuilder {
     `type` = NotificationType.GoalAlert,
     sender = gap.sender,
     target = Target(Set.empty, gap.topic),
-    payloads = payloads(gap),
+    payloads = buildPlatFormPayloads(gap),
     timeToLiveInSeconds = (150 - gap.goalMins) * 60,
     metadata = Map(
       "matchId" -> gap.matchId,
@@ -87,9 +87,9 @@ object NotificationBuilderImpl extends NotificationBuilder {
     importance = gap.importance
   )
 
-  private def payloads(payload: NotificationPayload, editions: Set[Edition] = Set.empty) = MessagePayloads(
-    ios = Some(IosPayloadBuilder.build(payload)),
-    android = Some(AndroidPayloadBuilder.build(payload, editions))
+  private def buildPlatFormPayloads(notification: NotificationPayload, editions: Set[Edition] = Set.empty) = MessagePayloads(
+    ios = Some(IosPayloadBuilder.build(notification)),
+    android = Some(AndroidPayloadBuilder.build(notification, editions))
   )
 
 
