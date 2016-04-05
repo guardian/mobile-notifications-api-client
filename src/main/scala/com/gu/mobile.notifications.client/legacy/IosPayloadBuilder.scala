@@ -16,7 +16,11 @@ object IosPayloadBuilder {
     case cn: ContentAlertPayload => buildContentAlert(cn)
   }
 
-  private def buildGoalAlert(payload: GoalAlertPayload) = IOSMessagePayload(payload.message, Map(IOSMessageType -> IOSGoalAlertType))
+  private def buildGoalAlert(payload: GoalAlertPayload) = {
+    IOSMessagePayload(
+      payload.message,
+      Map(IOSMessageType -> IOSGoalAlertType))
+  }
 
   private def buildBreakingNews(payload: BreakingNewsPayload) = {
     IOSMessagePayload(
