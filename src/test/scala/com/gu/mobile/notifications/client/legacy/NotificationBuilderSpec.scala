@@ -266,7 +266,6 @@ class NotificationBuilderSpec extends Specification with Mockito {
         TopicTypes.FootballMatch,
         matchId
       ),
-      //the old apps registered by the team NAME.
       Topic(
         TopicTypes.FootballTeam,
         homeTeamName
