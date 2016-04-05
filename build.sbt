@@ -18,7 +18,6 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.3.2",
-  "net.databinder.dispatch" %% "dispatch-core" % "0.11.1" % Test,
   "org.specs2" %% "specs2" % "2.3.13" % "test"
 )
 
