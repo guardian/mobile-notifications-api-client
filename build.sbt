@@ -17,10 +17,8 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play-json" % "2.4.6",
-  "net.databinder.dispatch" %% "dispatch-core" % "0.11.1" % Test,
-  "org.specs2" %% "specs2" % "2.3.13" % "test",
-  "com.github.tomakehurst" % "wiremock" % "1.33" % "test"
+  "com.typesafe.play" %% "play-json" % "2.3.2",
+  "org.specs2" %% "specs2" % "2.3.13" % "test"
 )
 
 description := "Scala client for the Guardian Push Notifications API"
