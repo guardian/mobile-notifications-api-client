@@ -19,7 +19,8 @@ object IosPayloadBuilder {
   private def buildGoalAlert(payload: GoalAlertPayload) = {
     IOSMessagePayload(
       payload.message,
-      Map(IOSMessageType -> IOSGoalAlertType))
+      Map(IOSMessageType -> IOSGoalAlertType)
+    )
   }
 
   private def buildBreakingNews(payload: BreakingNewsPayload) = {
