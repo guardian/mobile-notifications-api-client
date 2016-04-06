@@ -28,6 +28,9 @@ object AndroidKeys {
 }
 
 object IosKeys {
-  final val IOSMessageType = "t"
-  final val IOSGoalAlertType = "g"
+  final val MessageType = "t"
+  final val GoalAlertType = "g"
+  final val NotificationType = "notificationType"
+  final val Link = "link"
+  final val Topics = "topics"
 }

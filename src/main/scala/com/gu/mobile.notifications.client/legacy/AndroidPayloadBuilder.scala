@@ -4,10 +4,9 @@ import com.gu.mobile.notifications.client.models.Editions.Edition
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy.AndroidMessagePayload
 import com.gu.mobile.notifications.client.models.legacy.AndroidMessageTypes.{Custom, GoalAlert}
-import com.gu.mobile.notifications.client.models.legacy.AndroidKeys.{NotificationType => NotificationTypeKey, Edition => EditionKey, Editions => EditionsKey, Link => LinkKey, _}
+import com.gu.mobile.notifications.client.models.legacy.{AndroidKeys => keys}
 
 import scala.PartialFunction._
-
 
 object AndroidPayloadBuilder {
   def build(np: NotificationPayload, editions: Set[Edition] = Set.empty): AndroidMessagePayload = np match {
@@ -23,33 +22,33 @@ object AndroidPayloadBuilder {
 
   private def buildContentAlert(contentAlert: ContentAlertPayload) = AndroidMessagePayload(
     Map(
-      Type -> Custom,
-      Title -> contentAlert.title,
-      Ticker -> contentAlert.message,
-      Message -> contentAlert.message,
-      LinkKey -> toAndroidLink(contentAlert.link),
-      Topics -> contentAlert.topic.map(_.toTopicString).mkString(",")
+      keys.Type -> Custom,
+      keys.Title -> contentAlert.title,
+      keys.Ticker -> contentAlert.message,
+      keys.Message -> contentAlert.message,
+      keys.Link -> toAndroidLink(contentAlert.link),
+      keys.Topics -> contentAlert.topic.map(_.toTopicString).mkString(",")
     ) ++ Seq(
-      ImageUrl -> contentAlert.imageUrl.map(_.toString),
-      ThumbnailUrl -> contentAlert.thumbnailUrl.map(_.toString)
+      keys.ImageUrl -> contentAlert.imageUrl.map(_.toString),
+      keys.ThumbnailUrl -> contentAlert.thumbnailUrl.map(_.toString)
     ).collect({
       case (k, Some(v)) => k -> v
     })
   )
 
   private def buildGoalAlert(goalAlert: GoalAlertPayload) = AndroidMessagePayload(Map(
-    Type -> GoalAlert,
-    AwayTeamName -> goalAlert.awayTeamName,
-    AwayTeamScore -> goalAlert.awayTeamScore.toString,
-    HomeTeamName -> goalAlert.homeTeamName,
-    HomeTeamScore -> goalAlert.homeTeamScore.toString,
-    ScoringTeamName -> goalAlert.scoringTeamName,
-    ScorerName -> goalAlert.scorerName,
-    GoalMins -> goalAlert.goalMins.toString,
-    OtherTeamName -> goalAlert.otherTeamName,
-    MatchId -> goalAlert.matchId,
-    MapiUrl -> goalAlert.mapiUrl.toString,
-    Debug -> goalAlert.debug.toString
+    keys.Type -> GoalAlert,
+    keys.AwayTeamName -> goalAlert.awayTeamName,
+    keys.AwayTeamScore -> goalAlert.awayTeamScore.toString,
+    keys.HomeTeamName -> goalAlert.homeTeamName,
+    keys.HomeTeamScore -> goalAlert.homeTeamScore.toString,
+    keys.ScoringTeamName -> goalAlert.scoringTeamName,
+    keys.ScorerName -> goalAlert.scorerName,
+    keys.GoalMins -> goalAlert.goalMins.toString,
+    keys.OtherTeamName -> goalAlert.otherTeamName,
+    keys.MatchId -> goalAlert.matchId,
+    keys.MapiUrl -> goalAlert.mapiUrl.toString,
+    keys.Debug -> goalAlert.debug.toString
   ))
 
   private def buildBreakingNews(breakingNews: BreakingNewsPayload, editions: Set[Edition]) = {
@@ -64,21 +63,21 @@ object AndroidPayloadBuilder {
 
     AndroidMessagePayload(
       Map(
-        Type -> Custom,
-        NotificationTypeKey -> breakingNews.`type`.toString,
-        Title -> breakingNews.title,
-        Ticker -> breakingNews.message,
-        Message -> breakingNews.message,
-        Debug -> breakingNews.debug.toString,
-        EditionsKey -> editions.mkString(","),
-        LinkKey -> toAndroidLink(breakingNews.link),
-        Topics -> breakingNews.topic.map(_.toTopicString).mkString(",")
+        keys.Type -> Custom,
+        keys.NotificationType -> breakingNews.`type`.toString,
+        keys.Title -> breakingNews.title,
+        keys.Ticker -> breakingNews.message,
+        keys.Message -> breakingNews.message,
+        keys.Debug -> breakingNews.debug.toString,
+        keys.Editions -> editions.mkString(","),
+        keys.Link -> toAndroidLink(breakingNews.link),
+        keys.Topics -> breakingNews.topic.map(_.toTopicString).mkString(",")
       ) ++ Seq(
-        Section -> sectionLink,
-        EditionKey -> (if (editions.size == 1) Some(editions.head.toString) else None),
-        Keyword -> tagLink,
-        ImageUrl -> breakingNews.imageUrl.map(_.toString),
-        ThumbnailUrl -> breakingNews.thumbnailUrl.map(_.toString)
+        keys.Section -> sectionLink,
+        keys.Edition -> (if (editions.size == 1) Some(editions.head.toString) else None),
+        keys.Keyword -> tagLink,
+        keys.ImageUrl -> breakingNews.imageUrl.map(_.toString),
+        keys.ThumbnailUrl -> breakingNews.thumbnailUrl.map(_.toString)
       ).collect({
         case (k, Some(v)) => k -> v
       })

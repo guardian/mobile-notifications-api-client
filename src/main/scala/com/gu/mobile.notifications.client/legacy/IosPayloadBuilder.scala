@@ -3,9 +3,8 @@ package com.gu.mobile.notifications.client.legacy
 import java.net.URI
 
 import com.gu.mobile.notifications.client.models._
-import com.gu.mobile.notifications.client.models.legacy.AndroidKeys.{Edition => EditionKey, Editions => EditionsKey, Link => LinkKey, NotificationType => NotificationTypeKey, _}
 import com.gu.mobile.notifications.client.models.legacy.IOSMessagePayload
-import com.gu.mobile.notifications.client.models.legacy.IosKeys._
+import com.gu.mobile.notifications.client.models.legacy.{IosKeys => keys}
 import com.gu.mobile.notifications.client.models.legacy.IosMessageTypes._
 
 object IosPayloadBuilder {
@@ -19,7 +18,7 @@ object IosPayloadBuilder {
   private def buildGoalAlert(payload: GoalAlertPayload) = {
     IOSMessagePayload(
       payload.message,
-      Map(IOSMessageType -> IOSGoalAlertType)
+      Map(keys.MessageType -> keys.GoalAlertType)
     )
   }
 
@@ -53,10 +52,10 @@ object IosPayloadBuilder {
     }
 
     Map(
-      IOSMessageType -> NewsAlert,
-      NotificationTypeKey -> payload.`type`.toString,
-      LinkKey -> iosLink,
-      Topics -> payload.topic.map(_.toTopicString).mkString(",")
+      keys.MessageType -> NewsAlert,
+      keys.NotificationType -> payload.`type`.toString,
+      keys.Link -> iosLink,
+      keys.Topics -> payload.topic.map(_.toTopicString).mkString(",")
     )
   }
 }

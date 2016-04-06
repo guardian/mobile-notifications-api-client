@@ -1,10 +1,13 @@
 package com.gu.mobile.notifications.client.legacy
 
 import java.util.UUID
+import java.util.concurrent.TimeUnit.MINUTES
 
 import com.gu.mobile.notifications.client.models.Editions.Edition
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy._
+
+import scala.concurrent.duration.Duration
 
 trait NotificationBuilder {
   def buildNotification(notification: NotificationPayload): Notification
@@ -68,29 +71,37 @@ object NotificationBuilderImpl extends NotificationBuilder {
     }
   }
 
-  private def buildGoalAlert(gap: GoalAlertPayload) = Notification(
-    uniqueIdentifier = s"goalAlert/${gap.matchId}/${gap.homeTeamScore}-${gap.awayTeamScore}/${gap.goalMins}",
-    `type` = NotificationType.GoalAlert,
-    sender = gap.sender,
-    target = Target(Set.empty, gap.topic),
-    payloads = buildPlatFormPayloads(gap),
-    timeToLiveInSeconds = (150 - gap.goalMins) * 60,
-    metadata = Map(
-      "matchId" -> gap.matchId,
-      "homeTeamName" -> gap.homeTeamName,
-      "homeTeamScore" -> gap.homeTeamScore.toString,
-      "awayTeamName" -> gap.awayTeamName,
-      "awayTeamScore" -> gap.awayTeamScore.toString,
-      "scorer" -> gap.scorerName,
-      "minute" -> gap.goalMins.toString
-    ),
-    importance = gap.importance
-  )
+  private def buildGoalAlert(gap: GoalAlertPayload) = {
+    Notification(
+      uniqueIdentifier = s"goalAlert/${gap.matchId}/${gap.homeTeamScore}-${gap.awayTeamScore}/${gap.goalMins}",
+      `type` = NotificationType.GoalAlert,
+      sender = gap.sender,
+      target = Target(Set.empty, gap.topic),
+      payloads = buildPlatFormPayloads(gap),
+      timeToLiveInSeconds = Duration(FootballDurations.MaxTotalMinutes - gap.goalMins, MINUTES).toSeconds.toInt,
+      metadata = Map(
+        "matchId" -> gap.matchId,
+        "homeTeamName" -> gap.homeTeamName,
+        "homeTeamScore" -> gap.homeTeamScore.toString,
+        "awayTeamName" -> gap.awayTeamName,
+        "awayTeamScore" -> gap.awayTeamScore.toString,
+        "scorer" -> gap.scorerName,
+        "minute" -> gap.goalMins.toString
+      ),
+      importance = gap.importance
+    )
+  }
 
   private def buildPlatFormPayloads(notification: NotificationPayload, editions: Set[Edition] = Set.empty) = MessagePayloads(
     ios = Some(IosPayloadBuilder.build(notification)),
     android = Some(AndroidPayloadBuilder.build(notification, editions))
   )
 
+}
 
+private object FootballDurations {
+  val RegularTimeMinutes = 90
+  val ExtraTimeMinutes = 30
+  val MiscMinutes = 30
+  val MaxTotalMinutes = RegularTimeMinutes + ExtraTimeMinutes + MiscMinutes
 }
