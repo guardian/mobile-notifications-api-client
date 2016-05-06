@@ -5,6 +5,7 @@ import java.net.URI
 import com.gu.mobile.notifications.client.models.TopicTypes._
 import com.gu.mobile.notifications.client.models.Topic._
 import org.specs2.mutable.Specification
+import org.specs2.specification.Scope
 import play.api.libs.json.Json
 
 
@@ -53,29 +54,21 @@ class PayloadsSpec extends Specification {
       verifySerialization(payload, expectedJson)
     }
 
-    "define serializable Content Alert payload" in {
-      val internalLink = GuardianLinkDetails(
-        contentApiId = "environment/ng-interactive/2015/oct/16/which-countries-are-doing-the-most-to-stop-dangerous-global-warming",
-        shortUrl = Some("http:short.com"),
-        title = "linkTitle",
-        thumbnail = Some("http://thumb.om"),
-        git = GITContent)
+    "define derived id for new article" in new ContentAlertScope {
+      payload.derivedId mustEqual ("contentNotifications/newArticle/environment/ng-interactive/2015/oct/16/which-countries-are-doing-the-most-to-stop-dangerous-global-warming")
+    }
 
-      val payload = ContentAlertPayload(
-        id = "c8bd6aaa-072f-4593-a38b-322f3ecd6bd3",
-        title = "Follow",
-        message = "Which countries are doing the most to stop dangerous global warming?",
-        thumbnailUrl = Some(new URI("http://media.guim.co.uk/a07334e4ed5d13d3ecf4c1ac21145f7f4a099f18/127_0_3372_2023/140.jpg")),
-        sender = "test",
-        link = internalLink,
-        importance = Importance.Minor,
-        topic = Set(Topic(TagSeries, "environment/series/keep-it-in-the-ground"), Topic(Breaking, "n2")),
-        debug = false)
+    "define derived id for new liveblog block" in new ContentAlertScope {
+      val liveBlogLink = internalLink.copy(blockId = Some("block123456"))
+      val liveblogPayload = payload.copy(link = liveBlogLink)
+      liveblogPayload.derivedId mustEqual ("contentNotifications/newBlock/environment/ng-interactive/2015/oct/16/which-countries-are-doing-the-most-to-stop-dangerous-global-warming/block123456")
+    }
 
+    "define serializable Content Alert payload" in new ContentAlertScope{
       val expectedJson =
         """
           |{
-          |  "id" : "c8bd6aaa-072f-4593-a38b-322f3ecd6bd3",
+          |  "id" : "7c555802-2658-3656-9fda-b4f044a241cc",
           |  "title" : "Follow",
           |  "type" : "content",
           |  "message" : "Which countries are doing the most to stop dangerous global warming?",
@@ -102,37 +95,16 @@ class PayloadsSpec extends Specification {
       verifySerialization(payload, expectedJson)
     }
 
-    "define seriazable Goal Alert Payload" in {
-      val payload = GoalAlertPayload(
-        id = "3e0bc788-a27c-4864-bb71-77a80aadcce4",
-        title = "The Guardian",
-        message = "Leicester 2-1 Watford\nDeeney 75min",
-        thumbnailUrl = Some(new URI("http://url.net")),
-        sender = "someSender",
-        goalType = PenaltyGoalType,
-        awayTeamName = "someAwayTeam",
-        awayTeamScore = 1,
-        homeTeamName = "someHomeTeam",
-        homeTeamScore = 2,
-        scoringTeamName = "someScoringTeamName",
-        scorerName = "someFootballersName",
-        goalMins = 41,
-        otherTeamName = "someOtherTeamName",
-        matchId = "3833380",
-        mapiUrl = new URI("http://football.mobile-apps.guardianapis.com/match-info/3833380"),
-        importance = Importance.Major,
-        topic = Set(
-          Topic(FootballTeam, "29"),
-          Topic(FootballTeam, "41"),
-          Topic(FootballMatch, "3833380")
-        ),
-        debug = true,
-        addedTime = Some("someAddedTime"))
+    "define derived id for goal alert" in new GoalAlertScope {
+      payload.derivedId mustEqual ("goalAlert/3833380/2-1/41")
+    }
+
+    "define seriazable Goal Alert Payload" in new GoalAlertScope {
 
       val expectedJson =
        """
          |{
-         |  "id" : "3e0bc788-a27c-4864-bb71-77a80aadcce4",
+         |  "id" : "c0ddcd4b-c1f4-3933-a031-7e02b1134e2f",
          |  "title" : "The Guardian",
          |  "type" : "goal",
          |  "message" : "Leicester 2-1 Watford\nDeeney 75min",
@@ -193,4 +165,50 @@ class PayloadsSpec extends Specification {
 
     }
   }
+}
+trait GoalAlertScope extends Scope {
+  val payload = GoalAlertPayload(
+    title = "The Guardian",
+    message = "Leicester 2-1 Watford\nDeeney 75min",
+    thumbnailUrl = Some(new URI("http://url.net")),
+    sender = "someSender",
+    goalType = PenaltyGoalType,
+    awayTeamName = "someAwayTeam",
+    awayTeamScore = 1,
+    homeTeamName = "someHomeTeam",
+    homeTeamScore = 2,
+    scoringTeamName = "someScoringTeamName",
+    scorerName = "someFootballersName",
+    goalMins = 41,
+    otherTeamName = "someOtherTeamName",
+    matchId = "3833380",
+    mapiUrl = new URI("http://football.mobile-apps.guardianapis.com/match-info/3833380"),
+    importance = Importance.Major,
+    topic = Set(
+      Topic(FootballTeam, "29"),
+      Topic(FootballTeam, "41"),
+      Topic(FootballMatch, "3833380")
+    ),
+    debug = true,
+    addedTime = Some("someAddedTime"))
+}
+trait ContentAlertScope extends Scope {
+
+  val internalLink = GuardianLinkDetails(
+    contentApiId = "environment/ng-interactive/2015/oct/16/which-countries-are-doing-the-most-to-stop-dangerous-global-warming",
+    shortUrl = Some("http:short.com"),
+    title = "linkTitle",
+    thumbnail = Some("http://thumb.om"),
+    git = GITContent)
+
+  val payload = ContentAlertPayload(
+    title = "Follow",
+    message = "Which countries are doing the most to stop dangerous global warming?",
+    thumbnailUrl = Some(new URI("http://media.guim.co.uk/a07334e4ed5d13d3ecf4c1ac21145f7f4a099f18/127_0_3372_2023/140.jpg")),
+    sender = "test",
+    link = internalLink,
+    importance = Importance.Minor,
+    topic = Set(Topic(TagSeries, "environment/series/keep-it-in-the-ground"), Topic(Breaking, "n2")),
+    debug = false)
+
 }
