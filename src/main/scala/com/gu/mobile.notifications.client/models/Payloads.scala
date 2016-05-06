@@ -103,10 +103,10 @@ case class BreakingNewsPayload(
 
 object ContentAlertPayload {
   implicit val jf = new Writes[ContentAlertPayload] {
-    override def writes(o: ContentAlertPayload) =  (Json.writes[ContentAlertPayload] withAdditionalStringFields Map("type" -> ContentAlert.toString, "id" -> o.id)).writes(o)
+    override def writes(o: ContentAlertPayload) = (Json.writes[ContentAlertPayload] withAdditionalStringFields Map("type" -> ContentAlert.toString, "id" -> o.id)).writes(o)
   }
-
 }
+
 case class ContentAlertPayload(
   title: String,
   message: String,

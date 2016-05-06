@@ -14,7 +14,7 @@ object JsonFormatsHelper {
     def +:(kv: (String, JsValue)): JsObject = obj match {
       case JsObject(entries) => JsObject(kv +: entries)
     }
-    def +:(kv: Map[String, JsValue]): JsObject = obj match {
+    def ++:(kv: Map[String, JsValue]): JsObject = obj match {
       case JsObject(entries) => JsObject(kv ++: entries)
     }
   }
@@ -26,11 +26,11 @@ object JsonFormatsHelper {
     }}
 
     def withAdditionalFields(fields:Map[String,JsValue]): Writes[A] = writes transform { _ match {
-      case obj: JsObject => fields +: obj
+      case obj: JsObject => fields ++: obj
       case x: JsValue => x
     }}
 
-    def withAdditionalStringFields(fields:Map[String,String]): Writes[A] = withAdditionalFields(fields.mapValues(JsString))
+    def withAdditionalStringFields(fields: Map[String, String]): Writes[A] = withAdditionalFields(fields.mapValues(JsString))
   }
 
   implicit class RichReads[A](innerReads: Reads[A]) {
