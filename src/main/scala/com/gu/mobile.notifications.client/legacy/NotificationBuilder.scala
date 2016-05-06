@@ -43,7 +43,7 @@ object NotificationBuilderImpl extends NotificationBuilder {
   }
 
   private def buildContentAlert(cap: ContentAlertPayload) = Notification(
-    uniqueIdentifier = contentAlertId(cap),
+    uniqueIdentifier = cap.derivedId,
     `type` = NotificationType.Content,
     sender = cap.sender,
     target = Target(Set.empty, cap.topic),
@@ -56,24 +56,9 @@ object NotificationBuilderImpl extends NotificationBuilder {
     importance = cap.importance
   )
 
-  private def contentAlertId(cap: ContentAlertPayload): String = {
-    def newContentIdentifier(contentApiId: String): String = s"contentNotifications/newArticle/$contentApiId"
-    def newBlockIdentifier(contentApiId: String, blockId: String): String = s"contentNotifications/newBlock/$contentApiId/$blockId"
-    val contentCoordinates = cap.link match {
-      case GuardianLinkDetails(contentApiId, _, _, _, _, blockId) => (Some(contentApiId), blockId)
-      case _ => (None, None)
-    }
-
-    contentCoordinates match {
-      case (Some(contentApiId), Some(blockId)) => newBlockIdentifier(contentApiId, blockId)
-      case (Some(contentApiId), None) => newContentIdentifier(contentApiId)
-      case (None, _) => UUID.randomUUID.toString
-    }
-  }
-
   private def buildGoalAlert(gap: GoalAlertPayload) = {
     Notification(
-      uniqueIdentifier = s"goalAlert/${gap.matchId}/${gap.homeTeamScore}-${gap.awayTeamScore}/${gap.goalMins}",
+      uniqueIdentifier = gap.derivedId,
       `type` = NotificationType.GoalAlert,
       sender = gap.sender,
       target = Target(Set.empty, gap.topic),

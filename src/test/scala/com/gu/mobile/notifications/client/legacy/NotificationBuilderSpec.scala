@@ -185,7 +185,6 @@ class NotificationBuilderSpec extends Specification with Mockito {
     val link = GuardianLinkDetails(contentApiId = "capiId", shortUrl = Some("http://gu.com/short/url"), title = "some title", thumbnail = None, git = GITContent)
 
     val cap = ContentAlertPayload(
-      id = "contentAlertId",
       title = "myTitle",
       message = "myMessage",
       thumbnailUrl = Some(new URI("http://thumb.url.com")),
@@ -276,7 +275,6 @@ class NotificationBuilderSpec extends Specification with Mockito {
       )
     )
     val gap = GoalAlertPayload(
-      id = "ID",
       title = goalAlertTitle,
       message = goalAlertMessage,
       thumbnailUrl = None,
