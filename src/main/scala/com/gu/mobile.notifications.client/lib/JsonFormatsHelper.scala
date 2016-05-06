@@ -25,7 +25,7 @@ object JsonFormatsHelper {
       case x: JsValue => x
     }}
 
-    def withAdditionalFields(fields:Map[String,JsValue]): Writes[A] = writes transform { _ match {
+    def withAdditionalFields(fields: Map[String, JsValue]): Writes[A] = writes transform { _ match {
       case obj: JsObject => fields ++: obj
       case x: JsValue => x
     }}
