@@ -111,7 +111,8 @@ class NotificationBuilderSpec extends Specification with Mockito {
     )
 
     val expectedAndroidPayload = AndroidMessagePayload(
-      Map("topics" -> "",
+      Map("uniqueIdentifier" -> "someId",
+        "topics" -> "",
         "editions" -> "",
         "debug" -> "true",
         "notificationType" -> "news",
@@ -146,7 +147,8 @@ class NotificationBuilderSpec extends Specification with Mockito {
     )
 
     val expectedAndroidPayload = AndroidMessagePayload(
-      Map("topics" -> "",
+      Map("uniqueIdentifier" -> "someId",
+        "topics" -> "",
         "editions" -> "",
         "debug" -> "true",
         "notificationType" -> "news",
@@ -203,7 +205,8 @@ class NotificationBuilderSpec extends Specification with Mockito {
         "title" -> "myTitle",
         "type" -> "custom",
         "ticker" -> "myMessage",
-        "topics" -> "content//topicName,content//topicName2"
+        "topics" -> "content//topicName,content//topicName2",
+        "uniqueIdentifier" -> "contentNotifications/newArticle/capiId"
       ))
 
     val expectedIosPayload = IOSMessagePayload(
@@ -299,6 +302,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
     val expectedAndroidPayload = AndroidMessagePayload(
       Map(
         "type" -> "goalAlert",
+        "uniqueIdentifier" -> "goalAlert/matchId/6-7/91",
         "AWAY_TEAM_NAME" -> awayTeamName,
         "AWAY_TEAM_SCORE" -> awayScore.toString,
         "HOME_TEAM_NAME" -> homeTeamName,

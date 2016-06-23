@@ -23,6 +23,7 @@ object AndroidPayloadBuilder {
   private def buildContentAlert(contentAlert: ContentAlertPayload) = AndroidMessagePayload(
     Map(
       keys.Type -> Custom,
+      keys.uniqueIdentifier -> contentAlert.derivedId,
       keys.Title -> contentAlert.title,
       keys.Ticker -> contentAlert.message,
       keys.Message -> contentAlert.message,
@@ -38,6 +39,7 @@ object AndroidPayloadBuilder {
 
   private def buildGoalAlert(goalAlert: GoalAlertPayload) = AndroidMessagePayload(Map(
     keys.Type -> GoalAlert,
+    keys.uniqueIdentifier -> goalAlert.derivedId,
     keys.AwayTeamName -> goalAlert.awayTeamName,
     keys.AwayTeamScore -> goalAlert.awayTeamScore.toString,
     keys.HomeTeamName -> goalAlert.homeTeamName,
@@ -64,6 +66,7 @@ object AndroidPayloadBuilder {
     AndroidMessagePayload(
       Map(
         keys.Type -> Custom,
+        keys.uniqueIdentifier -> breakingNews.id,
         keys.NotificationType -> breakingNews.`type`.toString,
         keys.Title -> breakingNews.title,
         keys.Ticker -> breakingNews.message,
