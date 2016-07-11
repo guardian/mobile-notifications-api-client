@@ -22,8 +22,7 @@ object AndroidPayloadBuilder extends PlatformPayloadBuilder{
     case ExternalLink(url) => url
   }
 
-  private def toMapiGoalAlertLink(uri:URI) = if (uri.getHost.startsWith("football")) None else Some(replaceHost(uri))
-
+  private def toMapiGoalAlertLink(uri: URI) = if (uri.getHost.startsWith("football")) None else Some(replaceHost(uri))
 
   private def buildContentAlert(contentAlert: ContentAlertPayload) = AndroidMessagePayload(
     mapWithOptionalValues(
@@ -43,22 +42,20 @@ object AndroidPayloadBuilder extends PlatformPayloadBuilder{
 
   private def buildGoalAlert(goalAlert: GoalAlertPayload) = AndroidMessagePayload(
     mapWithOptionalValues(
-    keys.Type -> GoalAlert,
-    keys.uniqueIdentifier -> goalAlert.derivedId,
-    keys.AwayTeamName -> goalAlert.awayTeamName,
-    keys.AwayTeamScore -> goalAlert.awayTeamScore.toString,
-    keys.HomeTeamName -> goalAlert.homeTeamName,
-    keys.HomeTeamScore -> goalAlert.homeTeamScore.toString,
-    keys.ScoringTeamName -> goalAlert.scoringTeamName,
-    keys.ScorerName -> goalAlert.scorerName,
-    keys.GoalMins -> goalAlert.goalMins.toString,
-    keys.OtherTeamName -> goalAlert.otherTeamName,
-    keys.MatchId -> goalAlert.matchId,
-    keys.MapiUrl -> goalAlert.mapiUrl.toString,
-    keys.Debug -> goalAlert.debug.toString
-  )(
-    keys.MapiLink -> toMapiGoalAlertLink(goalAlert.mapiUrl)
-  )
+      keys.Type -> GoalAlert,
+      keys.uniqueIdentifier -> goalAlert.derivedId,
+      keys.AwayTeamName -> goalAlert.awayTeamName,
+      keys.AwayTeamScore -> goalAlert.awayTeamScore.toString,
+      keys.HomeTeamName -> goalAlert.homeTeamName,
+      keys.HomeTeamScore -> goalAlert.homeTeamScore.toString,
+      keys.ScoringTeamName -> goalAlert.scoringTeamName,
+      keys.ScorerName -> goalAlert.scorerName,
+      keys.GoalMins -> goalAlert.goalMins.toString,
+      keys.OtherTeamName -> goalAlert.otherTeamName,
+      keys.MatchId -> goalAlert.matchId,
+      keys.MapiUrl -> goalAlert.mapiUrl.toString,
+      keys.Debug -> goalAlert.debug.toString
+    )(keys.MapiLink -> toMapiGoalAlertLink(goalAlert.mapiUrl))
   )
 
   private def buildBreakingNews(breakingNews: BreakingNewsPayload, editions: Set[Edition]) = {

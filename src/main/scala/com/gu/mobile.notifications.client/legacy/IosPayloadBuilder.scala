@@ -18,8 +18,7 @@ object IosPayloadBuilder extends PlatformPayloadBuilder{
   private def buildGoalAlert(payload: GoalAlertPayload) = {
     IOSMessagePayload(
       payload.message,
-      Map(keys.MessageType -> keys.GoalAlertType,
-        keys.MapiLink -> replaceHost(payload.mapiUrl))
+      Map(keys.MessageType -> keys.GoalAlertType, keys.MapiLink -> replaceHost(payload.mapiUrl))
     )
   }
 

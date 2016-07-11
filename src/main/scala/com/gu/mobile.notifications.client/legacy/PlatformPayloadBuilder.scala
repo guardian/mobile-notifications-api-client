@@ -23,6 +23,4 @@ trait PlatformPayloadBuilder {
   }
 
   protected def mapWithOptionalValues(elems: (String, String)*)(optionals: (String, Option[String])*) = elems.toMap ++ optionals.collect { case (k, Some(v)) => k -> v }
-
-
 }
