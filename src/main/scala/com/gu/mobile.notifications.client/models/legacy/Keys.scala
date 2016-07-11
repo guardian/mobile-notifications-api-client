@@ -15,6 +15,7 @@ object AndroidKeys {
   final val Edition = "edition"
   final val Editions = "editions"
   final val MapiUrl = "mapiUrl"
+  final val MapiLink = "mapiLink"
   final val MatchId = "matchId"
   final val ScoringTeamName = "SCORING_TEAM_NAME"
   final val OtherTeamName = "OTHER_TEAM_NAME"
@@ -33,5 +34,6 @@ object IosKeys {
   final val GoalAlertType = "g"
   final val NotificationType = "notificationType"
   final val Link = "link"
+  final val MapiLink = "mapiLink"
   final val Topics = "topics"
 }

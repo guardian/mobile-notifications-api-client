@@ -7,7 +7,7 @@ import com.gu.mobile.notifications.client.models.legacy.IOSMessagePayload
 import com.gu.mobile.notifications.client.models.legacy.{IosKeys => keys}
 import com.gu.mobile.notifications.client.models.legacy.IosMessageTypes._
 
-object IosPayloadBuilder {
+object IosPayloadBuilder extends PlatformPayloadBuilder{
 
   def build(payload: NotificationPayload) = payload match {
     case ga: GoalAlertPayload => buildGoalAlert(ga)
@@ -18,7 +18,8 @@ object IosPayloadBuilder {
   private def buildGoalAlert(payload: GoalAlertPayload) = {
     IOSMessagePayload(
       payload.message,
-      Map(keys.MessageType -> keys.GoalAlertType)
+      Map(keys.MessageType -> keys.GoalAlertType,
+        keys.MapiLink -> replaceHost(payload.mapiUrl))
     )
   }
 
@@ -45,17 +46,19 @@ object IosPayloadBuilder {
 
   private def iosProperties(payload: NotificationWithLink) = {
 
-    val iosLink = payload.link match {
-      case GuardianLinkDetails(_, Some(url), _, _, _, _) => s"x-gu://" + new URI(url).getPath
-      case details: GuardianLinkDetails => details.webUrl
-      case ExternalLink(url) => url
+    val (iosLegacyLink, maybeMapiLink) = payload.link match {
+      case GuardianLinkDetails(_, Some(url), _, _, _, _) =>
+        val path = new URI(url).getPath
+        (s"x-gu://$path", Some(s"x-gu://MAPI/items$path"))
+      case GuardianLinkDetails(capiId, _, _, _, _, _) => (s"http://www.theguardian.com/$capiId", Some(s"x-gu://MAPI/items/$capiId"))
+      case ExternalLink(url) => (url, None)
     }
 
-    Map(
+    mapWithOptionalValues(
       keys.MessageType -> NewsAlert,
       keys.NotificationType -> payload.`type`.toString,
-      keys.Link -> iosLink,
+      keys.Link -> iosLegacyLink,
       keys.Topics -> payload.topic.map(_.toTopicString).mkString(",")
-    )
+    )(keys.MapiLink -> maybeMapiLink)
   }
 }

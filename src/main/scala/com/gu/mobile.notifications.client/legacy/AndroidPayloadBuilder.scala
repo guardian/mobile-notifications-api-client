@@ -1,5 +1,7 @@
 package com.gu.mobile.notifications.client.legacy
 
+import java.net.URI
+
 import com.gu.mobile.notifications.client.models.Editions.Edition
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy.AndroidMessagePayload
@@ -8,7 +10,7 @@ import com.gu.mobile.notifications.client.models.legacy.{AndroidKeys => keys}
 
 import scala.PartialFunction._
 
-object AndroidPayloadBuilder {
+object AndroidPayloadBuilder extends PlatformPayloadBuilder{
   def build(np: NotificationPayload, editions: Set[Edition] = Set.empty): AndroidMessagePayload = np match {
     case ga: GoalAlertPayload => buildGoalAlert(ga)
     case ca: ContentAlertPayload => buildContentAlert(ca)
@@ -20,8 +22,11 @@ object AndroidPayloadBuilder {
     case ExternalLink(url) => url
   }
 
+  private def toMapiGoalAlertLink(uri:URI) = if (uri.getHost.startsWith("football")) None else Some(replaceHost(uri))
+
+
   private def buildContentAlert(contentAlert: ContentAlertPayload) = AndroidMessagePayload(
-    Map(
+    mapWithOptionalValues(
       keys.Type -> Custom,
       keys.uniqueIdentifier -> contentAlert.derivedId,
       keys.Title -> contentAlert.title,
@@ -29,15 +34,15 @@ object AndroidPayloadBuilder {
       keys.Message -> contentAlert.message,
       keys.Link -> toAndroidLink(contentAlert.link),
       keys.Topics -> contentAlert.topic.map(_.toTopicString).mkString(",")
-    ) ++ Seq(
+    )(
       keys.ImageUrl -> contentAlert.imageUrl.map(_.toString),
-      keys.ThumbnailUrl -> contentAlert.thumbnailUrl.map(_.toString)
-    ).collect({
-      case (k, Some(v)) => k -> v
-    })
+      keys.ThumbnailUrl -> contentAlert.thumbnailUrl.map(_.toString),
+      keys.MapiLink -> toMapiLink(contentAlert.link)
+    )
   )
 
-  private def buildGoalAlert(goalAlert: GoalAlertPayload) = AndroidMessagePayload(Map(
+  private def buildGoalAlert(goalAlert: GoalAlertPayload) = AndroidMessagePayload(
+    mapWithOptionalValues(
     keys.Type -> GoalAlert,
     keys.uniqueIdentifier -> goalAlert.derivedId,
     keys.AwayTeamName -> goalAlert.awayTeamName,
@@ -51,7 +56,10 @@ object AndroidPayloadBuilder {
     keys.MatchId -> goalAlert.matchId,
     keys.MapiUrl -> goalAlert.mapiUrl.toString,
     keys.Debug -> goalAlert.debug.toString
-  ))
+  )(
+    keys.MapiLink -> toMapiGoalAlertLink(goalAlert.mapiUrl)
+  )
+  )
 
   private def buildBreakingNews(breakingNews: BreakingNewsPayload, editions: Set[Edition]) = {
 
@@ -64,7 +72,7 @@ object AndroidPayloadBuilder {
     }
 
     AndroidMessagePayload(
-      Map(
+      mapWithOptionalValues(
         keys.Type -> Custom,
         keys.uniqueIdentifier -> breakingNews.id,
         keys.NotificationType -> breakingNews.`type`.toString,
@@ -75,15 +83,14 @@ object AndroidPayloadBuilder {
         keys.Editions -> editions.mkString(","),
         keys.Link -> toAndroidLink(breakingNews.link),
         keys.Topics -> breakingNews.topic.map(_.toTopicString).mkString(",")
-      ) ++ Seq(
+      )(
         keys.Section -> sectionLink,
         keys.Edition -> (if (editions.size == 1) Some(editions.head.toString) else None),
         keys.Keyword -> tagLink,
         keys.ImageUrl -> breakingNews.imageUrl.map(_.toString),
-        keys.ThumbnailUrl -> breakingNews.thumbnailUrl.map(_.toString)
-      ).collect({
-        case (k, Some(v)) => k -> v
-      })
+        keys.ThumbnailUrl -> breakingNews.thumbnailUrl.map(_.toString),
+        keys.MapiLink -> toMapiLink(breakingNews.link)
+      )
     )
   }
 }
