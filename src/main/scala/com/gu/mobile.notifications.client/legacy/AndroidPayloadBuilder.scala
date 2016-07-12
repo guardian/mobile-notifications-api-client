@@ -10,7 +10,7 @@ import com.gu.mobile.notifications.client.models.legacy.{AndroidKeys => keys}
 
 import scala.PartialFunction._
 
-object AndroidPayloadBuilder extends PlatformPayloadBuilder{
+object AndroidPayloadBuilder extends PlatformPayloadBuilder {
   def build(np: NotificationPayload, editions: Set[Edition] = Set.empty): AndroidMessagePayload = np match {
     case ga: GoalAlertPayload => buildGoalAlert(ga)
     case ca: ContentAlertPayload => buildContentAlert(ca)
@@ -24,39 +24,49 @@ object AndroidPayloadBuilder extends PlatformPayloadBuilder{
 
   private def toMapiGoalAlertLink(uri: URI) = if (uri.getHost.startsWith("football")) None else Some(replaceHost(uri))
 
-  private def buildContentAlert(contentAlert: ContentAlertPayload) = AndroidMessagePayload(
-    mapWithOptionalValues(
-      keys.Type -> Custom,
-      keys.uniqueIdentifier -> contentAlert.derivedId,
-      keys.Title -> contentAlert.title,
-      keys.Ticker -> contentAlert.message,
-      keys.Message -> contentAlert.message,
-      keys.Link -> toAndroidLink(contentAlert.link),
-      keys.Topics -> contentAlert.topic.map(_.toTopicString).mkString(",")
-    )(
-      keys.ImageUrl -> contentAlert.imageUrl.map(_.toString),
-      keys.ThumbnailUrl -> contentAlert.thumbnailUrl.map(_.toString),
-      keys.MapiLink -> toMapiLink(contentAlert.link)
-    )
-  )
+  private def buildContentAlert(contentAlert: ContentAlertPayload) = {
+    val link = toPlatformLink(contentAlert.link)
 
-  private def buildGoalAlert(goalAlert: GoalAlertPayload) = AndroidMessagePayload(
-    mapWithOptionalValues(
-      keys.Type -> GoalAlert,
-      keys.uniqueIdentifier -> goalAlert.derivedId,
-      keys.AwayTeamName -> goalAlert.awayTeamName,
-      keys.AwayTeamScore -> goalAlert.awayTeamScore.toString,
-      keys.HomeTeamName -> goalAlert.homeTeamName,
-      keys.HomeTeamScore -> goalAlert.homeTeamScore.toString,
-      keys.ScoringTeamName -> goalAlert.scoringTeamName,
-      keys.ScorerName -> goalAlert.scorerName,
-      keys.GoalMins -> goalAlert.goalMins.toString,
-      keys.OtherTeamName -> goalAlert.otherTeamName,
-      keys.MatchId -> goalAlert.matchId,
-      keys.MapiUrl -> goalAlert.mapiUrl.toString,
-      keys.Debug -> goalAlert.debug.toString
-    )(keys.MapiLink -> toMapiGoalAlertLink(goalAlert.mapiUrl))
-  )
+    AndroidMessagePayload(
+      mapWithOptionalValues(
+        keys.Type -> Custom,
+        keys.uniqueIdentifier -> contentAlert.derivedId,
+        keys.Title -> contentAlert.title,
+        keys.Ticker -> contentAlert.message,
+        keys.Message -> contentAlert.message,
+        keys.LegacyLink -> toAndroidLink(contentAlert.link),
+        keys.Topics -> contentAlert.topic.map(_.toTopicString).mkString(","),
+        keys.UriType -> link.`type`.toString,
+        keys.Uri -> link.uri
+
+      )(
+        keys.ImageUrl -> contentAlert.imageUrl.map(_.toString),
+        keys.ThumbnailUrl -> contentAlert.thumbnailUrl.map(_.toString)
+      )
+    )
+  }
+
+  private def buildGoalAlert(goalAlert: GoalAlertPayload) = {
+    AndroidMessagePayload(
+      Map(
+        keys.Type -> GoalAlert,
+        keys.uniqueIdentifier -> goalAlert.derivedId,
+        keys.AwayTeamName -> goalAlert.awayTeamName,
+        keys.AwayTeamScore -> goalAlert.awayTeamScore.toString,
+        keys.HomeTeamName -> goalAlert.homeTeamName,
+        keys.HomeTeamScore -> goalAlert.homeTeamScore.toString,
+        keys.ScoringTeamName -> goalAlert.scoringTeamName,
+        keys.ScorerName -> goalAlert.scorerName,
+        keys.GoalMins -> goalAlert.goalMins.toString,
+        keys.OtherTeamName -> goalAlert.otherTeamName,
+        keys.MatchId -> goalAlert.matchId,
+        keys.MapiUrl -> goalAlert.mapiUrl.toString,
+        keys.Debug -> goalAlert.debug.toString,
+        keys.Uri -> replaceHost(goalAlert.mapiUrl),
+        keys.UriType -> FootballMatch.toString
+      )
+    )
+  }
 
   private def buildBreakingNews(breakingNews: BreakingNewsPayload, editions: Set[Edition]) = {
 
@@ -68,6 +78,8 @@ object AndroidPayloadBuilder extends PlatformPayloadBuilder{
       case GuardianLinkDetails(contentApiId, _, _, _, GITTag, _) => contentApiId
     }
 
+    val link = toPlatformLink(breakingNews.link)
+
     AndroidMessagePayload(
       mapWithOptionalValues(
         keys.Type -> Custom,
@@ -78,15 +90,16 @@ object AndroidPayloadBuilder extends PlatformPayloadBuilder{
         keys.Message -> breakingNews.message,
         keys.Debug -> breakingNews.debug.toString,
         keys.Editions -> editions.mkString(","),
-        keys.Link -> toAndroidLink(breakingNews.link),
-        keys.Topics -> breakingNews.topic.map(_.toTopicString).mkString(",")
+        keys.LegacyLink -> toAndroidLink(breakingNews.link),
+        keys.Topics -> breakingNews.topic.map(_.toTopicString).mkString(","),
+        keys.UriType -> link.`type`.toString,
+        keys.Uri -> link.uri
       )(
         keys.Section -> sectionLink,
         keys.Edition -> (if (editions.size == 1) Some(editions.head.toString) else None),
         keys.Keyword -> tagLink,
         keys.ImageUrl -> breakingNews.imageUrl.map(_.toString),
-        keys.ThumbnailUrl -> breakingNews.thumbnailUrl.map(_.toString),
-        keys.MapiLink -> toMapiLink(breakingNews.link)
+        keys.ThumbnailUrl -> breakingNews.thumbnailUrl.map(_.toString)
       )
     )
   }

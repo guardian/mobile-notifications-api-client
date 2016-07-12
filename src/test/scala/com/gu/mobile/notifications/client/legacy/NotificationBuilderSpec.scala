@@ -117,7 +117,8 @@ class NotificationBuilderSpec extends Specification with Mockito {
         "debug" -> "true",
         "notificationType" -> "news",
         "link" -> "x-gu://www.guardian.co.uk/contentId",
-        "mapiLink" -> "x-gu://MAPI/items/contentId",
+        "uri" -> "x-gu:///items/p/4fv33",
+        "uriType" -> "item",
         "message" -> "myMessage",
         "title" -> "myTitle",
         "type" -> "custom",
@@ -127,13 +128,13 @@ class NotificationBuilderSpec extends Specification with Mockito {
 
     val expectedIosPayload = IOSMessagePayload(
       body = "myMessage",
-      customProperties = Map("t" -> "m", "notificationType" -> "news", "link" -> "x-gu:///p/4fv33", "topics" -> "", "mapiLink"->"x-gu://MAPI/items/p/4fv33"),
+      customProperties = Map("t" -> "m", "notificationType" -> "news", "link" -> "x-gu:///p/4fv33", "topics" -> "", "uri"->"x-gu:///items/p/4fv33", "uriType" -> "item"),
       category = Some("ITEM_CATEGORY")
     )
   }
 
   trait BreakingNewsScope extends Scope {
-
+    val link = GuardianLinkDetails(contentApiId = "capiId", shortUrl = Some("http://gu.com/short/url"), title = "some title", thumbnail = None, git = GITContent)
     val bnp = BreakingNewsPayload(
       id = "someId",
       title = "myTitle",
@@ -141,7 +142,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
       sender = "test sender",
       imageUrl = None,
       thumbnailUrl = None,
-      link = ExternalLink("http://mylink"),
+      link = link,
       importance = Major,
       topic = Set.empty,
       debug = true
@@ -153,18 +154,20 @@ class NotificationBuilderSpec extends Specification with Mockito {
         "editions" -> "",
         "debug" -> "true",
         "notificationType" -> "news",
-        "link" -> "http://mylink",
+        "link" -> "x-gu://www.guardian.co.uk/capiId",
         "message" -> "myMessage",
         "title" -> "myTitle",
         "type" -> "custom",
-        "ticker" -> "myMessage"
+        "ticker" -> "myMessage",
+        "uri" -> "x-gu:///items/short/url",
+        "uriType" -> "item"
       )
     )
 
     val expectedIosPayload = IOSMessagePayload(
       body = "myMessage",
-      customProperties = Map("t" -> "m", "notificationType" -> "news", "link" -> "http://mylink", "topics" -> ""),
-      category = None
+      customProperties = Map("t" -> "m", "notificationType" -> "news", "link" -> "x-gu:///short/url", "topics" -> "", "uri" -> "x-gu:///items/short/url", "uriType" -> "item"),
+      category = Some("ITEM_CATEGORY")
     )
 
     val expectedNotification = Notification(
@@ -176,7 +179,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
       metadata = Map(
         "title" -> "myTitle",
         "message" -> "myMessage",
-        "link" -> "http://mylink"
+        "link" -> link.toString
       ),
       importance = Major
     )
@@ -201,7 +204,8 @@ class NotificationBuilderSpec extends Specification with Mockito {
     val expectedAndroidPayload = AndroidMessagePayload(
       Map(
         "link" -> "x-gu://www.guardian.co.uk/capiId",
-        "mapiLink" ->"x-gu://MAPI/items/capiId",
+        "uri" ->"x-gu:///items/short/url",
+        "uriType" -> "item",
         "thumbnailUrl" -> "http://thumb.url.com",
         "message" -> "myMessage",
         "title" -> "myTitle",
@@ -217,7 +221,8 @@ class NotificationBuilderSpec extends Specification with Mockito {
         "t" -> "m",
         "notificationType" -> "content",
         "link" -> "x-gu:///short/url",
-        "mapiLink"->"x-gu://MAPI/items/short/url",
+        "uri"->"x-gu:///items/short/url",
+        "uriType" -> "item",
         "topics" -> "content//topicName,content//topicName2"),
       category = Some("ITEM_CATEGORY")
     )
@@ -317,13 +322,14 @@ class NotificationBuilderSpec extends Specification with Mockito {
         "SCORING_TEAM_NAME" -> scoringTeamName,
         "matchId" -> "matchId",
         "mapiUrl" -> mapiURl,
-        "mapiLink" -> s"x-gu://MAPI/$mapiPath",
+        "uri" -> s"x-gu:///$mapiPath",
+        "uriType" -> "football-match",
         "debug" -> "true"
       ))
 
     val expectedIosPayload = IOSMessagePayload(
       body = goalAlertMessage,
-      customProperties = Map("t" -> "g", "mapiLink" -> s"x-gu://MAPI/$mapiPath")
+      customProperties = Map("t" -> "g", "uri" -> s"x-gu:///$mapiPath", "uriType" ->"football-match")
     )
 
     val expectedMetadata = Map(

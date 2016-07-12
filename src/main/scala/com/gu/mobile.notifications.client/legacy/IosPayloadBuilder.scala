@@ -18,7 +18,9 @@ object IosPayloadBuilder extends PlatformPayloadBuilder{
   private def buildGoalAlert(payload: GoalAlertPayload) = {
     IOSMessagePayload(
       payload.message,
-      Map(keys.MessageType -> keys.GoalAlertType, keys.MapiLink -> replaceHost(payload.mapiUrl))
+      Map(keys.MessageType -> keys.GoalAlertType,
+        keys.Uri -> replaceHost(payload.mapiUrl),
+        keys.UriType -> FootballMatch.toString)
     )
   }
 
@@ -45,19 +47,21 @@ object IosPayloadBuilder extends PlatformPayloadBuilder{
 
   private def iosProperties(payload: NotificationWithLink) = {
 
-    val (iosLegacyLink, maybeMapiLink) = payload.link match {
-      case GuardianLinkDetails(_, Some(url), _, _, _, _) =>
-        val path = new URI(url).getPath
-        (s"x-gu://$path", Some(s"x-gu://MAPI/items$path"))
-      case GuardianLinkDetails(capiId, _, _, _, _, _) => (s"http://www.theguardian.com/$capiId", Some(s"x-gu://MAPI/items/$capiId"))
-      case ExternalLink(url) => (url, None)
+    val legacyIosLink = payload.link match {
+      case GuardianLinkDetails(_, Some(url), _, _, _, _) => s"x-gu://" + new URI(url).getPath
+        //TODO IS THIS CORRECT OR SHOULD IT BE x-gu:///contentApiId?
+      case details: GuardianLinkDetails => details.webUrl
+      case ExternalLink(url) => url
     }
 
-    mapWithOptionalValues(
+    val link = toPlatformLink(payload.link)
+    Map(
       keys.MessageType -> NewsAlert,
       keys.NotificationType -> payload.`type`.toString,
-      keys.Link -> iosLegacyLink,
-      keys.Topics -> payload.topic.map(_.toTopicString).mkString(",")
-    )(keys.MapiLink -> maybeMapiLink)
+      keys.LegacyLink -> legacyIosLink,
+      keys.Topics -> payload.topic.map(_.toTopicString).mkString(","),
+      keys.Uri -> link.uri,
+      keys.UriType -> link.`type`.toString
+    )
   }
 }
