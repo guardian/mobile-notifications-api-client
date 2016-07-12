@@ -1,13 +1,11 @@
 package com.gu.mobile.notifications.client.legacy
 
 import java.net.URI
-
 import com.gu.mobile.notifications.client.models.Editions.Edition
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy.AndroidMessagePayload
 import com.gu.mobile.notifications.client.models.legacy.AndroidMessageTypes.{Custom, GoalAlert}
 import com.gu.mobile.notifications.client.models.legacy.{AndroidKeys => keys}
-
 import scala.PartialFunction._
 
 object AndroidPayloadBuilder extends PlatformPayloadBuilder {
@@ -38,7 +36,6 @@ object AndroidPayloadBuilder extends PlatformPayloadBuilder {
         keys.Topics -> contentAlert.topic.map(_.toTopicString).mkString(","),
         keys.UriType -> link.`type`.toString,
         keys.Uri -> link.uri
-
       )(
         keys.ImageUrl -> contentAlert.imageUrl.map(_.toString),
         keys.ThumbnailUrl -> contentAlert.thumbnailUrl.map(_.toString)
