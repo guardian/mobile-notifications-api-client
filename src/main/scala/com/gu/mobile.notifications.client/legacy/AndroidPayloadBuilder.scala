@@ -1,6 +1,5 @@
 package com.gu.mobile.notifications.client.legacy
 
-import java.net.URI
 import com.gu.mobile.notifications.client.models.Editions.Edition
 import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy.AndroidMessagePayload
@@ -19,8 +18,6 @@ object AndroidPayloadBuilder extends PlatformPayloadBuilder {
     case GuardianLinkDetails(contentApiId, _, _, _, _, _) => s"x-gu://www.guardian.co.uk/$contentApiId"
     case ExternalLink(url) => url
   }
-
-  private def toMapiGoalAlertLink(uri: URI) = if (uri.getHost.startsWith("football")) None else Some(replaceHost(uri))
 
   private def buildContentAlert(contentAlert: ContentAlertPayload) = {
     val link = toPlatformLink(contentAlert.link)
