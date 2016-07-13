@@ -33,9 +33,7 @@ trait PlatformPayloadBuilder {
 
   protected def replaceHost(uri: URI) = List(Some("x-gu://"), uri.path, uri.query.map("?" + _)).flatten.mkString
 
-  protected def toPlatformLink(link:Link) = link match {
-      //TODO should we still use the short url? can I use it for android as well as for iOS?
-    case GuardianLinkDetails(_, Some(shortUrl), _, _, _, _) => PlatformUri("x-gu:///items" + new URI(shortUrl).getPath, Item)
+  protected def toPlatformLink(link: Link) = link match {
     case GuardianLinkDetails(contentApiId, _, _, _, _, _) => PlatformUri(s"x-gu:///items/$contentApiId", Item)
     case ExternalLink(url) => PlatformUri(url, External)
   }

@@ -117,7 +117,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
         "debug" -> "true",
         "notificationType" -> "news",
         "link" -> "x-gu://www.guardian.co.uk/contentId",
-        "uri" -> "x-gu:///items/p/4fv33",
+        "uri" -> "x-gu:///items/contentId",
         "uriType" -> "item",
         "message" -> "myMessage",
         "title" -> "myTitle",
@@ -128,7 +128,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
 
     val expectedIosPayload = IOSMessagePayload(
       body = "myMessage",
-      customProperties = Map("t" -> "m", "notificationType" -> "news", "link" -> "x-gu:///p/4fv33", "topics" -> "", "uri"->"x-gu:///items/p/4fv33", "uriType" -> "item"),
+      customProperties = Map("t" -> "m", "notificationType" -> "news", "link" -> "x-gu:///p/4fv33", "topics" -> "", "uri"->"x-gu:///items/contentId", "uriType" -> "item"),
       category = Some("ITEM_CATEGORY")
     )
   }
@@ -159,14 +159,14 @@ class NotificationBuilderSpec extends Specification with Mockito {
         "title" -> "myTitle",
         "type" -> "custom",
         "ticker" -> "myMessage",
-        "uri" -> "x-gu:///items/short/url",
+        "uri" -> "x-gu:///items/capiId",
         "uriType" -> "item"
       )
     )
 
     val expectedIosPayload = IOSMessagePayload(
       body = "myMessage",
-      customProperties = Map("t" -> "m", "notificationType" -> "news", "link" -> "x-gu:///short/url", "topics" -> "", "uri" -> "x-gu:///items/short/url", "uriType" -> "item"),
+      customProperties = Map("t" -> "m", "notificationType" -> "news", "link" -> "x-gu:///short/url", "topics" -> "", "uri" -> "x-gu:///items/capiId", "uriType" -> "item"),
       category = Some("ITEM_CATEGORY")
     )
 
@@ -204,7 +204,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
     val expectedAndroidPayload = AndroidMessagePayload(
       Map(
         "link" -> "x-gu://www.guardian.co.uk/capiId",
-        "uri" ->"x-gu:///items/short/url",
+        "uri" ->"x-gu:///items/capiId",
         "uriType" -> "item",
         "thumbnailUrl" -> "http://thumb.url.com",
         "message" -> "myMessage",
@@ -221,7 +221,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
         "t" -> "m",
         "notificationType" -> "content",
         "link" -> "x-gu:///short/url",
-        "uri"->"x-gu:///items/short/url",
+        "uri"->"x-gu:///items/capiId",
         "uriType" -> "item",
         "topics" -> "content//topicName,content//topicName2"),
       category = Some("ITEM_CATEGORY")

@@ -7,7 +7,7 @@ import com.gu.mobile.notifications.client.models.legacy.IOSMessagePayload
 import com.gu.mobile.notifications.client.models.legacy.{IosKeys => keys}
 import com.gu.mobile.notifications.client.models.legacy.IosMessageTypes._
 
-object IosPayloadBuilder extends PlatformPayloadBuilder{
+object IosPayloadBuilder extends PlatformPayloadBuilder {
 
   def build(payload: NotificationPayload) = payload match {
     case ga: GoalAlertPayload => buildGoalAlert(ga)
@@ -49,7 +49,6 @@ object IosPayloadBuilder extends PlatformPayloadBuilder{
 
     val legacyIosLink = payload.link match {
       case GuardianLinkDetails(_, Some(url), _, _, _, _) => s"x-gu://" + new URI(url).getPath
-        //TODO IS THIS CORRECT OR SHOULD IT BE x-gu:///contentApiId?
       case details: GuardianLinkDetails => details.webUrl
       case ExternalLink(url) => url
     }
