@@ -22,11 +22,9 @@ trait PlatformPayloadBuilder {
   case class PlatformUri(uri: String, `type`: PlatformUriType)
 
   implicit class RichURI(uri: URI) {
-    def path: Option[String] = toStringOption(uri.getPath)
+    def path: Option[String] = Option(uri.getPath)
 
-    def query: Option[String] = toStringOption(uri.getQuery)
-
-    private def toStringOption(s: String) = if (s != null) Some(s) else None
+    def query: Option[String] = Option(uri.getQuery)
   }
 
   protected def replaceHost(uri: URI) = List(Some("x-gu://"), uri.path, uri.query.map("?" + _)).flatten.mkString
