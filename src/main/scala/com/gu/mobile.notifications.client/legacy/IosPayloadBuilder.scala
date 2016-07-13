@@ -7,7 +7,7 @@ import com.gu.mobile.notifications.client.models.legacy.IOSMessagePayload
 import com.gu.mobile.notifications.client.models.legacy.{IosKeys => keys}
 import com.gu.mobile.notifications.client.models.legacy.IosMessageTypes._
 
-object IosPayloadBuilder {
+object IosPayloadBuilder extends PlatformPayloadBuilder {
 
   def build(payload: NotificationPayload) = payload match {
     case ga: GoalAlertPayload => buildGoalAlert(ga)
@@ -18,7 +18,9 @@ object IosPayloadBuilder {
   private def buildGoalAlert(payload: GoalAlertPayload) = {
     IOSMessagePayload(
       payload.message,
-      Map(keys.MessageType -> keys.GoalAlertType)
+      Map(keys.MessageType -> keys.GoalAlertType,
+        keys.Uri -> replaceHost(payload.mapiUrl),
+        keys.UriType -> FootballMatch.toString)
     )
   }
 
@@ -45,17 +47,20 @@ object IosPayloadBuilder {
 
   private def iosProperties(payload: NotificationWithLink) = {
 
-    val iosLink = payload.link match {
+    val legacyIosLink = payload.link match {
       case GuardianLinkDetails(_, Some(url), _, _, _, _) => s"x-gu://" + new URI(url).getPath
       case details: GuardianLinkDetails => details.webUrl
       case ExternalLink(url) => url
     }
 
+    val link = toPlatformLink(payload.link)
     Map(
       keys.MessageType -> NewsAlert,
       keys.NotificationType -> payload.`type`.toString,
-      keys.Link -> iosLink,
-      keys.Topics -> payload.topic.map(_.toTopicString).mkString(",")
+      keys.Link -> legacyIosLink,
+      keys.Topics -> payload.topic.map(_.toTopicString).mkString(","),
+      keys.Uri -> link.uri,
+      keys.UriType -> link.`type`.toString
     )
   }
 }
