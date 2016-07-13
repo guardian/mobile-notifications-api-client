@@ -21,13 +21,7 @@ trait PlatformPayloadBuilder {
 
   case class PlatformUri(uri: String, `type`: PlatformUriType)
 
-  implicit class RichURI(uri: URI) {
-    def path: Option[String] = Option(uri.getPath)
-
-    def query: Option[String] = Option(uri.getQuery)
-  }
-
-  protected def replaceHost(uri: URI) = List(Some("x-gu://"), uri.path, uri.query.map("?" + _)).flatten.mkString
+  protected def replaceHost(uri: URI) = List(Some("x-gu://"), Option(uri.getPath), Option(uri.getQuery).map("?" + _)).flatten.mkString
 
   protected def toPlatformLink(link: Link) = link match {
     case GuardianLinkDetails(contentApiId, _, _, _, _, _) => PlatformUri(s"x-gu:///items/$contentApiId", Item)

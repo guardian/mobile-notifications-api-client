@@ -10,7 +10,7 @@ object testBuilder extends PlatformPayloadBuilder {
 
 class PlatformPayloadBuilderSpec extends Specification {
 
-  "toMapiUrl" should {
+  "replaceHost" should {
     "return correct Url for full addresses" in {
       testBuilder.testReplaceHost("https://mobile.code.dev-guardianapis.com/search?query=sport&page=2") mustEqual ("x-gu:///search?query=sport&page=2")
     }
