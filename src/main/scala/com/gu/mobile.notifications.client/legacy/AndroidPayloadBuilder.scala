@@ -29,7 +29,7 @@ object AndroidPayloadBuilder extends PlatformPayloadBuilder {
         keys.Title -> contentAlert.title,
         keys.Ticker -> contentAlert.message,
         keys.Message -> contentAlert.message,
-        keys.LegacyLink -> toAndroidLink(contentAlert.link),
+        keys.Link -> toAndroidLink(contentAlert.link),
         keys.Topics -> contentAlert.topic.map(_.toTopicString).mkString(","),
         keys.UriType -> link.`type`.toString,
         keys.Uri -> link.uri
@@ -84,7 +84,7 @@ object AndroidPayloadBuilder extends PlatformPayloadBuilder {
         keys.Message -> breakingNews.message,
         keys.Debug -> breakingNews.debug.toString,
         keys.Editions -> editions.mkString(","),
-        keys.LegacyLink -> toAndroidLink(breakingNews.link),
+        keys.Link -> toAndroidLink(breakingNews.link),
         keys.Topics -> breakingNews.topic.map(_.toTopicString).mkString(","),
         keys.UriType -> link.`type`.toString,
         keys.Uri -> link.uri

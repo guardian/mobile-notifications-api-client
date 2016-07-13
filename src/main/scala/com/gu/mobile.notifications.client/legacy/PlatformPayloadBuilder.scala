@@ -1,9 +1,7 @@
 package com.gu.mobile.notifications.client.legacy
 
 import java.net.URI
-
 import com.gu.mobile.notifications.client.models.{ExternalLink, GuardianLinkDetails, Link}
-
 
 trait PlatformPayloadBuilder {
 
@@ -23,7 +21,7 @@ trait PlatformPayloadBuilder {
 
   case class PlatformUri(uri: String, `type`: PlatformUriType)
 
-  implicit class enrichedURI(uri: URI) {
+  implicit class RichURI(uri: URI) {
     def path: Option[String] = toStringOption(uri.getPath)
 
     def query: Option[String] = toStringOption(uri.getQuery)

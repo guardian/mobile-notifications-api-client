@@ -57,7 +57,7 @@ object IosPayloadBuilder extends PlatformPayloadBuilder {
     Map(
       keys.MessageType -> NewsAlert,
       keys.NotificationType -> payload.`type`.toString,
-      keys.LegacyLink -> legacyIosLink,
+      keys.Link -> legacyIosLink,
       keys.Topics -> payload.topic.map(_.toTopicString).mkString(","),
       keys.Uri -> link.uri,
       keys.UriType -> link.`type`.toString
