@@ -262,7 +262,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
     val homeScore = 6
     val goalMins = 91
     val mapiPath = s"sport/football/matches/$matchId"
-    val mapiURl = s"http://mobile.guardianapis.com/$mapiPath"
+    val mapiUrl = s"http://mobile.guardianapis.com/$mapiPath"
 
     val topics = Set(
       Topic(
@@ -301,7 +301,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
       goalMins = goalMins,
       otherTeamName = otherTeamName,
       matchId = matchId,
-      mapiUrl = new URI(mapiURl),
+      mapiUrl = new URI(mapiUrl),
       importance = Major,
       topic = topics,
       debug = true,
@@ -321,7 +321,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
         "OTHER_TEAM_NAME" -> otherTeamName,
         "SCORING_TEAM_NAME" -> scoringTeamName,
         "matchId" -> "matchId",
-        "mapiUrl" -> mapiURl,
+        "mapiUrl" -> mapiUrl,
         "uri" -> s"x-gu:///$mapiPath",
         "uriType" -> "football-match",
         "debug" -> "true"
