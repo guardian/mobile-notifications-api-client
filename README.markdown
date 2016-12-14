@@ -20,7 +20,7 @@ object NotificationHttpProvider extends HttpProvider {
     if (response.status >= 200 && response.status < 300)
       HttpOk(response.status, response.body)
     else
-      HttpError(response.status.response.body)
+      HttpError(response.status, response.body)
   }
   
   override def post(url: String, contentType: ContentType, body: Array[Byte]): Future[HttpResponse] = {
