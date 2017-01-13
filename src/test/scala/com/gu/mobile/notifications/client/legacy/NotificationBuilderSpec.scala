@@ -16,7 +16,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
 
   "buildNotification" should {
     "return a well constructed Notification if a valid ContentAlertPayload is provided" in new ContentAlertScope {
-      buildNotification(cap) mustEqual expectedNotification
+      buildNotification(cap) mustEqual Some(expectedNotification)
     }
 
     "return a notification with an imageURI if it is on the ContentAlertPayload" in new ContentAlertScope {
@@ -25,31 +25,31 @@ class NotificationBuilderSpec extends Specification with Mockito {
 
       val notification = buildNotification(contentAlertPayload)
 
-      notification.payloads.android.get mustEqual expectedAndroidPayloadWithImage
+      notification.get.payloads.android.get mustEqual expectedAndroidPayloadWithImage
     }
 
     "compute an ID for an article" in new ContentAlertScope {
       val notification = buildNotification(cap)
-      notification.uniqueIdentifier mustEqual "contentNotifications/newArticle/capiId"
+      notification.get.uniqueIdentifier mustEqual "contentNotifications/newArticle/capiId"
     }
 
     "compute an ID for a liveblog block" in new ContentAlertScope {
       val content = cap.copy(link = link.copy(blockId = Some("block-abcdefgh")))
       val notification = buildNotification(content)
-      notification.uniqueIdentifier mustEqual "contentNotifications/newBlock/capiId/block-abcdefgh"
+      notification.get.uniqueIdentifier mustEqual "contentNotifications/newBlock/capiId/block-abcdefgh"
     }
 
     "return a well constructed Notification if a valid goal alert is provided" in new GoalAlertScope {
-      buildNotification(gap) mustEqual expectedNotification
+      buildNotification(gap) mustEqual Some(expectedNotification)
     }
 
     "return a well constructed Notification if a valid breaking news payload is provided" in new BreakingNewsScope {
-      buildNotification(bnp) mustEqual expectedNotification
+      buildNotification(bnp) mustEqual Some(expectedNotification)
     }
 
     "return the correct link format for each platform" in new PlatFormLinkTestScope {
 
-      val notification = buildNotification(bnpGuardianLink)
+      val notification = buildNotification(bnpGuardianLink).get
       notification.uniqueIdentifier mustEqual bnpGuardianLink.id
       notification.`type` mustEqual NotificationType.BreakingNews
       notification.payloads.isEmpty mustNotEqual true
@@ -71,7 +71,7 @@ class NotificationBuilderSpec extends Specification with Mockito {
         debug = true
       )
 
-      val notification = buildNotification(breakingNewsWithTopics)
+      val notification = buildNotification(breakingNewsWithTopics).get
       notification.target.topics mustEqual Set(BreakingNewsSport, NewsstandIos)
       notification.target.regions mustEqual Set(UK, US)
 

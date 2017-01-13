@@ -8,7 +8,7 @@ import com.gu.mobile.notifications.client.models.legacy.{AndroidKeys => keys}
 import scala.PartialFunction._
 
 object AndroidPayloadBuilder extends PlatformPayloadBuilder {
-  def build(np: NotificationPayload, editions: Set[Edition] = Set.empty): AndroidMessagePayload = np match {
+  def build(np: NotificationPayload, editions: Set[Edition] = Set.empty): Option[AndroidMessagePayload] = condOpt(np) {
     case ga: GoalAlertPayload => buildGoalAlert(ga)
     case ca: ContentAlertPayload => buildContentAlert(ca)
     case bn: BreakingNewsPayload => buildBreakingNews(bn, editions)
