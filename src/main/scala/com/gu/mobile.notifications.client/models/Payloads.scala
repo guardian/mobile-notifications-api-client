@@ -78,6 +78,7 @@ object NotificationPayload {
       case n: BreakingNewsPayload => BreakingNewsPayload.jf.writes(n)
       case n: ContentAlertPayload => ContentAlertPayload.jf.writes(n)
       case n: GoalAlertPayload => GoalAlertPayload.jf.writes(n)
+      case n: FootballMatchStatusPayload => FootballMatchStatusPayload.jf.writes(n)
     }
   }
 }
@@ -167,6 +168,32 @@ case class GoalAlertPayload(
   override val derivedId = s"goalAlert/${matchId}/${homeTeamScore}-${awayTeamScore}/${goalMins}"
 }
 
+object FootballMatchStatusPayload {
+  implicit val jf = new Writes[FootballMatchStatusPayload] {
+    override def writes(o: FootballMatchStatusPayload) = (Json.writes[FootballMatchStatusPayload] withAdditionalStringFields Map("type" -> FootballMatchStatusPayload.toString, "id" -> o.id)).writes(o)
+  }
+}
+case class FootballMatchStatusPayload(
+  title: String,
+  message: String,
+  thumbnailUrl: Option[URI] = None,
+  sender: String,
+  awayTeamName: String,
+  awayTeamScore: Int,
+  awayTeamMessage: String,
+  homeTeamName: String,
+  homeTeamScore: Int,
+  homeTeamMessage: String,
+  matchId: String,
+  mapiUrl: URI,
+  importance: Importance,
+  topic: Set[Topic],
+  eventId: String,
+  debug: Boolean
+) extends NotificationPayload with derivedId {
+  val `type` = GoalAlert
+  override val derivedId = s"football-match-status/$matchId/$homeTeamScore-$awayTeamScore/$eventId"
+}
 trait derivedId {
   val derivedId: String
   lazy val id = UUID.nameUUIDFromBytes(derivedId.getBytes).toString
