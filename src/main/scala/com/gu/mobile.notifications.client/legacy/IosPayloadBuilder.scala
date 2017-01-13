@@ -6,10 +6,11 @@ import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy.IOSMessagePayload
 import com.gu.mobile.notifications.client.models.legacy.{IosKeys => keys}
 import com.gu.mobile.notifications.client.models.legacy.IosMessageTypes._
+import PartialFunction.condOpt
 
 object IosPayloadBuilder extends PlatformPayloadBuilder {
 
-  def build(payload: NotificationPayload) = payload match {
+  def build(payload: NotificationPayload): Option[IOSMessagePayload] = condOpt(payload) {
     case ga: GoalAlertPayload => buildGoalAlert(ga)
     case bn: BreakingNewsPayload => buildBreakingNews(bn)
     case cn: ContentAlertPayload => buildContentAlert(cn)

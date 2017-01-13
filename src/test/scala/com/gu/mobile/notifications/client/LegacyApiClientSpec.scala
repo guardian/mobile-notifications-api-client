@@ -48,7 +48,7 @@ class LegacyApiClientSpec extends ApiClientSpec[LegacyApiClient] {
   val expectedPostUrl = s"$host/notifications?api-key=$apiKey"
 
   val fakeNotificationBuilder = mock[NotificationBuilder]
-  fakeNotificationBuilder.buildNotification(payload) returns notification
+  fakeNotificationBuilder.buildNotification(payload) returns Some(notification)
 
   override def getTestApiClient(httpProvider: HttpProvider) = new LegacyApiClient(
     apiKey = apiKey,
