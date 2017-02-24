@@ -181,13 +181,18 @@ case class FootballMatchStatusPayload(
   awayTeamName: String,
   awayTeamScore: Int,
   awayTeamMessage: String,
+  awayTeamId: String,
   homeTeamName: String,
   homeTeamScore: Int,
   homeTeamMessage: String,
+  homeTeamId: String,
+  competitionName: Option[String],
+  venue: Option[String],
   matchId: String,
   mapiUrl: URI,
   importance: Importance,
   topic: Set[Topic],
+  phase: String,
   eventId: String,
   debug: Boolean
 ) extends NotificationPayload with derivedId {
