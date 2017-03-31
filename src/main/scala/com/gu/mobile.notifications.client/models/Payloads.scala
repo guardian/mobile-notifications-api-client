@@ -170,7 +170,7 @@ case class GoalAlertPayload(
 
 object FootballMatchStatusPayload {
   implicit val jf = new Writes[FootballMatchStatusPayload] {
-    override def writes(o: FootballMatchStatusPayload) = (Json.writes[FootballMatchStatusPayload] withAdditionalStringFields Map("type" -> FootballMatchStatusPayload.toString, "id" -> o.id)).writes(o)
+    override def writes(o: FootballMatchStatusPayload) = (Json.writes[FootballMatchStatusPayload] withAdditionalStringFields Map("type" -> FootballMatchStatus.toString, "id" -> o.id)).writes(o)
   }
 }
 case class FootballMatchStatusPayload(
@@ -196,7 +196,7 @@ case class FootballMatchStatusPayload(
   eventId: String,
   debug: Boolean
 ) extends NotificationPayload with derivedId {
-  val `type` = GoalAlert
+  val `type` = FootballMatchStatus
   override val derivedId = s"football-match-status/$matchId/$homeTeamScore-$awayTeamScore/$eventId"
 }
 trait derivedId {
