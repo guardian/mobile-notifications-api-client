@@ -192,7 +192,7 @@ case class FootballMatchStatusPayload(
   mapiUrl: URI,
   importance: Importance,
   topic: Set[Topic],
-  phase: String,
+  matchStatus: String,
   eventId: String,
   debug: Boolean
 ) extends NotificationPayload with derivedId {
