@@ -169,8 +169,35 @@ case class GoalAlertPayload(
 }
 
 object FootballMatchStatusPayload {
-  implicit val jf = new Writes[FootballMatchStatusPayload] {
-    override def writes(o: FootballMatchStatusPayload) = (Json.writes[FootballMatchStatusPayload] withAdditionalStringFields Map("type" -> FootballMatchStatus.toString, "id" -> o.id)).writes(o)
+  // this has to be defined has I have reached the 22 fields limit
+  val defaultWriter = new Writes[FootballMatchStatusPayload] {
+    override def writes(o: FootballMatchStatusPayload): JsValue = Json.obj(
+      "title" -> o.title,
+      "message" -> o.message,
+      "thumbnailUrl" -> o.thumbnailUrl,
+      "sender" -> o.sender,
+      "awayTeamName" -> o.awayTeamName,
+      "awayTeamScore" -> o.awayTeamScore,
+      "awayTeamMessage" -> o.awayTeamMessage,
+      "awayTeamId" -> o.awayTeamId,
+      "homeTeamName" -> o.homeTeamName,
+      "homeTeamScore" -> o.homeTeamScore,
+      "homeTeamMessage" -> o.homeTeamMessage,
+      "homeTeamId" -> o.homeTeamId,
+      "competitionName" -> o.competitionName,
+      "venue" -> o.venue,
+      "matchId" -> o.matchId,
+      "mapiUrl" -> o.mapiUrl,
+      "importance" -> o.importance,
+      "topic" -> o.topic,
+      "matchStatus" -> o.matchStatus,
+      "eventId" -> o.eventId,
+      "sound" -> o.sound,
+      "debug" -> o.debug
+    )
+  }
+  implicit val jf: Writes[FootballMatchStatusPayload] = new Writes[FootballMatchStatusPayload] {
+    override def writes(o: FootballMatchStatusPayload) = (defaultWriter withAdditionalStringFields Map("type" -> FootballMatchStatus.toString, "id" -> o.id)).writes(o)
   }
 }
 case class FootballMatchStatusPayload(
@@ -194,6 +221,7 @@ case class FootballMatchStatusPayload(
   topic: Set[Topic],
   matchStatus: String,
   eventId: String,
+  sound: Boolean,
   debug: Boolean
 ) extends NotificationPayload with derivedId {
   val `type` = FootballMatchStatus
