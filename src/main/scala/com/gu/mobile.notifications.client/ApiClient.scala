@@ -78,5 +78,7 @@ object ApiClient {
     new CompositeApiClient(List(legacy, client))
   }
 
+  def apply(host: String, apiKey: String, httpProvider: HttpProvider) = new NextGenApiClient(host, apiKey, httpProvider)
+
 }
 
