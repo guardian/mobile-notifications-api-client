@@ -23,7 +23,7 @@ protected class NextGenApiClient(val host: String,
 
       val json = Json.stringify(Json.toJson(notificationPayload))
       postJson(url, json) map {
-        case error: HttpError => Left(ApiHttpError(error.status))
+        case error: HttpError => Left(ApiHttpError(error.status, Some(error.body)))
         case HttpOk(201, body) => validateFormat[NextGenResponse](body)
         case HttpOk(code, body) => Left(UnexpectedApiResponseError(s"Server returned status code $code and body:$body"))
       } recover {

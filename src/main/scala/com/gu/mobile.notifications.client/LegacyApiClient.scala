@@ -15,14 +15,16 @@ protected class LegacyApiClient(val host: String,
   private val url = s"$host/notifications?api-key=$apiKey"
 
   override def send(notificationPayload: NotificationPayload)(implicit ec: ExecutionContext): Future[Either[ApiClientError, Unit]] = {
-    val legacyNotification = notificationBuilder.buildNotification(notificationPayload)
-
-    val json = Json.stringify(Json.toJson(legacyNotification))
-    postJson(url, json) map {
-      case HttpOk(code, body) => validateFormat[SendNotificationReply](body)
-      case error: HttpError => Left(ApiHttpError(error.status))
-    } recover {
-      case e: Exception => Left(HttpProviderError(e))
+    notificationBuilder.buildNotification(notificationPayload) map { legacyNotification =>
+      val json = Json.stringify(Json.toJson(legacyNotification))
+      postJson(url, json) map {
+        case HttpOk(code, body) => validateFormat[SendNotificationReply](body)
+        case error: HttpError => Left(ApiHttpError(error.status))
+      } recover {
+        case e: Exception => Left(HttpProviderError(e))
+      }
+    } getOrElse {
+      Future.successful(Right(()))
     }
 
   }

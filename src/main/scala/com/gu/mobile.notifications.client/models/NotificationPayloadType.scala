@@ -18,6 +18,10 @@ object NotificationPayloadType {
     override def toString = "goal"
   }
 
+  case object FootballMatchStatus extends NotificationPayloadType {
+    override def toString = "football-match-status"
+  }
+
   implicit val jf = new Writes[NotificationPayloadType] {
     override def writes(nType: NotificationPayloadType): JsValue = JsString(nType.toString)
   }

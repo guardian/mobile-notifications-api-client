@@ -1,6 +1,5 @@
 package com.gu.mobile.notifications.client.legacy
 
-import java.util.UUID
 import java.util.concurrent.TimeUnit.MINUTES
 
 import com.gu.mobile.notifications.client.models.Editions.Edition
@@ -8,14 +7,15 @@ import com.gu.mobile.notifications.client.models._
 import com.gu.mobile.notifications.client.models.legacy._
 
 import scala.concurrent.duration.Duration
+import PartialFunction.condOpt
 
 trait NotificationBuilder {
-  def buildNotification(notification: NotificationPayload): Notification
+  def buildNotification(notification: NotificationPayload): Option[Notification]
 }
 
 object NotificationBuilderImpl extends NotificationBuilder {
 
-  def buildNotification(notification: NotificationPayload) = notification match {
+  def buildNotification(notification: NotificationPayload): Option[Notification] = condOpt(notification) {
     case bnp: BreakingNewsPayload => buildBreakingNewsAlert(bnp)
     case cap: ContentAlertPayload => buildContentAlert(cap)
     case gap: GoalAlertPayload => buildGoalAlert(gap)
@@ -78,8 +78,8 @@ object NotificationBuilderImpl extends NotificationBuilder {
   }
 
   private def buildPlatFormPayloads(notification: NotificationPayload, editions: Set[Edition] = Set.empty) = MessagePayloads(
-    ios = Some(IosPayloadBuilder.build(notification)),
-    android = Some(AndroidPayloadBuilder.build(notification, editions))
+    ios = IosPayloadBuilder.build(notification),
+    android = AndroidPayloadBuilder.build(notification, editions)
   )
 
 }

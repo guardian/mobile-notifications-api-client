@@ -21,8 +21,11 @@ case class PartialApiError(errors: List[ErrorWithSource]) extends CompositeApiEr
 
 case class TotalApiError(errors: List[ErrorWithSource]) extends CompositeApiError
 
-case class ApiHttpError(status: Int) extends ApiClientError {
-  val description = s"Http error status $status"
+case class ApiHttpError(status: Int, body: Option[String] = None ) extends ApiClientError {
+  val description = body match {
+    case Some(b) => s"Http error: status: $status body: $b "
+    case _ => s"Http error: status: $status"
+  }
 }
 
 case class HttpProviderError(throwable: Throwable) extends ApiClientError {
@@ -77,6 +80,8 @@ object ApiClient {
     val legacy = new LegacyApiClient(host = legacyHost, apiKey = legacyApiKey, httpProvider = httpProvider)
     new CompositeApiClient(List(legacy, client))
   }
+
+  def apply(host: String, apiKey: String, httpProvider: HttpProvider) = new NextGenApiClient(host, apiKey, httpProvider)
 
 }
 
