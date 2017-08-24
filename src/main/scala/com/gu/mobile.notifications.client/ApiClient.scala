@@ -75,13 +75,7 @@ protected trait SimpleHttpApiClient extends ApiClient {
 }
 
 object ApiClient {
-  def apply(host: String, apiKey: String, httpProvider: HttpProvider, legacyHost: String, legacyApiKey: String): ApiClient = {
-    val client = new NextGenApiClient(host = host, apiKey = apiKey, httpProvider = httpProvider)
-    val legacy = new LegacyApiClient(host = legacyHost, apiKey = legacyApiKey, httpProvider = httpProvider)
-    new CompositeApiClient(List(legacy, client))
-  }
-
-  def apply(host: String, apiKey: String, httpProvider: HttpProvider) = new NextGenApiClient(host, apiKey, httpProvider)
-
+  def apply(host: String, apiKey: String, httpProvider: HttpProvider) =
+    new NextGenApiClient(host, apiKey, httpProvider)
 }
 
