@@ -6,7 +6,7 @@
 Scala client for the Guardian Mobile Notifications API.
 
 ## Integrating with your application
-Add to build.sbt: `libraryDependencies += "com.gu" % "mobile-notifications-client_2.11" % "0.6.0"`
+Add to build.sbt: `libraryDependencies += "com.gu" %% "mobile-notifications-client" % "0.6.0"`
 ## Configure API Client
 ### Implement `HttpProvider` trait methods. 
 This provider will be used by API Client to make an actual calls from your service. Example trait implementation:
