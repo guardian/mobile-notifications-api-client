@@ -73,7 +73,7 @@ If you take a look at `ApiClient.send` method signature, you can spot its return
 def send(notificationPayload: NotificationPayload): Future[Either[ApiClientError, Unit]]
 ```
 
-If you're interesed in root error cause, you can pattern match on Either's `Left` side and errors from `com.gu.mobile.notifications.client.ApiClientError` hierarchy.
+If you're interesed in root error cause, you can pattern match on either's `Left` side and errors from `com.gu.mobile.notifications.client.ApiClientError` hierarchy.
 For instance:
 
 ```scala
