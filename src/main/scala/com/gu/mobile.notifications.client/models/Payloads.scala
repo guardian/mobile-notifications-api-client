@@ -4,7 +4,7 @@ import java.net.URI
 import java.util.UUID
 
 import com.gu.mobile.notifications.client.lib.JsonFormatsHelper._
-import com.gu.mobile.notifications.client.models.Importance.{Importance, Major}
+import com.gu.mobile.notifications.client.models.Importance.Importance
 import play.api.libs.json._
 import NotificationPayloadType._
 sealed case class GuardianItemType(mobileAggregatorPrefix: String)
@@ -170,7 +170,33 @@ case class GoalAlertPayload(
 
 object FootballMatchStatusPayload {
   implicit val jf = new Writes[FootballMatchStatusPayload] {
-    override def writes(o: FootballMatchStatusPayload) = (Json.writes[FootballMatchStatusPayload] withAdditionalStringFields Map("type" -> FootballMatchStatus.toString, "id" -> o.id)).writes(o)
+    // more than 22 fields so I have to define that manually
+    override def writes(o: FootballMatchStatusPayload): JsValue = Json.obj(
+      "id" -> o.id,
+      "type" -> FootballMatchStatus.toString,
+      "title" -> o.title,
+      "message" -> o.message,
+      "thumbnailUrl" -> o.thumbnailUrl,
+      "sender" -> o.sender,
+      "awayTeamName" -> o.awayTeamName,
+      "awayTeamScore" -> o.awayTeamScore,
+      "awayTeamMessage" -> o.awayTeamMessage,
+      "awayTeamId" -> o.awayTeamId,
+      "homeTeamName" -> o.homeTeamName,
+      "homeTeamScore" -> o.homeTeamScore,
+      "homeTeamMessage" -> o.homeTeamMessage,
+      "homeTeamId" -> o.homeTeamId,
+      "competitionName" -> o.competitionName,
+      "venue" -> o.venue,
+      "matchId" -> o.matchId,
+      "matchInfoUri" -> o.matchInfoUri,
+      "articleUri" -> o.articleUri,
+      "importance" -> o.importance,
+      "topic" -> o.topic,
+      "matchStatus" -> o.matchStatus,
+      "eventId" -> o.eventId,
+      "debug" -> o.debug
+    )
   }
 }
 case class FootballMatchStatusPayload(
@@ -189,7 +215,8 @@ case class FootballMatchStatusPayload(
   competitionName: Option[String],
   venue: Option[String],
   matchId: String,
-  mapiUrl: URI,
+  matchInfoUri: URI,
+  articleUri: Option[URI],
   importance: Importance,
   topic: Set[Topic],
   matchStatus: String,
