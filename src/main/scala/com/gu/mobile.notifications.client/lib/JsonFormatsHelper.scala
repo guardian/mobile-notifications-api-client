@@ -10,9 +10,8 @@ import scala.util.Try
 
 object JsonFormatsHelper {
   implicit class RichJsObject(obj: JsObject) {
-    /* JsObject is actually ordered: this allows you to prepend key value pairs */
     def +:(kv: (String, JsValue)): JsObject = obj match {
-      case JsObject(entries) => JsObject(kv +: entries)
+      case JsObject(entries) => JsObject(entries + kv)
     }
     def ++:(kv: Map[String, JsValue]): JsObject = obj match {
       case JsObject(entries) => JsObject(kv ++: entries)

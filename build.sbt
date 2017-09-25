@@ -17,7 +17,7 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play-json" % "2.3.2",
+  "com.typesafe.play" %% "play-json" % "2.4.6",
   "org.specs2" %% "specs2" % "2.3.13" % "test"
 )
 
