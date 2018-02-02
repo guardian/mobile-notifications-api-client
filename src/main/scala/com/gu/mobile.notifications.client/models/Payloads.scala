@@ -224,7 +224,7 @@ case class FootballMatchStatusPayload(
   debug: Boolean
 ) extends NotificationPayload with derivedId {
   val `type` = FootballMatchStatus
-  override val derivedId = s"football-match-status/$matchId/$homeTeamScore-$awayTeamScore/$eventId"
+  override val derivedId = s"football-match-status/$matchId/$eventId"
 }
 trait derivedId {
   val derivedId: String
