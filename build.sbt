@@ -5,9 +5,9 @@ name := "mobile-notifications-client"
 
 organization := "com.gu"
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.12"
 
-crossScalaVersions := Seq("2.10.4", "2.11.2")
+crossScalaVersions := Seq("2.11.12", "2.12.4")
 
 releaseCrossBuild := true
 
@@ -17,8 +17,8 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play-json" % "2.4.6",
-  "org.specs2" %% "specs2" % "2.3.13" % "test"
+  "com.typesafe.play" %% "play-json" % "2.6.8",
+  "org.specs2" %% "specs2" % "3.7" % "test"
 )
 
 description := "Scala client for the Guardian Push Notifications API"
