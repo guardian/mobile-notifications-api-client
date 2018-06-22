@@ -14,10 +14,6 @@ object NotificationPayloadType {
     override def toString = "content"
   }
 
-  case object GoalAlert extends NotificationPayloadType {
-    override def toString = "goal"
-  }
-
   case object FootballMatchStatus extends NotificationPayloadType {
     override def toString = "football-match-status"
   }

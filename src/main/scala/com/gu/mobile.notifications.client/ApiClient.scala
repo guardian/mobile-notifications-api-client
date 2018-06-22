@@ -9,18 +9,6 @@ sealed trait ApiClientError {
   def description: String
 }
 
-case class ErrorWithSource(clientId: String, error: ApiClientError) {
-  def description = clientId + ": " + error.description
-}
-
-trait CompositeApiError extends ApiClientError {
-  def errors: List[ErrorWithSource]
-  def description = errors.map(_.description).mkString(", ")
-}
-case class PartialApiError(errors: List[ErrorWithSource]) extends CompositeApiError
-
-case class TotalApiError(errors: List[ErrorWithSource]) extends CompositeApiError
-
 case class ApiHttpError(status: Int, body: Option[String] = None ) extends ApiClientError {
   val description = body match {
     case Some(b) => s"Http error: status: $status body: $b "

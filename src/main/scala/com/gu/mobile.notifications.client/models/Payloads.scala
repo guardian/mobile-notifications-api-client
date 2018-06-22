@@ -77,7 +77,6 @@ object NotificationPayload {
     override def writes(o: NotificationPayload): JsValue = o match {
       case n: BreakingNewsPayload => BreakingNewsPayload.jf.writes(n)
       case n: ContentAlertPayload => ContentAlertPayload.jf.writes(n)
-      case n: GoalAlertPayload => GoalAlertPayload.jf.writes(n)
       case n: FootballMatchStatusPayload => FootballMatchStatusPayload.jf.writes(n)
     }
   }
@@ -136,36 +135,6 @@ case class ContentAlertPayload(
       case (None, _) => UUID.randomUUID.toString
     }
   }
-}
-
-object GoalAlertPayload {
-  implicit val jf = new Writes[GoalAlertPayload] {
-    override def writes(o: GoalAlertPayload) = (Json.writes[GoalAlertPayload] withAdditionalStringFields Map("type" -> GoalAlert.toString, "id" -> o.id)).writes(o)
-  }
-}
-case class GoalAlertPayload(
-  title: String,
-  message: String,
-  thumbnailUrl: Option[URI] = None,
-  sender: String,
-  goalType: GoalType,
-  awayTeamName: String,
-  awayTeamScore: Int,
-  homeTeamName: String,
-  homeTeamScore: Int,
-  scoringTeamName: String,
-  scorerName: String,
-  goalMins: Int,
-  otherTeamName: String,
-  matchId: String,
-  mapiUrl: URI,
-  importance: Importance,
-  topic: Set[Topic],
-  debug: Boolean,
-  addedTime: Option[String]
-) extends NotificationPayload with derivedId {
-  val `type` = GoalAlert
-  override val derivedId = s"goalAlert/${matchId}/${homeTeamScore}-${awayTeamScore}/${goalMins}"
 }
 
 object FootballMatchStatusPayload {

@@ -95,50 +95,6 @@ class PayloadsSpec extends Specification {
       verifySerialization(payload, expectedJson)
     }
 
-    "define derived id for goal alert" in new GoalAlertScope {
-      payload.derivedId mustEqual ("goalAlert/3833380/2-1/41")
-    }
-
-    "define seriazable Goal Alert Payload" in new GoalAlertScope {
-
-      val expectedJson =
-       """
-         |{
-         |  "id" : "c0ddcd4b-c1f4-3933-a031-7e02b1134e2f",
-         |  "title" : "The Guardian",
-         |  "type" : "goal",
-         |  "message" : "Leicester 2-1 Watford\nDeeney 75min",
-         |  "thumbnailUrl":"http://url.net",
-         |  "sender" : "someSender",
-         |  "goalType" : "Penalty",
-         |  "awayTeamName" : "someAwayTeam",
-         |  "awayTeamScore" : 1,
-         |  "homeTeamName" : "someHomeTeam",
-         |  "homeTeamScore" : 2,
-         |  "scoringTeamName" : "someScoringTeamName",
-         |  "scorerName" : "someFootballersName",
-         |  "goalMins" : 41,
-         |  "otherTeamName" : "someOtherTeamName",
-         |  "matchId" : "3833380",
-         |  "mapiUrl" : "http://football.mobile-apps.guardianapis.com/match-info/3833380",
-         |  "importance" : "Major",
-         |  "topic" : [ {
-         |    "type" : "football-team",
-         |    "name" : "29"
-         |  }, {
-         |    "type" : "football-team",
-         |    "name" : "41"
-         |  }, {
-         |    "type" : "football-match",
-         |    "name" : "3833380"
-         |  } ],
-         |  "debug":true,
-         |  "addedTime":"someAddedTime"
-         |}
-       """.stripMargin
-      verifySerialization(payload, expectedJson)
-
-    }
     "define seriazable goal types" in {
       def verifySerialization(gType: GoalType, expectedJson: String) = Json.toJson(gType) shouldEqual Json.parse(expectedJson)
       verifySerialization(OwnGoalType, "\"Own\"")
@@ -166,32 +122,7 @@ class PayloadsSpec extends Specification {
     }
   }
 }
-trait GoalAlertScope extends Scope {
-  val payload = GoalAlertPayload(
-    title = "The Guardian",
-    message = "Leicester 2-1 Watford\nDeeney 75min",
-    thumbnailUrl = Some(new URI("http://url.net")),
-    sender = "someSender",
-    goalType = PenaltyGoalType,
-    awayTeamName = "someAwayTeam",
-    awayTeamScore = 1,
-    homeTeamName = "someHomeTeam",
-    homeTeamScore = 2,
-    scoringTeamName = "someScoringTeamName",
-    scorerName = "someFootballersName",
-    goalMins = 41,
-    otherTeamName = "someOtherTeamName",
-    matchId = "3833380",
-    mapiUrl = new URI("http://football.mobile-apps.guardianapis.com/match-info/3833380"),
-    importance = Importance.Major,
-    topic = Set(
-      Topic(FootballTeam, "29"),
-      Topic(FootballTeam, "41"),
-      Topic(FootballMatch, "3833380")
-    ),
-    debug = true,
-    addedTime = Some("someAddedTime"))
-}
+
 trait ContentAlertScope extends Scope {
 
   val internalLink = GuardianLinkDetails(
