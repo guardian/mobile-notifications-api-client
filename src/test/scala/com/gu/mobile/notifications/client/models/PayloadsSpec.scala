@@ -26,7 +26,7 @@ class PayloadsSpec extends Specification {
         thumbnailUrl = Some(new URI("http://media.guim.co.uk/09951387fda453719fe1fee3e5dcea4efa05e4fa/0_181_3596_2160/140.jpg")),
         link = ExternalLink("http://mylink"),
         importance = Importance.Major,
-        topic = Set(BreakingNewsUk),
+        topic = List(BreakingNewsUk),
         debug = true
       )
       val expectedJson =
@@ -139,7 +139,7 @@ trait ContentAlertScope extends Scope {
     sender = "test",
     link = internalLink,
     importance = Importance.Minor,
-    topic = Set(Topic(TagSeries, "environment/series/keep-it-in-the-ground"), Topic(Breaking, "n2")),
+    topic = List(Topic(TagSeries, "environment/series/keep-it-in-the-ground"), Topic(Breaking, "n2")),
     debug = false)
 
 }

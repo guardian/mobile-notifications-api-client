@@ -19,7 +19,7 @@ class NextGenApiClientSpec(implicit ee: ExecutionEnv) extends ApiClientSpec[Next
     thumbnailUrl = None,
     link = ExternalLink("http://mylink"),
     importance = Importance.Major,
-    topic = Set(Topic(Breaking, "n1"), Topic(FootballMatch, "n2")),
+    topic = List(Topic(Breaking, "n1"), Topic(FootballMatch, "n2")),
     debug = true
   )
 

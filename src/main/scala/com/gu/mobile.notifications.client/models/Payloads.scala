@@ -68,7 +68,7 @@ sealed trait NotificationPayload {
   def thumbnailUrl: Option[URI]
   def sender: String
   def importance: Importance
-  def topic: Set[Topic]
+  def topic: List[Topic]
   def debug: Boolean
 }
 
@@ -95,7 +95,7 @@ case class BreakingNewsPayload(
   link: Link,
   imageUrl: Option[URI],
   importance: Importance,
-  topic: Set[Topic],
+  topic: List[Topic],
   debug: Boolean
 ) extends NotificationWithLink {
   val `type` = BreakingNews
@@ -115,7 +115,7 @@ case class ContentAlertPayload(
   link: Link,
   imageUrl: Option[URI] = None,
   importance: Importance,
-  topic: Set[Topic],
+  topic: List[Topic],
   debug: Boolean
 ) extends NotificationWithLink with derivedId {
   val `type` = ContentAlert
@@ -187,7 +187,7 @@ case class FootballMatchStatusPayload(
   matchInfoUri: URI,
   articleUri: Option[URI],
   importance: Importance,
-  topic: Set[Topic],
+  topic: List[Topic],
   matchStatus: String,
   eventId: String,
   debug: Boolean
