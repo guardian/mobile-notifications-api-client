@@ -61,7 +61,7 @@ object GoalType {
 }
 
 sealed trait NotificationPayload {
-  def id: String
+  def id: UUID
   def title: String
   def `type`: NotificationPayloadType
   def message: String
@@ -87,7 +87,7 @@ sealed trait NotificationWithLink extends NotificationPayload {
 
 object BreakingNewsPayload { val jf = Json.writes[BreakingNewsPayload] withTypeString BreakingNews.toString }
 case class BreakingNewsPayload(
-  id: String = UUID.randomUUID.toString,
+  id: UUID = UUID.randomUUID,
   title: String = "The Guardian",
   message: String,
   thumbnailUrl: Option[URI],
@@ -103,7 +103,7 @@ case class BreakingNewsPayload(
 
 object ContentAlertPayload {
   implicit val jf = new Writes[ContentAlertPayload] {
-    override def writes(o: ContentAlertPayload) = (Json.writes[ContentAlertPayload] withAdditionalStringFields Map("type" -> ContentAlert.toString, "id" -> o.id)).writes(o)
+    override def writes(o: ContentAlertPayload) = (Json.writes[ContentAlertPayload] withAdditionalStringFields Map("type" -> ContentAlert.toString, "id" -> o.id.toString)).writes(o)
   }
 }
 
@@ -197,5 +197,5 @@ case class FootballMatchStatusPayload(
 }
 trait derivedId {
   val derivedId: String
-  lazy val id = UUID.nameUUIDFromBytes(derivedId.getBytes).toString
+  lazy val id = UUID.nameUUIDFromBytes(derivedId.getBytes)
 }

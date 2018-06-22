@@ -1,6 +1,7 @@
 package com.gu.mobile.notifications.client.models
 
 import java.net.URI
+import java.util.UUID
 
 import com.gu.mobile.notifications.client.models.TopicTypes._
 import com.gu.mobile.notifications.client.models.Topic._
@@ -18,7 +19,7 @@ class PayloadsSpec extends Specification {
     "define serializable Breaking News payload" in {
 
       val payload = BreakingNewsPayload(
-        id = "30aac5f5-34bb-4a88-8b69-97f995a4907b",
+        id = UUID.fromString("30aac5f5-34bb-4a88-8b69-97f995a4907b"),
         title = "The Guardian",
         message = "Mali hotel attack: UN counts 27 bodies as hostage situation ends",
         sender = "test",
