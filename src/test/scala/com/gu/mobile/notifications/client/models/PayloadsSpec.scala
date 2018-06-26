@@ -1,6 +1,7 @@
 package com.gu.mobile.notifications.client.models
 
 import java.net.URI
+import java.util.UUID
 
 import com.gu.mobile.notifications.client.models.TopicTypes._
 import com.gu.mobile.notifications.client.models.Topic._
@@ -18,7 +19,7 @@ class PayloadsSpec extends Specification {
     "define serializable Breaking News payload" in {
 
       val payload = BreakingNewsPayload(
-        id = "30aac5f5-34bb-4a88-8b69-97f995a4907b",
+        id = UUID.fromString("30aac5f5-34bb-4a88-8b69-97f995a4907b"),
         title = "The Guardian",
         message = "Mali hotel attack: UN counts 27 bodies as hostage situation ends",
         sender = "test",
@@ -26,7 +27,7 @@ class PayloadsSpec extends Specification {
         thumbnailUrl = Some(new URI("http://media.guim.co.uk/09951387fda453719fe1fee3e5dcea4efa05e4fa/0_181_3596_2160/140.jpg")),
         link = ExternalLink("http://mylink"),
         importance = Importance.Major,
-        topic = Set(BreakingNewsUk),
+        topic = List(BreakingNewsUk),
         debug = true
       )
       val expectedJson =
@@ -95,50 +96,6 @@ class PayloadsSpec extends Specification {
       verifySerialization(payload, expectedJson)
     }
 
-    "define derived id for goal alert" in new GoalAlertScope {
-      payload.derivedId mustEqual ("goalAlert/3833380/2-1/41")
-    }
-
-    "define seriazable Goal Alert Payload" in new GoalAlertScope {
-
-      val expectedJson =
-       """
-         |{
-         |  "id" : "c0ddcd4b-c1f4-3933-a031-7e02b1134e2f",
-         |  "title" : "The Guardian",
-         |  "type" : "goal",
-         |  "message" : "Leicester 2-1 Watford\nDeeney 75min",
-         |  "thumbnailUrl":"http://url.net",
-         |  "sender" : "someSender",
-         |  "goalType" : "Penalty",
-         |  "awayTeamName" : "someAwayTeam",
-         |  "awayTeamScore" : 1,
-         |  "homeTeamName" : "someHomeTeam",
-         |  "homeTeamScore" : 2,
-         |  "scoringTeamName" : "someScoringTeamName",
-         |  "scorerName" : "someFootballersName",
-         |  "goalMins" : 41,
-         |  "otherTeamName" : "someOtherTeamName",
-         |  "matchId" : "3833380",
-         |  "mapiUrl" : "http://football.mobile-apps.guardianapis.com/match-info/3833380",
-         |  "importance" : "Major",
-         |  "topic" : [ {
-         |    "type" : "football-team",
-         |    "name" : "29"
-         |  }, {
-         |    "type" : "football-team",
-         |    "name" : "41"
-         |  }, {
-         |    "type" : "football-match",
-         |    "name" : "3833380"
-         |  } ],
-         |  "debug":true,
-         |  "addedTime":"someAddedTime"
-         |}
-       """.stripMargin
-      verifySerialization(payload, expectedJson)
-
-    }
     "define seriazable goal types" in {
       def verifySerialization(gType: GoalType, expectedJson: String) = Json.toJson(gType) shouldEqual Json.parse(expectedJson)
       verifySerialization(OwnGoalType, "\"Own\"")
@@ -166,32 +123,7 @@ class PayloadsSpec extends Specification {
     }
   }
 }
-trait GoalAlertScope extends Scope {
-  val payload = GoalAlertPayload(
-    title = "The Guardian",
-    message = "Leicester 2-1 Watford\nDeeney 75min",
-    thumbnailUrl = Some(new URI("http://url.net")),
-    sender = "someSender",
-    goalType = PenaltyGoalType,
-    awayTeamName = "someAwayTeam",
-    awayTeamScore = 1,
-    homeTeamName = "someHomeTeam",
-    homeTeamScore = 2,
-    scoringTeamName = "someScoringTeamName",
-    scorerName = "someFootballersName",
-    goalMins = 41,
-    otherTeamName = "someOtherTeamName",
-    matchId = "3833380",
-    mapiUrl = new URI("http://football.mobile-apps.guardianapis.com/match-info/3833380"),
-    importance = Importance.Major,
-    topic = Set(
-      Topic(FootballTeam, "29"),
-      Topic(FootballTeam, "41"),
-      Topic(FootballMatch, "3833380")
-    ),
-    debug = true,
-    addedTime = Some("someAddedTime"))
-}
+
 trait ContentAlertScope extends Scope {
 
   val internalLink = GuardianLinkDetails(
@@ -208,7 +140,7 @@ trait ContentAlertScope extends Scope {
     sender = "test",
     link = internalLink,
     importance = Importance.Minor,
-    topic = Set(Topic(TagSeries, "environment/series/keep-it-in-the-ground"), Topic(Breaking, "n2")),
+    topic = List(Topic(TagSeries, "environment/series/keep-it-in-the-ground"), Topic(Breaking, "n2")),
     debug = false)
 
 }

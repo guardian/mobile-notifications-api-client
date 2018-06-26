@@ -4,7 +4,9 @@ import com.gu.mobile.notifications.client.models.TopicTypes._
 import com.gu.mobile.notifications.client.models._
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.execute.Result
+import org.specs2.mock.mockito.ArgumentCapture
 import play.api.libs.json.Json
+import scala.collection.JavaConverters._
 
 import scala.concurrent.Future
 
@@ -19,7 +21,7 @@ class NextGenApiClientSpec(implicit ee: ExecutionEnv) extends ApiClientSpec[Next
     thumbnailUrl = None,
     link = ExternalLink("http://mylink"),
     importance = Importance.Major,
-    topic = Set(Topic(Breaking, "n1"), Topic(FootballMatch, "n2")),
+    topic = List(Topic(Breaking, "n1")),
     debug = true
   )
 
@@ -39,6 +41,28 @@ class NextGenApiClientSpec(implicit ee: ExecutionEnv) extends ApiClientSpec[Next
   "NextGenApiClient" should {
     "successfully send payload" in apiTest {
       client => client.send(payload) must beRight.await
+    }
+    "successfully send multiple HTTP calls for breaking news with more than one tag" in {
+      val payLoadMultipleTopics = payload.copy(topic = List(Topic(Breaking, "n1"), Topic(Breaking, "n2")))
+
+      val fakeHttpProvider = mock[HttpProvider]
+      fakeHttpProvider.post(anyString, any[ContentType], any[Array[Byte]]) returns Future.successful(HttpOk(201, """{"id":"someId"}"""))
+
+      val testApiClient = getTestApiClient(fakeHttpProvider)
+      testApiClient.send(payLoadMultipleTopics)
+
+      val bodyCapture = new ArgumentCapture[Array[Byte]]
+      val urlCapture = new ArgumentCapture[String]
+      val contentTypeCapture = new ArgumentCapture[ContentType]
+
+      there was two(fakeHttpProvider).post(urlCapture, contentTypeCapture, bodyCapture)
+      urlCapture.value mustEqual expectedPostUrl
+      contentTypeCapture.value mustEqual ContentType("application/json", "UTF-8")
+      val ids = bodyCapture.values
+        .asScala.toList
+        .map(Json.parse)
+        .map(_ \ "id")
+      ids(0) mustNotEqual ids(1)
     }
     "return HttpApiError error if http provider returns ApiHttpError" in apiTest(serverResponse = HttpError(500, "")) {
       client => client.send(payload) must beEqualTo(Left(ApiHttpError(status = 500, Some("")))).await

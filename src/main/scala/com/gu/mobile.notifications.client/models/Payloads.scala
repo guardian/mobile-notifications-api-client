@@ -61,14 +61,14 @@ object GoalType {
 }
 
 sealed trait NotificationPayload {
-  def id: String
+  def id: UUID
   def title: String
   def `type`: NotificationPayloadType
   def message: String
   def thumbnailUrl: Option[URI]
   def sender: String
   def importance: Importance
-  def topic: Set[Topic]
+  def topic: List[Topic]
   def debug: Boolean
 }
 
@@ -77,7 +77,6 @@ object NotificationPayload {
     override def writes(o: NotificationPayload): JsValue = o match {
       case n: BreakingNewsPayload => BreakingNewsPayload.jf.writes(n)
       case n: ContentAlertPayload => ContentAlertPayload.jf.writes(n)
-      case n: GoalAlertPayload => GoalAlertPayload.jf.writes(n)
       case n: FootballMatchStatusPayload => FootballMatchStatusPayload.jf.writes(n)
     }
   }
@@ -88,7 +87,7 @@ sealed trait NotificationWithLink extends NotificationPayload {
 
 object BreakingNewsPayload { val jf = Json.writes[BreakingNewsPayload] withTypeString BreakingNews.toString }
 case class BreakingNewsPayload(
-  id: String = UUID.randomUUID.toString,
+  id: UUID = UUID.randomUUID,
   title: String = "The Guardian",
   message: String,
   thumbnailUrl: Option[URI],
@@ -96,7 +95,7 @@ case class BreakingNewsPayload(
   link: Link,
   imageUrl: Option[URI],
   importance: Importance,
-  topic: Set[Topic],
+  topic: List[Topic],
   debug: Boolean
 ) extends NotificationWithLink {
   val `type` = BreakingNews
@@ -104,7 +103,7 @@ case class BreakingNewsPayload(
 
 object ContentAlertPayload {
   implicit val jf = new Writes[ContentAlertPayload] {
-    override def writes(o: ContentAlertPayload) = (Json.writes[ContentAlertPayload] withAdditionalStringFields Map("type" -> ContentAlert.toString, "id" -> o.id)).writes(o)
+    override def writes(o: ContentAlertPayload) = (Json.writes[ContentAlertPayload] withAdditionalStringFields Map("type" -> ContentAlert.toString, "id" -> o.id.toString)).writes(o)
   }
 }
 
@@ -116,7 +115,7 @@ case class ContentAlertPayload(
   link: Link,
   imageUrl: Option[URI] = None,
   importance: Importance,
-  topic: Set[Topic],
+  topic: List[Topic],
   debug: Boolean
 ) extends NotificationWithLink with derivedId {
   val `type` = ContentAlert
@@ -136,36 +135,6 @@ case class ContentAlertPayload(
       case (None, _) => UUID.randomUUID.toString
     }
   }
-}
-
-object GoalAlertPayload {
-  implicit val jf = new Writes[GoalAlertPayload] {
-    override def writes(o: GoalAlertPayload) = (Json.writes[GoalAlertPayload] withAdditionalStringFields Map("type" -> GoalAlert.toString, "id" -> o.id)).writes(o)
-  }
-}
-case class GoalAlertPayload(
-  title: String,
-  message: String,
-  thumbnailUrl: Option[URI] = None,
-  sender: String,
-  goalType: GoalType,
-  awayTeamName: String,
-  awayTeamScore: Int,
-  homeTeamName: String,
-  homeTeamScore: Int,
-  scoringTeamName: String,
-  scorerName: String,
-  goalMins: Int,
-  otherTeamName: String,
-  matchId: String,
-  mapiUrl: URI,
-  importance: Importance,
-  topic: Set[Topic],
-  debug: Boolean,
-  addedTime: Option[String]
-) extends NotificationPayload with derivedId {
-  val `type` = GoalAlert
-  override val derivedId = s"goalAlert/${matchId}/${homeTeamScore}-${awayTeamScore}/${goalMins}"
 }
 
 object FootballMatchStatusPayload {
@@ -218,7 +187,7 @@ case class FootballMatchStatusPayload(
   matchInfoUri: URI,
   articleUri: Option[URI],
   importance: Importance,
-  topic: Set[Topic],
+  topic: List[Topic],
   matchStatus: String,
   eventId: String,
   debug: Boolean
@@ -228,5 +197,5 @@ case class FootballMatchStatusPayload(
 }
 trait derivedId {
   val derivedId: String
-  lazy val id = UUID.nameUUIDFromBytes(derivedId.getBytes).toString
+  lazy val id = UUID.nameUUIDFromBytes(derivedId.getBytes)
 }
